@@ -1,0 +1,119 @@
+:root {
+  --footerBg: whitesmoke;
+  --footerTextPrimary: #333;
+  --footerTextSecondary: #666;
+  --footerLink: #2c3e50;
+  --footerLinkHover: #1a242f;
+  --footerBorder: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] {
+  --footerBg: #1e1e1e;
+  --footerTextPrimary: #d8d8d8;
+  --footerTextSecondary: #a0a0a0;
+  --footerLink: #9ecbff;
+  --footerLinkHover: #c0e4ff;
+  --footerBorder: rgba(255, 255, 255, 0.1);
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  min-height: 56px;
+  padding: 6px 12px;
+  z-index: 1000;
+  background-color: var(--footerBg);
+  border-top: 1px solid var(--footerBorder);
+}
+
+.footerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 220px;
+}
+
+.footerMeta {
+  margin: 0;
+  color: var(--footerTextSecondary);
+  font-size: 0.8rem;
+}
+
+.footerMetaLink {
+  color: var(--footerLink);
+  text-decoration: none;
+  font-size: 0.8rem;
+}
+
+.footerMetaLink:hover {
+  color: var(--footerLinkHover);
+  text-decoration: underline;
+}
+
+.footerCenter {
+  flex: 1;
+}
+
+.footerItems {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.footerButton {
+  color: var(--footerLink);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.footerButton:hover {
+  color: var(--footerLinkHover);
+  text-decoration: underline;
+}
+
+.footerRight {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 44px;
+}
+
+.menuToggle {
+  display: none;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.menuToggle span {
+  width: 24px;
+  height: 2px;
+  background-color: var(--footerTextPrimary);
+}
+
+@media (max-width: 768px) {
+  .footerItems {
+    display: none;
+  }
+
+  .menuToggle {
+    display: inline-flex;
+  }
+
+  .footerLeft {
+    min-width: 0;
+  }
+}

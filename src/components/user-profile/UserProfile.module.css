@@ -1,0 +1,36 @@
+.userProfileContainer {
+  position: relative;
+  display: inline-block;
+  margin-right: 12px;
+}
+
+.userProfileAvatar {
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.hasAvatar {
+  background: transparent;
+}
+
+.noAvatar {
+  background-color: var(--fallback-avatar-bg, #ccc);
+}
+
+.userProfileAvatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.userProfileInitials {
+  color: white;
+  font-weight: bold;
+}

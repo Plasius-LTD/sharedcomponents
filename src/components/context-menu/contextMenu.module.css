@@ -1,0 +1,62 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+  background: transparent;
+}
+
+.menu {
+  position: absolute;
+  min-width: 200px;
+  background-color: var(--bg-color, #fff);
+  padding: 8px 0;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-family: sans-serif;
+  z-index: 10001;
+  animation: fadeInMenu 0.2s ease-out;
+  transform-origin: top center;
+}
+
+.menuItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-color, #333);
+  background-color: transparent;
+  border: none;
+  text-align: left;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.menuItem:hover {
+  background-color: var(--hover-color, #f0f0f0);
+}
+
+.menuText {
+  flex-grow: 1;
+}
+
+.shortcut {
+  color: #888;
+  font-size: 0.85em;
+  margin-left: 12px;
+}
+
+@keyframes fadeInMenu {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.8) translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1) translateY(0);
+  }
+}
