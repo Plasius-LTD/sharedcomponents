@@ -9,6 +9,20 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [1.0.1] - 2026-02-12
+
+- **Added**
   - Standalone public package scaffold at repository root with independent CI/CD, ADRs, and legal governance assets.
   - New component tests for header, footer, contact details, context menu, and user profile.
   - ADR-0003 documenting base-package dependency boundaries.
@@ -40,7 +54,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ---
 
-[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/main...HEAD
+[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.0.1...HEAD
 
 ## [1.0.0] - 2026-02-11
 
@@ -55,3 +69,4 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 - **Security**
   - (placeholder)
+[1.0.1]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.1
