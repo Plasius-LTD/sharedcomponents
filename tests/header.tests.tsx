@@ -39,7 +39,7 @@ describe("Header", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Toggle navigation menu" }));
-    fireEvent.click(screen.getByRole("button", { name: "External" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "External" }));
 
     expect(openSpy).toHaveBeenCalledWith(
       "https://example.com",

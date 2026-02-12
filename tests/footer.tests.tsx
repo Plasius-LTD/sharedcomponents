@@ -37,7 +37,7 @@ describe("Footer", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
-    fireEvent.click(screen.getByRole("button", { name: "Docs" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Docs" }));
 
     expect(openSpy).toHaveBeenCalledWith(
       "https://example.com/docs",

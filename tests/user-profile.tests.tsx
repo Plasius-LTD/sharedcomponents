@@ -8,7 +8,7 @@ describe("UserProfile", () => {
     render(<UserProfile onLogin={onLogin} providers={["google"]} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Open user menu" }));
-    fireEvent.click(screen.getByRole("button", { name: "Sign in with Google" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Sign in with Google" }));
 
     expect(onLogin).toHaveBeenCalledWith("google");
   });
@@ -25,9 +25,9 @@ describe("UserProfile", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Open user menu" }));
-    fireEvent.click(screen.getByRole("button", { name: "Settings" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Settings" }));
     fireEvent.click(screen.getByRole("button", { name: "Open user menu" }));
-    fireEvent.click(screen.getByRole("button", { name: "Logout" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Logout" }));
 
     expect(onOpenSettings).toHaveBeenCalledTimes(1);
     expect(onLogout).toHaveBeenCalledTimes(1);

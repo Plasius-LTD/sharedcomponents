@@ -15,7 +15,7 @@ describe("ContextMenu", () => {
       />
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Run" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Run" }));
 
     expect(action).toHaveBeenCalledTimes(1);
     expect(onClose).toHaveBeenCalledTimes(1);
