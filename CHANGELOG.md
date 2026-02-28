@@ -9,6 +9,20 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [1.0.3] - 2026-02-28
+
+- **Added**
   - Added `ContactDetails` `details` data object contract for host-driven content injection.
   - Added shared white-label metadata contracts/helpers (`SharedComponentsMetadataInput`) for cross-component branding injection.
   - Added `SharedComponentsBrandingProvider` and branding metadata hook for single-point white-label configuration.
@@ -75,7 +89,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ---
 
-[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.0.3...HEAD
 
 ## [1.0.0] - 2026-02-11
 
@@ -92,3 +106,4 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - (placeholder)
 [1.0.1]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.1
 [1.0.2]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.2
+[1.0.3]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.3
