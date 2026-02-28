@@ -22,6 +22,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 - **Fixed**
   - Updated contact/footer tests to use generic fake data and removed brand-specific assumptions.
+  - Fixed header/footer/mobile context menu placement so burger popups clamp inside viewport bounds with consistent edge padding and narrow-screen size limits.
 
 - **Security**
   - (placeholder)

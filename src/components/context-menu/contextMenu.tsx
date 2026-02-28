@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import styles from "./contextMenu.module.css";
+import { resolveMenuPosition } from "./positioning.js";
 
 export interface ContextMenuCommand {
   name: string;
@@ -21,7 +22,7 @@ export function ContextMenu({
   id,
 }: ContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
-  const [resolvedPosition, setResolvedPosition] = useState(position);
+  const viewportPadding = 12;
 
   const commandEntries = useMemo(() => commands, [commands]);
 
@@ -37,28 +38,46 @@ export function ContextMenu({
     };
   }, [onClose]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const menu = menuRef.current;
-    if (menu) {
-      const { innerWidth, innerHeight } = window;
-      const rect = menu.getBoundingClientRect();
-      const overflowX = position.x + rect.width > innerWidth;
-      const overflowY = position.y + rect.height > innerHeight;
-
-      const newX = overflowX
-        ? Math.max(position.x - rect.width, 0)
-        : position.x;
-      const newY = overflowY
-        ? Math.max(position.y - rect.height, 0)
-        : position.y;
-
-      setResolvedPosition({ x: newX, y: newY });
+    if (!menu) {
+      return;
     }
-  }, [position]);
 
-  useEffect(() => {
-    setResolvedPosition(position);
-  }, [position]);
+    const applyPosition = () => {
+      const availableWidth = Math.max(0, window.innerWidth - viewportPadding * 2);
+      const availableHeight = Math.max(0, window.innerHeight - viewportPadding * 2);
+
+      menu.style.maxWidth = `${availableWidth}px`;
+      menu.style.maxHeight = `${availableHeight}px`;
+
+      const { x: newX, y: newY } = resolveMenuPosition({
+        position,
+        menuSize: {
+          width: menu.offsetWidth,
+          height: menu.offsetHeight,
+        },
+        viewportSize: {
+          width: window.innerWidth,
+          height: window.innerHeight,
+        },
+        viewportPadding,
+      });
+
+      menu.style.left = `${newX}px`;
+      menu.style.top = `${newY}px`;
+    };
+
+    applyPosition();
+
+    window.addEventListener("resize", applyPosition);
+    window.addEventListener("scroll", applyPosition, true);
+
+    return () => {
+      window.removeEventListener("resize", applyPosition);
+      window.removeEventListener("scroll", applyPosition, true);
+    };
+  }, [commandEntries, position]);
 
   return (
     <div className={styles.overlay}>
@@ -67,7 +86,7 @@ export function ContextMenu({
         className={styles.menu}
         ref={menuRef}
         role="menu"
-        style={{ left: `${resolvedPosition.x}px`, top: `${resolvedPosition.y}px` }}
+        style={{ left: `${position.x}px`, top: `${position.y}px` }}
       >
         {commandEntries.map((cmd: ContextMenuCommand, idx: number) => (
           <button
