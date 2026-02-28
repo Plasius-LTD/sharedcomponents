@@ -1,3 +1,7 @@
+import type { SharedComponentsMetadataInput } from "../../metadata/white-label.js";
+import { toContactDetailsBranding } from "../../metadata/white-label.js";
+import { useSharedComponentsBrandingMetadata } from "../../metadata/provider.js";
+
 export interface ContactDetailsData {
   teamName: string;
   companyName: string;
@@ -9,6 +13,7 @@ export interface ContactDetailsData {
 
 export interface ContactDetailsProps {
   details?: Partial<ContactDetailsData>;
+  metadata?: SharedComponentsMetadataInput;
   teamName?: string;
   companyName?: string;
   addressLines?: string[];
@@ -18,15 +23,6 @@ export interface ContactDetailsProps {
   className?: string;
 }
 
-const defaultDetails: ContactDetailsData = {
-  teamName: "Support Team",
-  companyName: "Example Organization",
-  addressLines: ["123 Example Street", "Sample City", "Sample Region", "00000"],
-  email: "contact@example.com",
-  website: "https://example.com",
-  websiteLabel: "example.com",
-};
-
 function resolveDetails({
   details,
   teamName,
@@ -35,22 +31,30 @@ function resolveDetails({
   email,
   website,
   websiteLabel,
-}: ContactDetailsProps): ContactDetailsData {
+}: ContactDetailsProps): Partial<ContactDetailsData> {
   return {
-    ...defaultDetails,
     ...details,
-    teamName: teamName ?? details?.teamName ?? defaultDetails.teamName,
-    companyName: companyName ?? details?.companyName ?? defaultDetails.companyName,
-    addressLines: addressLines ?? details?.addressLines ?? defaultDetails.addressLines,
-    email: email ?? details?.email ?? defaultDetails.email,
-    website: website ?? details?.website ?? defaultDetails.website,
-    websiteLabel: websiteLabel ?? details?.websiteLabel ?? defaultDetails.websiteLabel,
+    ...(teamName !== undefined ? { teamName } : {}),
+    ...(companyName !== undefined ? { companyName } : {}),
+    ...(addressLines !== undefined ? { addressLines } : {}),
+    ...(email !== undefined ? { email } : {}),
+    ...(website !== undefined ? { website } : {}),
+    ...(websiteLabel !== undefined ? { websiteLabel } : {}),
   };
 }
 
 export function ContactDetails(props: ContactDetailsProps) {
   const { className } = props;
-  const details = resolveDetails(props);
+  const metadata = useSharedComponentsBrandingMetadata(
+    "ContactDetails",
+    props.metadata
+  );
+  const detailsOverrides = resolveDetails(props);
+  const metadataDetails = toContactDetailsBranding(metadata);
+  const resolvedDetails = {
+    ...metadataDetails,
+    ...detailsOverrides,
+  };
 
   return (
     <address className={className}>
@@ -58,11 +62,11 @@ export function ContactDetails(props: ContactDetailsProps) {
         For inquiries, please contact:
         <br />
         <br />
-        <strong>{details.teamName}</strong>
+        <strong>{resolvedDetails.teamName}</strong>
         <br />
-        <strong>{details.companyName}</strong>
+        <strong>{resolvedDetails.companyName}</strong>
         <div>
-          {details.addressLines.map((line, index) => (
+          {resolvedDetails.addressLines.map((line, index) => (
             <span key={`${line}-${index}`}>
               {line}
               <br />
@@ -70,11 +74,11 @@ export function ContactDetails(props: ContactDetailsProps) {
           ))}
         </div>
         <br />
-        Email: <a href={`mailto:${details.email}`}>{details.email}</a>
+        Email: <a href={`mailto:${resolvedDetails.email}`}>{resolvedDetails.email}</a>
         <br />
         Website:{" "}
-        <a href={details.website} target="_blank" rel="noopener noreferrer">
-          {details.websiteLabel}
+        <a href={resolvedDetails.website} target="_blank" rel="noopener noreferrer">
+          {resolvedDetails.websiteLabel}
         </a>
       </div>
     </address>

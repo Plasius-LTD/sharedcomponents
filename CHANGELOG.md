@@ -10,11 +10,15 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 - **Added**
   - Added `ContactDetails` `details` data object contract for host-driven content injection.
+  - Added shared white-label metadata contracts/helpers (`SharedComponentsMetadataInput`) for cross-component branding injection.
+  - Added `SharedComponentsBrandingProvider` and branding metadata hook for single-point white-label configuration.
 
 - **Changed**
   - Refactored `ContactDetails` defaults to generic sample data and resolved values from injected props.
   - Updated `Footer` fallback metadata defaults to generic non-brand values.
   - Updated README examples to show host-provided organization/contact data.
+  - `ContactDetails` and `Footer` now accept a common `metadata` object so host apps can configure branding/contact details once and reuse it across components.
+  - `Header`, `Footer`, and `ContactDetails` now require a branding metadata reference via provider or `metadata` prop.
 
 - **Fixed**
   - Updated contact/footer tests to use generic fake data and removed brand-specific assumptions.

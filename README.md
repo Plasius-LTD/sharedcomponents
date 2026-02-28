@@ -38,7 +38,14 @@ npm install @plasius/sharedcomponents
 ## Usage
 
 ```tsx
-import { ContactDetails, Footer, Header, UserProfile } from "@plasius/sharedcomponents";
+import {
+  ContactDetails,
+  Footer,
+  Header,
+  SharedComponentsBrandingProvider,
+  UserProfile,
+  type SharedComponentsMetadataInput,
+} from "@plasius/sharedcomponents";
 
 const navHeaderItems = [
   { name: "Hexagons", url: "/hexagons" },
@@ -50,36 +57,37 @@ const navFooterItems = [
   { name: "Terms", url: "/terms-of-service" },
 ];
 
-<Header
-  items={navHeaderItems}
-  brand={<img src="/brand-logo.svg" alt="Example Organization Logo" />}
-  profileSlot={
-    <UserProfile
-      user={{ firstName: "Ada", lastName: "Lovelace" }}
-      onOpenSettings={() => console.info("settings")}
-      onLogout={() => console.info("logout")}
-      onLogin={(provider) => console.info("login", provider)}
-    />
-  }
-/>;
+const sharedMetadata: SharedComponentsMetadataInput = {
+  organizationName: "Example Organization",
+  website: "https://example.com",
+  websiteLabel: "example.com",
+  contactEmail: "legal@example.com",
+  contactTeamName: "Legal Team",
+  contactAddressLines: ["123 Example Street", "Sample City", "Sample Region", "00000"],
+};
 
-<Footer
-  items={navFooterItems}
-  companyName="Example Organization"
-  contactEmail="legal@example.com"
-/>;
+<SharedComponentsBrandingProvider metadata={sharedMetadata}>
+  <Header
+    items={navHeaderItems}
+    brand={<img src="/brand-logo.svg" alt="Example Organization Logo" />}
+    profileSlot={
+      <UserProfile
+        user={{ firstName: "Ada", lastName: "Lovelace" }}
+        onOpenSettings={() => console.info("settings")}
+        onLogout={() => console.info("logout")}
+        onLogin={(provider) => console.info("login", provider)}
+      />
+    }
+  />
 
-<ContactDetails
-  details={{
-    teamName: "Legal Team",
-    companyName: "Example Organization",
-    addressLines: ["123 Example Street", "Sample City", "Sample Region", "00000"],
-    email: "legal@example.com",
-    website: "https://example.com",
-    websiteLabel: "example.com",
-  }}
-/>;
+  <Footer items={navFooterItems} />
+
+  <ContactDetails />
+</SharedComponentsBrandingProvider>;
 ```
+
+`Header`, `Footer`, and `ContactDetails` require a branding metadata reference.
+Provide it once with `SharedComponentsBrandingProvider` (recommended), or per component using the `metadata` prop.
 
 ## Suitability Checklist
 

@@ -6,6 +6,9 @@ import {
   type MouseEvent,
 } from "react";
 import { ContextMenu } from "../context-menu/index.js";
+import type { SharedComponentsMetadataInput } from "../../metadata/white-label.js";
+import { toFooterBranding } from "../../metadata/white-label.js";
+import { useSharedComponentsBrandingMetadata } from "../../metadata/provider.js";
 import styles from "./Footer.module.css";
 
 export interface FooterNavItem {
@@ -17,6 +20,7 @@ export interface FooterNavItem {
 
 export interface FooterProps {
   items: FooterNavItem[];
+  metadata?: SharedComponentsMetadataInput;
   companyName?: string;
   contactEmail?: string;
   className?: string;
@@ -36,11 +40,16 @@ function resolveHref(item: FooterNavItem): string {
 
 export function Footer({
   items,
-  companyName = "Example Organization",
-  contactEmail = "contact@example.com",
+  metadata,
+  companyName,
+  contactEmail,
   className,
   onNavigate,
 }: FooterProps) {
+  const resolvedMetadata = useSharedComponentsBrandingMetadata("Footer", metadata);
+  const branding = toFooterBranding(resolvedMetadata);
+  const resolvedCompanyName = companyName ?? branding.companyName;
+  const resolvedContactEmail = contactEmail ?? branding.contactEmail;
   const menuToggleRef = useRef<HTMLButtonElement | null>(null);
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(
     null
@@ -95,9 +104,9 @@ export function Footer({
     <footer className={[styles.footer, className].filter(Boolean).join(" ")}>
       <div className={styles.footerLeft}>
         <p className={styles.footerMeta}>
-          &copy; {new Date().getFullYear()} {companyName}. All rights reserved.
+          &copy; {new Date().getFullYear()} {resolvedCompanyName}. All rights reserved.
         </p>
-        <a href={`mailto:${contactEmail}`} className={styles.footerMetaLink}>
+        <a href={`mailto:${resolvedContactEmail}`} className={styles.footerMetaLink}>
           Contact us
         </a>
       </div>

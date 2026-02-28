@@ -6,6 +6,8 @@ import {
   type ReactNode,
 } from "react";
 import { ContextMenu } from "../context-menu/index.js";
+import type { SharedComponentsMetadataInput } from "../../metadata/white-label.js";
+import { useSharedComponentsBrandingMetadata } from "../../metadata/provider.js";
 import styles from "./Header.module.css";
 
 export interface HeaderNavItem {
@@ -17,6 +19,7 @@ export interface HeaderNavItem {
 
 export interface HeaderProps {
   items: HeaderNavItem[];
+  metadata?: SharedComponentsMetadataInput;
   brand?: ReactNode;
   homeHref?: string;
   profileSlot?: ReactNode;
@@ -37,12 +40,14 @@ function resolveHref(item: HeaderNavItem): string {
 
 export function Header({
   items,
+  metadata,
   brand,
   homeHref = "/",
   profileSlot,
   className,
   onNavigate,
 }: HeaderProps) {
+  const resolvedMetadata = useSharedComponentsBrandingMetadata("Header", metadata);
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(
     null
   );
@@ -94,7 +99,9 @@ export function Header({
     <header className={[styles.header, className].filter(Boolean).join(" ")}>
       <nav className={styles.headerBar} aria-label="Primary navigation">
         <a href={homeHref} className={styles.brandLink} aria-label="Home">
-          {brand ?? <span className={styles.brandText}>Plasius</span>}
+          {brand ?? (
+            <span className={styles.brandText}>{resolvedMetadata.organizationName}</span>
+          )}
         </a>
 
         <div className={styles.headerItems}>

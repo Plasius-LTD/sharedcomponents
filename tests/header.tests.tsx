@@ -1,6 +1,12 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Header } from "../src/components/header/Header.js";
+import type { SharedComponentsMetadataInput } from "../src/metadata/white-label.js";
+
+const fakeMetadata: SharedComponentsMetadataInput = {
+  organizationName: "Metadata Org",
+  contactEmail: "metadata@example.com",
+};
 
 describe("Header", () => {
   afterEach(() => {
@@ -10,6 +16,7 @@ describe("Header", () => {
   it("renders navigation items and custom brand content", () => {
     render(
       <Header
+        metadata={fakeMetadata}
         brand={<span>Brand</span>}
         items={[
           { name: "About", url: "/about" },
@@ -34,6 +41,7 @@ describe("Header", () => {
 
     render(
       <Header
+        metadata={fakeMetadata}
         items={[{ name: "External", url: "https://example.com", external: true }]}
       />
     );
@@ -46,5 +54,11 @@ describe("Header", () => {
       "_blank",
       "noopener,noreferrer"
     );
+  });
+
+  it("requires branding metadata reference", () => {
+    expect(() =>
+      render(<Header items={[{ name: "About", url: "/about" }]} />)
+    ).toThrow(/requires branding metadata/i);
   });
 });
