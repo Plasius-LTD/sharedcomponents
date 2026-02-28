@@ -36,8 +36,8 @@ function resolveHref(item: FooterNavItem): string {
 
 export function Footer({
   items,
-  companyName = "Plasius LTD",
-  contactEmail = "web@plasius.co.uk",
+  companyName = "Example Organization",
+  contactEmail = "contact@example.com",
   className,
   onNavigate,
 }: FooterProps) {

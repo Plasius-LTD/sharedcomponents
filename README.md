@@ -38,8 +38,7 @@ npm install @plasius/sharedcomponents
 ## Usage
 
 ```tsx
-import { Footer, Header, UserProfile } from "@plasius/sharedcomponents";
-import { PlasiusLTDLogo } from "@plasius/sharedassets";
+import { ContactDetails, Footer, Header, UserProfile } from "@plasius/sharedcomponents";
 
 const navHeaderItems = [
   { name: "Hexagons", url: "/hexagons" },
@@ -53,7 +52,7 @@ const navFooterItems = [
 
 <Header
   items={navHeaderItems}
-  brand={<img src={PlasiusLTDLogo} alt="Plasius LTD Logo" />}
+  brand={<img src="/brand-logo.svg" alt="Example Organization Logo" />}
   profileSlot={
     <UserProfile
       user={{ firstName: "Ada", lastName: "Lovelace" }}
@@ -64,7 +63,22 @@ const navFooterItems = [
   }
 />;
 
-<Footer items={navFooterItems} />;
+<Footer
+  items={navFooterItems}
+  companyName="Example Organization"
+  contactEmail="legal@example.com"
+/>;
+
+<ContactDetails
+  details={{
+    teamName: "Legal Team",
+    companyName: "Example Organization",
+    addressLines: ["123 Example Street", "Sample City", "Sample Region", "00000"],
+    email: "legal@example.com",
+    website: "https://example.com",
+    websiteLabel: "example.com",
+  }}
+/>;
 ```
 
 ## Suitability Checklist

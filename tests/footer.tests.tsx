@@ -2,17 +2,22 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Footer } from "../src/components/footer/Footer.js";
 
+const fakeFooterItems = [
+  { name: "Privacy", url: "/privacy" },
+  { name: "Docs", url: "https://example.com/docs", external: true },
+];
+
 describe("Footer", () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it("renders company metadata and links", () => {
+  it("renders provided metadata and links", () => {
     render(
       <Footer
         companyName="Acme Co"
         contactEmail="hello@example.com"
-        items={[{ name: "Privacy", url: "/privacy" }]}
+        items={fakeFooterItems}
       />
     );
 
@@ -25,14 +30,16 @@ describe("Footer", () => {
     );
   });
 
-  it("opens context menu from toggle and runs command", () => {
+  it("opens context menu from toggle and runs external command", () => {
     const openSpy = vi
       .spyOn(window, "open")
       .mockImplementation(() => null as unknown as Window);
 
     render(
       <Footer
-        items={[{ name: "Docs", url: "https://example.com/docs", external: true }]}
+        companyName="Acme Co"
+        contactEmail="hello@example.com"
+        items={fakeFooterItems}
       />
     );
 

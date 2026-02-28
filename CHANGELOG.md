@@ -9,13 +9,15 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
-  - (placeholder)
+  - Added `ContactDetails` `details` data object contract for host-driven content injection.
 
 - **Changed**
-  - (placeholder)
+  - Refactored `ContactDetails` defaults to generic sample data and resolved values from injected props.
+  - Updated `Footer` fallback metadata defaults to generic non-brand values.
+  - Updated README examples to show host-provided organization/contact data.
 
 - **Fixed**
-  - (placeholder)
+  - Updated contact/footer tests to use generic fake data and removed brand-specific assumptions.
 
 - **Security**
   - (placeholder)

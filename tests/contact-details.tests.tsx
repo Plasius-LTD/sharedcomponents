@@ -2,34 +2,44 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { ContactDetails } from "../src/components/contact-details/contact-details.js";
 
-describe("ContactDetails", () => {
-  it("renders defaults", () => {
-    render(<ContactDetails />);
+const fakeContactDetails = {
+  teamName: "Platform Team",
+  companyName: "Example Org",
+  email: "platform@example.com",
+  website: "https://example.com",
+  websiteLabel: "example.com",
+  addressLines: ["Line 1", "Line 2"],
+};
 
-    expect(screen.getByText("Web Development Team")).toBeTruthy();
-    expect(screen.getByText("Plasius LTD")).toBeTruthy();
+describe("ContactDetails", () => {
+  it("renders details from injected data", () => {
+    render(<ContactDetails details={fakeContactDetails} />);
+
+    expect(screen.getByText(fakeContactDetails.teamName)).toBeTruthy();
+    expect(screen.getByText(fakeContactDetails.companyName)).toBeTruthy();
+    expect(screen.getByText("Line 1")).toBeTruthy();
     expect(
-      screen.getByRole("link", { name: "web@plasius.co.uk" }).getAttribute("href")
-    ).toBe("mailto:web@plasius.co.uk");
+      screen
+        .getByRole("link", { name: fakeContactDetails.email })
+        .getAttribute("href")
+    ).toBe(`mailto:${fakeContactDetails.email}`);
+    expect(
+      screen
+        .getByRole("link", { name: fakeContactDetails.websiteLabel })
+        .getAttribute("href")
+    ).toBe(fakeContactDetails.website);
   });
 
-  it("renders custom address and website values", () => {
+  it("supports top-level prop overrides for host compatibility", () => {
     render(
       <ContactDetails
-        teamName="Platform Team"
-        companyName="Example Org"
-        email="platform@example.com"
-        website="https://example.com"
-        websiteLabel="example.com"
-        addressLines={["Line 1", "Line 2"]}
+        details={fakeContactDetails}
+        companyName="Override Org"
+        email="override@example.com"
       />
     );
 
-    expect(screen.getByText("Platform Team")).toBeTruthy();
-    expect(screen.getByText("Example Org")).toBeTruthy();
-    expect(screen.getByText("Line 1")).toBeTruthy();
-    expect(screen.getByRole("link", { name: "example.com" }).getAttribute("href")).toBe(
-      "https://example.com"
-    );
+    expect(screen.getByText("Override Org")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "override@example.com" })).toBeTruthy();
   });
 });
