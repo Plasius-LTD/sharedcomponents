@@ -2,6 +2,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Header } from "../src/components/header/Header.js";
 import type { SharedComponentsMetadataInput } from "../src/metadata/white-label.js";
+import { __resetSharedComponentsAnalyticsClientsForTests } from "../src/analytics/tracker.js";
+import { analyticsTrackSpy, resetAnalyticsMocks } from "./analytics-mocks.js";
 
 const fakeMetadata: SharedComponentsMetadataInput = {
   organizationName: "Metadata Org",
@@ -10,6 +12,8 @@ const fakeMetadata: SharedComponentsMetadataInput = {
 
 describe("Header", () => {
   afterEach(() => {
+    resetAnalyticsMocks();
+    __resetSharedComponentsAnalyticsClientsForTests();
     vi.restoreAllMocks();
   });
 
@@ -60,5 +64,57 @@ describe("Header", () => {
     expect(() =>
       render(<Header items={[{ name: "About", url: "/about" }]} />)
     ).toThrow(/requires branding metadata/i);
+  });
+
+  it("tracks desktop and mobile navigation interactions", () => {
+    const metadataWithAnalytics: SharedComponentsMetadataInput = {
+      ...fakeMetadata,
+      analytics: {
+        endpoint: "https://analytics.example.com/collect",
+      },
+    };
+
+    const openSpy = vi
+      .spyOn(window, "open")
+      .mockImplementation(() => null as unknown as Window);
+
+    render(
+      <Header
+        metadata={metadataWithAnalytics}
+        items={[
+          { name: "About", url: "/about" },
+          { name: "Docs", url: "https://example.com/docs", external: true },
+        ]}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("link", { name: "About" }));
+    fireEvent.click(screen.getByRole("button", { name: "Toggle navigation menu" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Docs" }));
+
+    expect(openSpy).toHaveBeenCalledTimes(1);
+    expect(analyticsTrackSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        component: "Header",
+        action: "nav_click",
+        label: "About",
+        variant: "desktop",
+      })
+    );
+    expect(analyticsTrackSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        component: "Header",
+        action: "mobile_menu_toggle",
+        variant: "open",
+      })
+    );
+    expect(analyticsTrackSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        component: "Header",
+        action: "nav_click",
+        label: "Docs",
+        variant: "mobile",
+      })
+    );
   });
 });

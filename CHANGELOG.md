@@ -9,13 +9,18 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
-  - (placeholder)
+  - Added embedded interaction analytics integration using `@plasius/analytics`.
+  - Added `analytics` metadata contract (`endpoint`, `source`, `enabled`, `headers`, `context`) to white-label branding input.
+  - Added analytics tests covering header, footer, contact details, and user profile interaction tracking.
 
 - **Changed**
-  - (placeholder)
+  - Instrumented `Header`, `Footer`, `ContactDetails`, and `UserProfile` interaction paths to emit analytics events when `metadata.analytics.endpoint` is configured.
+  - Added optional branding metadata hook for components that can operate with or without provider metadata.
+  - Updated README usage examples with white-label analytics endpoint configuration.
 
 - **Fixed**
-  - (placeholder)
+  - Enforced CommonJS runtime compatibility for dual-build output by generating and validating `dist-cjs/package.json` (`type: commonjs`) during build and package verification.
+  - Ensured analytics metadata merges safely with provider- and component-level overrides.
 
 - **Security**
   - (placeholder)

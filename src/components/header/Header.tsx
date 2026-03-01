@@ -8,6 +8,7 @@ import {
 import { ContextMenu } from "../context-menu/index.js";
 import type { SharedComponentsMetadataInput } from "../../metadata/white-label.js";
 import { useSharedComponentsBrandingMetadata } from "../../metadata/provider.js";
+import { trackSharedComponentsInteraction } from "../../analytics/tracker.js";
 import styles from "./Header.module.css";
 
 export interface HeaderNavItem {
@@ -65,11 +66,34 @@ export function Header({
 
   const closeMenu = () => setMenuPosition(null);
 
+  const trackInteraction = (
+    action: string,
+    details?: {
+      label?: string;
+      href?: string;
+      variant?: string;
+      context?: Record<string, unknown>;
+    }
+  ) => {
+    trackSharedComponentsInteraction(resolvedMetadata, {
+      component: "Header",
+      action,
+      label: details?.label,
+      href: details?.href,
+      variant: details?.variant,
+      context: details?.context,
+    });
+  };
+
   const toggleMobileMenu = (event: MouseEvent<HTMLButtonElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
-    setMenuPosition((previous: { x: number; y: number } | null) =>
-      previous ? null : { x: rect.left, y: rect.bottom + 4 }
-    );
+    setMenuPosition((previous: { x: number; y: number } | null) => {
+      const next = previous ? null : { x: rect.left, y: rect.bottom + 4 };
+      trackInteraction("mobile_menu_toggle", {
+        variant: next ? "open" : "close",
+      });
+      return next;
+    });
   };
 
   useEffect(() => {
@@ -98,7 +122,18 @@ export function Header({
   return (
     <header className={[styles.header, className].filter(Boolean).join(" ")}>
       <nav className={styles.headerBar} aria-label="Primary navigation">
-        <a href={homeHref} className={styles.brandLink} aria-label="Home">
+        <a
+          href={homeHref}
+          className={styles.brandLink}
+          aria-label="Home"
+          onClick={() =>
+            trackInteraction("brand_click", {
+              label: "Home",
+              href: homeHref,
+              variant: "desktop",
+            })
+          }
+        >
           {brand ?? (
             <span className={styles.brandText}>{resolvedMetadata.organizationName}</span>
           )}
@@ -112,9 +147,15 @@ export function Header({
               className={styles.headerButton}
               target={item.external ? "_blank" : undefined}
               rel={item.external ? "noopener noreferrer" : undefined}
-              onClick={(event: MouseEvent<HTMLAnchorElement>) =>
-                onNavigate?.(item, item.href, event)
-              }
+              onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+                trackInteraction("nav_click", {
+                  label: item.name,
+                  href: item.href,
+                  variant: "desktop",
+                  context: { external: !!item.external },
+                });
+                onNavigate?.(item, item.href, event);
+              }}
             >
               {item.name}
             </a>
@@ -142,6 +183,12 @@ export function Header({
             commands={links.map((item: HeaderNavItem & { href: string }) => ({
               name: item.name,
               action: () => {
+                trackInteraction("nav_click", {
+                  label: item.name,
+                  href: item.href,
+                  variant: "mobile",
+                  context: { external: !!item.external },
+                });
                 if (item.external) {
                   window.open(item.href, "_blank", "noopener,noreferrer");
                   return;

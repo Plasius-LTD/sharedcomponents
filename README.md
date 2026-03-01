@@ -28,12 +28,19 @@ If a product needs auth/profile behavior, wire it via callbacks/props from the h
 - `ContactDetails`: reusable legal contact block with configurable details
 - `ContextMenu`: generic context menu surface
 - `UserProfile`: optional generic avatar/menu shell driven by callbacks
+- Built-in interaction analytics forwarding through `@plasius/analytics`
 
 ## Install
 
 ```bash
 npm install @plasius/sharedcomponents
 ```
+
+## Module formats
+
+This package publishes dual ESM and CJS artifacts.
+When CJS output is emitted under `dist-cjs/*.js` with `type: module`, `dist-cjs/package.json` is generated with `{ "type": "commonjs" }` to ensure Node `require(...)` compatibility.
+
 
 ## Usage
 
@@ -64,6 +71,14 @@ const sharedMetadata: SharedComponentsMetadataInput = {
   contactEmail: "legal@example.com",
   contactTeamName: "Legal Team",
   contactAddressLines: ["123 Example Street", "Sample City", "Sample Region", "00000"],
+  analytics: {
+    endpoint: "https://analytics.example.com/collect",
+    source: "@plasius/sharedcomponents",
+    context: {
+      tenant: "example-tenant",
+      environment: "production",
+    },
+  },
 };
 
 <SharedComponentsBrandingProvider metadata={sharedMetadata}>
@@ -88,6 +103,17 @@ const sharedMetadata: SharedComponentsMetadataInput = {
 
 `Header`, `Footer`, and `ContactDetails` require a branding metadata reference.
 Provide it once with `SharedComponentsBrandingProvider` (recommended), or per component using the `metadata` prop.
+
+## Interaction Analytics
+
+When `metadata.analytics.endpoint` is configured, sharedcomponents automatically tracks user interactions for:
+
+- Header nav, brand click, and mobile menu flows
+- Footer contact/nav clicks and mobile menu flows
+- Contact details email/website clicks
+- User profile avatar/menu command interactions (when branding metadata is available)
+
+This keeps analytics endpoint configuration in one white-label metadata object.
 
 ## Suitability Checklist
 

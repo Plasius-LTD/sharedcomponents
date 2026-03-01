@@ -25,10 +25,9 @@ export function SharedComponentsBrandingProvider({
   );
 }
 
-export function useSharedComponentsBrandingMetadata(
-  componentName: string,
+export function useOptionalSharedComponentsBrandingMetadata(
   metadata?: SharedComponentsMetadataInput
-): SharedComponentsMetadata {
+): SharedComponentsMetadata | null {
   const contextValue = useContext(BrandingMetadataContext);
 
   if (contextValue && metadata) {
@@ -36,6 +35,18 @@ export function useSharedComponentsBrandingMetadata(
       ...contextValue,
       ...metadata,
       contactAddressLines: metadata.contactAddressLines ?? contextValue.contactAddressLines,
+      analytics: {
+        ...contextValue.analytics,
+        ...(metadata.analytics ?? {}),
+        headers: {
+          ...(contextValue.analytics.headers ?? {}),
+          ...(metadata.analytics?.headers ?? {}),
+        },
+        context: {
+          ...(contextValue.analytics.context ?? {}),
+          ...(metadata.analytics?.context ?? {}),
+        },
+      },
     });
   }
 
@@ -45,6 +56,19 @@ export function useSharedComponentsBrandingMetadata(
 
   if (contextValue) {
     return contextValue;
+  }
+
+  return null;
+}
+
+export function useSharedComponentsBrandingMetadata(
+  componentName: string,
+  metadata?: SharedComponentsMetadataInput
+): SharedComponentsMetadata {
+  const resolved = useOptionalSharedComponentsBrandingMetadata(metadata);
+
+  if (resolved) {
+    return resolved;
   }
 
   throw new Error(
