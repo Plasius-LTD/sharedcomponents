@@ -3,6 +3,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { Footer } from "../src/components/footer/Footer.js";
 import { SharedComponentsBrandingProvider } from "../src/metadata/provider.js";
 import type { SharedComponentsMetadataInput } from "../src/metadata/white-label.js";
+import { __resetSharedComponentsAnalyticsClientsForTests } from "../src/analytics/tracker.js";
+import { analyticsTrackSpy, resetAnalyticsMocks } from "./analytics-mocks.js";
 
 const fakeFooterItems = [
   { name: "Privacy", url: "/privacy" },
@@ -16,6 +18,8 @@ const fakeMetadata: SharedComponentsMetadataInput = {
 
 describe("Footer", () => {
   afterEach(() => {
+    resetAnalyticsMocks();
+    __resetSharedComponentsAnalyticsClientsForTests();
     vi.restoreAllMocks();
   });
 
@@ -78,6 +82,58 @@ describe("Footer", () => {
       "https://example.com/docs",
       "_blank",
       "noopener,noreferrer"
+    );
+  });
+
+  it("tracks footer interactions when analytics is configured", () => {
+    const metadataWithAnalytics: SharedComponentsMetadataInput = {
+      ...fakeMetadata,
+      analytics: {
+        endpoint: "https://analytics.example.com/collect",
+      },
+    };
+
+    const openSpy = vi
+      .spyOn(window, "open")
+      .mockImplementation(() => null as unknown as Window);
+
+    render(<Footer metadata={metadataWithAnalytics} items={fakeFooterItems} />);
+
+    fireEvent.click(screen.getByRole("link", { name: "Contact us" }));
+    fireEvent.click(screen.getByRole("link", { name: "Privacy" }));
+    fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Docs" }));
+
+    expect(openSpy).toHaveBeenCalledTimes(1);
+    expect(analyticsTrackSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        component: "Footer",
+        action: "contact_click",
+        label: "Contact us",
+      })
+    );
+    expect(analyticsTrackSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        component: "Footer",
+        action: "nav_click",
+        label: "Privacy",
+        variant: "desktop",
+      })
+    );
+    expect(analyticsTrackSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        component: "Footer",
+        action: "mobile_menu_toggle",
+        variant: "open",
+      })
+    );
+    expect(analyticsTrackSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        component: "Footer",
+        action: "nav_click",
+        label: "Docs",
+        variant: "mobile",
+      })
     );
   });
 });

@@ -5,9 +5,18 @@ export interface SharedComponentsMetadata {
   contactEmail: string;
   contactTeamName: string;
   contactAddressLines: string[];
+  analytics: SharedComponentsAnalyticsMetadata;
 }
 
 export type SharedComponentsMetadataInput = Partial<SharedComponentsMetadata>;
+
+export interface SharedComponentsAnalyticsMetadata {
+  endpoint?: string;
+  source?: string;
+  enabled?: boolean;
+  headers?: Record<string, string>;
+  context?: Record<string, unknown>;
+}
 
 export interface ContactDetailsBranding {
   teamName: string;
@@ -23,6 +32,13 @@ export interface FooterBranding {
   contactEmail: string;
 }
 
+export const defaultSharedComponentsAnalyticsMetadata: SharedComponentsAnalyticsMetadata = {
+  source: "@plasius/sharedcomponents",
+  enabled: true,
+  headers: {},
+  context: {},
+};
+
 export const defaultSharedComponentsMetadata: SharedComponentsMetadata = {
   organizationName: "Example Organization",
   website: "https://example.com",
@@ -35,16 +51,31 @@ export const defaultSharedComponentsMetadata: SharedComponentsMetadata = {
     "Sample Region",
     "00000",
   ],
+  analytics: defaultSharedComponentsAnalyticsMetadata,
 };
 
 export function resolveSharedComponentsMetadata(
   metadata?: SharedComponentsMetadataInput
 ): SharedComponentsMetadata {
+  const analyticsOverrides = metadata?.analytics;
+
   return {
     ...defaultSharedComponentsMetadata,
     ...metadata,
     contactAddressLines:
       metadata?.contactAddressLines ?? defaultSharedComponentsMetadata.contactAddressLines,
+    analytics: {
+      ...defaultSharedComponentsAnalyticsMetadata,
+      ...analyticsOverrides,
+      headers: {
+        ...defaultSharedComponentsAnalyticsMetadata.headers,
+        ...(analyticsOverrides?.headers ?? {}),
+      },
+      context: {
+        ...defaultSharedComponentsAnalyticsMetadata.context,
+        ...(analyticsOverrides?.context ?? {}),
+      },
+    },
   };
 }
 

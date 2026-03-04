@@ -1,6 +1,7 @@
 import type { SharedComponentsMetadataInput } from "../../metadata/white-label.js";
 import { toContactDetailsBranding } from "../../metadata/white-label.js";
 import { useSharedComponentsBrandingMetadata } from "../../metadata/provider.js";
+import { trackSharedComponentsInteraction } from "../../analytics/tracker.js";
 
 export interface ContactDetailsData {
   teamName: string;
@@ -56,6 +57,19 @@ export function ContactDetails(props: ContactDetailsProps) {
     ...detailsOverrides,
   };
 
+  const trackInteraction = (
+    action: string,
+    details: { label: string; href: string; variant?: string }
+  ) => {
+    trackSharedComponentsInteraction(metadata, {
+      component: "ContactDetails",
+      action,
+      label: details.label,
+      href: details.href,
+      variant: details.variant,
+    });
+  };
+
   return (
     <address className={className}>
       <div>
@@ -74,10 +88,31 @@ export function ContactDetails(props: ContactDetailsProps) {
           ))}
         </div>
         <br />
-        Email: <a href={`mailto:${resolvedDetails.email}`}>{resolvedDetails.email}</a>
+        Email:{" "}
+        <a
+          href={`mailto:${resolvedDetails.email}`}
+          onClick={() =>
+            trackInteraction("email_click", {
+              label: resolvedDetails.email,
+              href: `mailto:${resolvedDetails.email}`,
+            })
+          }
+        >
+          {resolvedDetails.email}
+        </a>
         <br />
         Website:{" "}
-        <a href={resolvedDetails.website} target="_blank" rel="noopener noreferrer">
+        <a
+          href={resolvedDetails.website}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() =>
+            trackInteraction("website_click", {
+              label: resolvedDetails.websiteLabel,
+              href: resolvedDetails.website,
+            })
+          }
+        >
           {resolvedDetails.websiteLabel}
         </a>
       </div>

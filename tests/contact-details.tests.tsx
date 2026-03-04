@@ -1,7 +1,9 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { ContactDetails } from "../src/components/contact-details/contact-details.js";
 import type { SharedComponentsMetadataInput } from "../src/metadata/white-label.js";
+import { __resetSharedComponentsAnalyticsClientsForTests } from "../src/analytics/tracker.js";
+import { analyticsTrackSpy, resetAnalyticsMocks } from "./analytics-mocks.js";
 
 const fakeContactDetails = {
   teamName: "Platform Team",
@@ -22,6 +24,11 @@ const fakeMetadata: SharedComponentsMetadataInput = {
 };
 
 describe("ContactDetails", () => {
+  afterEach(() => {
+    resetAnalyticsMocks();
+    __resetSharedComponentsAnalyticsClientsForTests();
+  });
+
   it("renders details from injected data", () => {
     render(<ContactDetails metadata={fakeMetadata} details={fakeContactDetails} />);
 
@@ -65,5 +72,37 @@ describe("ContactDetails", () => {
 
     expect(screen.getByText("Override Org")).toBeTruthy();
     expect(screen.getByRole("link", { name: "override@example.com" })).toBeTruthy();
+  });
+
+  it("tracks email and website interactions when analytics is configured", () => {
+    const metadataWithAnalytics: SharedComponentsMetadataInput = {
+      ...fakeMetadata,
+      analytics: {
+        endpoint: "https://analytics.example.com/collect",
+      },
+    };
+
+    render(<ContactDetails metadata={metadataWithAnalytics} />);
+
+    const emailLink = screen.getByRole("link", { name: "metadata@example.com" });
+    const websiteLink = screen.getByRole("link", { name: "metadata.example.com" });
+
+    emailLink.click();
+    websiteLink.click();
+
+    expect(analyticsTrackSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        component: "ContactDetails",
+        action: "email_click",
+        label: "metadata@example.com",
+      })
+    );
+    expect(analyticsTrackSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        component: "ContactDetails",
+        action: "website_click",
+        label: "metadata.example.com",
+      })
+    );
   });
 });

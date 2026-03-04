@@ -9,6 +9,7 @@ import { ContextMenu } from "../context-menu/index.js";
 import type { SharedComponentsMetadataInput } from "../../metadata/white-label.js";
 import { toFooterBranding } from "../../metadata/white-label.js";
 import { useSharedComponentsBrandingMetadata } from "../../metadata/provider.js";
+import { trackSharedComponentsInteraction } from "../../analytics/tracker.js";
 import styles from "./Footer.module.css";
 
 export interface FooterNavItem {
@@ -56,6 +57,25 @@ export function Footer({
   );
   const menuOpen = menuPosition !== null;
 
+  const trackInteraction = (
+    action: string,
+    details?: {
+      label?: string;
+      href?: string;
+      variant?: string;
+      context?: Record<string, unknown>;
+    }
+  ) => {
+    trackSharedComponentsInteraction(resolvedMetadata, {
+      component: "Footer",
+      action,
+      label: details?.label,
+      href: details?.href,
+      variant: details?.variant,
+      context: details?.context,
+    });
+  };
+
   const links = useMemo(
     () =>
       items.map((item) => ({
@@ -72,9 +92,13 @@ export function Footer({
       return;
     }
     const rect = menuToggleRef.current.getBoundingClientRect();
-    setMenuPosition((previous: { x: number; y: number } | null) =>
-      previous ? null : { x: rect.left, y: rect.top - 4 }
-    );
+    setMenuPosition((previous: { x: number; y: number } | null) => {
+      const next = previous ? null : { x: rect.left, y: rect.top - 4 };
+      trackInteraction("mobile_menu_toggle", {
+        variant: next ? "open" : "close",
+      });
+      return next;
+    });
   };
 
   useEffect(() => {
@@ -106,7 +130,17 @@ export function Footer({
         <p className={styles.footerMeta}>
           &copy; {new Date().getFullYear()} {resolvedCompanyName}. All rights reserved.
         </p>
-        <a href={`mailto:${resolvedContactEmail}`} className={styles.footerMetaLink}>
+        <a
+          href={`mailto:${resolvedContactEmail}`}
+          className={styles.footerMetaLink}
+          onClick={() =>
+            trackInteraction("contact_click", {
+              label: "Contact us",
+              href: `mailto:${resolvedContactEmail}`,
+              variant: "desktop",
+            })
+          }
+        >
           Contact us
         </a>
       </div>
@@ -120,9 +154,15 @@ export function Footer({
               className={styles.footerButton}
               target={item.external ? "_blank" : undefined}
               rel={item.external ? "noopener noreferrer" : undefined}
-              onClick={(event: MouseEvent<HTMLAnchorElement>) =>
-                onNavigate?.(item, item.href, event)
-              }
+              onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+                trackInteraction("nav_click", {
+                  label: item.name,
+                  href: item.href,
+                  variant: "desktop",
+                  context: { external: !!item.external },
+                });
+                onNavigate?.(item, item.href, event);
+              }}
             >
               {item.name}
             </a>
@@ -153,6 +193,12 @@ export function Footer({
             commands={links.map((item: FooterNavItem & { href: string }) => ({
               name: item.name,
               action: () => {
+                trackInteraction("nav_click", {
+                  label: item.name,
+                  href: item.href,
+                  variant: "mobile",
+                  context: { external: !!item.external },
+                });
                 if (item.external) {
                   window.open(item.href, "_blank", "noopener,noreferrer");
                   return;

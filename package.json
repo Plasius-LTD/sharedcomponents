@@ -1,6 +1,6 @@
 {
   "name": "@plasius/sharedcomponents",
-  "version": "1.0.4",
+  "version": "1.0.7",
   "description": "Base React UI components for shared navigation, menus, profile shells, and legal/contact surfaces.",
   "keywords": [
     "Components",
@@ -24,7 +24,7 @@
     "audit:npm": "npm audit --audit-level=moderate || true",
     "audit:test": "vitest run --coverage",
     "audit:all": "npm-run-all -l audit:ts audit:eslint audit:deps audit:npm audit:test",
-    "build:cjs": "tsc -p tsconfig.json --module commonjs --moduleResolution node --outDir dist-cjs --tsBuildInfoFile dist-cjs/tsconfig.tsbuildinfo --listEmittedFiles && (rsync -av --include '*/' --include '*.module.css' --exclude '*' src/ dist-cjs/ || true)",
+    "build:cjs": "tsc -p tsconfig.json --module commonjs --moduleResolution node --outDir dist-cjs --tsBuildInfoFile dist-cjs/tsconfig.tsbuildinfo --listEmittedFiles && (rsync -av --include '*/' --include '*.module.css' --exclude '*' src/ dist-cjs/ || true) && node scripts/write-cjs-package-json.cjs",
     "lint": "eslint .",
     "prepare": "npm run build",
     "pack:check": "node scripts/verify-public-package.cjs",
@@ -32,6 +32,9 @@
   },
   "author": "Plasius LTD <development@plasius.co.uk>",
   "license": "MIT",
+  "dependencies": {
+    "@plasius/analytics": "^1.1.0"
+  },
   "peerDependencies": {
     "react": "^19.1.0"
   },

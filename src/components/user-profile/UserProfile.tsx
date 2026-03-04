@@ -1,5 +1,8 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import { ContextMenu } from "../context-menu/index.js";
+import type { SharedComponentsMetadataInput } from "../../metadata/white-label.js";
+import { useOptionalSharedComponentsBrandingMetadata } from "../../metadata/provider.js";
+import { trackSharedComponentsInteraction } from "../../analytics/tracker.js";
 import styles from "./UserProfile.module.css";
 
 export interface UserProfileIdentity {
@@ -16,6 +19,7 @@ export interface UserProfileCommand {
 
 export interface UserProfileProps {
   user?: UserProfileIdentity | null;
+  metadata?: SharedComponentsMetadataInput;
   className?: string;
   providers?: string[];
   onLogin?: (provider: string) => void | Promise<void>;
@@ -42,6 +46,7 @@ function toProviderLabel(provider: string) {
 
 export function UserProfile({
   user = null,
+  metadata,
   className,
   providers = ["apple", "google", "microsoft"],
   onLogin,
@@ -54,6 +59,31 @@ export function UserProfile({
   const [menuVisible, setMenuVisible] = useState(false);
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(
     null
+  );
+  const resolvedMetadata = useOptionalSharedComponentsBrandingMetadata(metadata);
+
+  const trackInteraction = useCallback(
+    (
+      action: string,
+      details?: {
+        label?: string;
+        variant?: string;
+        context?: Record<string, unknown>;
+      }
+    ) => {
+      if (!resolvedMetadata) {
+        return;
+      }
+
+      trackSharedComponentsInteraction(resolvedMetadata, {
+        component: "UserProfile",
+        action,
+        label: details?.label,
+        variant: details?.variant,
+        context: details?.context,
+      });
+    },
+    [resolvedMetadata]
   );
 
   useEffect(() => {
@@ -90,12 +120,37 @@ export function UserProfile({
     ? signedInCommands ?? defaultSignedInCommands
     : signedOutCommands ?? defaultSignedOutCommands;
 
+  const trackedCommands = useMemo(
+    () =>
+      commands.map((command) => ({
+        ...command,
+        action: () => {
+          trackInteraction("menu_command", {
+            label: command.name,
+            context: {
+              signedIn: !!user,
+            },
+          });
+          command.action();
+        },
+      })),
+    [commands, trackInteraction, user]
+  );
+
   return (
     <div className={[styles.userProfileContainer, className].filter(Boolean).join(" ")}>
       <button
         ref={avatarRef}
         type="button"
-        onClick={() => setMenuVisible((visible: boolean) => !visible)}
+        onClick={() =>
+          setMenuVisible((visible: boolean) => {
+            const nextVisible = !visible;
+            trackInteraction("avatar_toggle", {
+              variant: nextVisible ? "open" : "close",
+            });
+            return nextVisible;
+          })
+        }
         className={`${styles.userProfileAvatar} ${
           user?.avatarUrl ? styles.hasAvatar : styles.noAvatar
         }`}
@@ -115,7 +170,7 @@ export function UserProfile({
         <ContextMenu
           position={menuPosition}
           onClose={() => setMenuVisible(false)}
-          commands={commands}
+          commands={trackedCommands}
         />
       ) : null}
     </div>
