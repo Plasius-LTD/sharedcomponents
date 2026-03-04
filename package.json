@@ -1,6 +1,6 @@
 {
   "name": "@plasius/sharedcomponents",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Base React UI components for shared navigation, menus, profile shells, and legal/contact surfaces.",
   "keywords": [
     "Components",
@@ -33,7 +33,7 @@
   "author": "Plasius LTD <development@plasius.co.uk>",
   "license": "MIT",
   "dependencies": {
-    "@plasius/analytics": "^1.1.0"
+    "@plasius/analytics": "^1.1.3"
   },
   "peerDependencies": {
     "react": "^19.1.0"
