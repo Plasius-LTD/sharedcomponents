@@ -9,6 +9,20 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [1.0.11] - 2026-03-06
+
+- **Added**
   - Added `ConfirmationDialog` component with reusable confirm/cancel UX, optional typed challenge flow, and danger/default action tones.
   - Added dialog tests covering two-step challenge flow, single-step confirmation mode, and Escape-to-cancel behavior.
 
@@ -137,7 +151,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ---
 
-[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.0.10...HEAD
+[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.0.11...HEAD
 
 ## [1.0.0] - 2026-02-11
 
@@ -158,3 +172,4 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 [1.0.5]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.5
 [1.0.9]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.9
 [1.0.10]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.10
+[1.0.11]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.11
