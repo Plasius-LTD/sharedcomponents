@@ -1,0 +1,126 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10020;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(15 23 42 / 48%);
+}
+
+.dialog {
+  width: min(34rem, 100%);
+  border-radius: 0.75rem;
+  border: 1px solid #d2dae8;
+  background: #ffffff;
+  box-shadow: 0 20px 42px rgb(15 23 42 / 34%);
+  padding: 1rem;
+  display: grid;
+  gap: 0.75rem;
+  color: #1f2937;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.description {
+  margin: 0;
+  color: #374151;
+  line-height: 1.45;
+}
+
+.summary,
+.challenge {
+  border: 1px solid #d2dae8;
+  border-radius: 0.55rem;
+  padding: 0.75rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.summaryTitle {
+  margin: 0;
+  font-size: 0.96rem;
+}
+
+.summaryList {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.35rem;
+  color: #374151;
+}
+
+.summaryEmpty {
+  margin: 0;
+  color: #4b5563;
+}
+
+.challengeLabel {
+  display: grid;
+  gap: 0.4rem;
+  font-weight: 600;
+}
+
+.challengeInput {
+  border: 1px solid #b9c4d8;
+  border-radius: 0.45rem;
+  padding: 0.5rem 0.55rem;
+  font: inherit;
+  color: inherit;
+}
+
+.challengeInput:focus-visible,
+.button:focus-visible {
+  outline: 3px solid #005fcc;
+  outline-offset: 2px;
+}
+
+.challengeHint {
+  margin: 0;
+  color: #4b5563;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.55rem;
+}
+
+.button {
+  border: 1px solid #9aa6bc;
+  background: #ffffff;
+  color: #1f2937;
+  border-radius: 0.45rem;
+  padding: 0.45rem 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.primaryButton {
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+  color: #ffffff;
+}
+
+.primaryButton:hover:enabled {
+  background: #1e40af;
+}
+
+.dangerButton {
+  border-color: #b91c1c;
+  background: #b91c1c;
+  color: #ffffff;
+}
+
+.dangerButton:hover:enabled {
+  background: #991b1b;
+}

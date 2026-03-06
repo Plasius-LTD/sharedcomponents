@@ -9,7 +9,8 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
-  - (placeholder)
+  - Added `ConfirmationDialog` component with reusable confirm/cancel UX, optional typed challenge flow, and danger/default action tones.
+  - Added dialog tests covering two-step challenge flow, single-step confirmation mode, and Escape-to-cancel behavior.
 
 - **Changed**
   - (placeholder)

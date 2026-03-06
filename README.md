@@ -28,6 +28,7 @@ If a product needs auth/profile behavior, wire it via callbacks/props from the h
 - `ContactDetails`: reusable legal contact block with configurable details
 - `ContextMenu`: generic context menu surface
 - `UserProfile`: optional generic avatar/menu shell driven by callbacks
+- `ConfirmationDialog`: reusable confirmation dialog with optional typed challenge flow for destructive actions
 - Built-in interaction analytics forwarding through `@plasius/analytics`
 
 ## Install
