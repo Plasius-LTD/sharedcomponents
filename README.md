@@ -29,6 +29,7 @@ If a product needs auth/profile behavior, wire it via callbacks/props from the h
 - `ContextMenu`: generic context menu surface
 - `UserProfile`: optional generic avatar/menu shell driven by callbacks
 - `ConfirmationDialog`: reusable confirmation dialog with optional typed challenge flow for destructive actions
+- `StatusPanel`: reusable status/alert surface for loading, empty, warning, and retryable error states
 - Built-in interaction analytics forwarding through `@plasius/analytics`
 
 ## Install

@@ -4,3 +4,4 @@ export * from "./footer/index.js";
 export * from "./context-menu/index.js";
 export * from "./user-profile/index.js";
 export * from "./confirmation-dialog/index.js";
+export * from "./status-panel/index.js";
