@@ -132,6 +132,7 @@ Do not add components here if they need app-specific business logic or service w
 
 ```bash
 npm install
+npm run typecheck
 npm run build
 npm test
 npm run test:coverage
