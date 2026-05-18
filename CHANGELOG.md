@@ -12,7 +12,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - (placeholder)
 
 - **Changed**
-  - (placeholder)
+  - Exposed `npm run typecheck` as the canonical TypeScript validation gate and routed audit/workflow checks through the same command.
 
 - **Fixed**
   - (placeholder)
