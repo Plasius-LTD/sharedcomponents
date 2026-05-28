@@ -85,6 +85,25 @@ describe("Footer", () => {
     );
   });
 
+  it("closes the mobile context menu on Escape", () => {
+    render(<Footer metadata={fakeMetadata} items={fakeFooterItems} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
+    expect(screen.getByRole("menu")).toBeTruthy();
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("runs internal mobile navigation commands", () => {
+    render(<Footer metadata={fakeMetadata} items={fakeFooterItems} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Privacy" }));
+
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
   it("tracks footer interactions when analytics is configured", () => {
     const metadataWithAnalytics: SharedComponentsMetadataInput = {
       ...fakeMetadata,

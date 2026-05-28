@@ -1,7 +1,12 @@
+import { useI18n } from "@plasius/translations";
 import type { SharedComponentsMetadataInput } from "../../metadata/white-label.js";
 import { toContactDetailsBranding } from "../../metadata/white-label.js";
 import { useSharedComponentsBrandingMetadata } from "../../metadata/provider.js";
 import { trackSharedComponentsInteraction } from "../../analytics/tracker.js";
+import {
+  createSharedComponentTranslationResolver,
+  sharedComponentTranslationKeys,
+} from "../../i18n.js";
 
 export interface ContactDetailsData {
   teamName: string;
@@ -46,6 +51,8 @@ function resolveDetails({
 
 export function ContactDetails(props: ContactDetailsProps) {
   const { className } = props;
+  const { t } = useI18n();
+  const translate = createSharedComponentTranslationResolver(t);
   const metadata = useSharedComponentsBrandingMetadata(
     "ContactDetails",
     props.metadata
@@ -73,7 +80,7 @@ export function ContactDetails(props: ContactDetailsProps) {
   return (
     <address className={className}>
       <div>
-        For inquiries, please contact:
+        {translate(sharedComponentTranslationKeys.contactDetails.inquiries)}
         <br />
         <br />
         <strong>{resolvedDetails.teamName}</strong>
@@ -88,7 +95,7 @@ export function ContactDetails(props: ContactDetailsProps) {
           ))}
         </div>
         <br />
-        Email:{" "}
+        {translate(sharedComponentTranslationKeys.contactDetails.emailLabel)}{" "}
         <a
           href={`mailto:${resolvedDetails.email}`}
           onClick={() =>
@@ -101,7 +108,7 @@ export function ContactDetails(props: ContactDetailsProps) {
           {resolvedDetails.email}
         </a>
         <br />
-        Website:{" "}
+        {translate(sharedComponentTranslationKeys.contactDetails.websiteLabel)}{" "}
         <a
           href={resolvedDetails.website}
           target="_blank"

@@ -1,8 +1,14 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from "react";
+import { useI18n } from "@plasius/translations";
 import { ContextMenu } from "../context-menu/index.js";
 import type { SharedComponentsMetadataInput } from "../../metadata/white-label.js";
 import { useOptionalSharedComponentsBrandingMetadata } from "../../metadata/provider.js";
 import { trackSharedComponentsInteraction } from "../../analytics/tracker.js";
+import {
+  createSharedComponentTranslationResolver,
+  sharedComponentTranslationKeys,
+  type SharedComponentTranslationResolver,
+} from "../../i18n.js";
 import styles from "./UserProfile.module.css";
 
 export interface UserProfileIdentity {
@@ -29,17 +35,29 @@ export interface UserProfileProps {
   signedOutCommands?: UserProfileCommand[];
 }
 
-function getInitials(first: unknown, last: unknown) {
+function getInitials(
+  first: unknown,
+  last: unknown,
+  translate: SharedComponentTranslationResolver
+) {
   const f =
-    typeof first === "string" && first.length > 0 ? first.charAt(0) : "U";
-  const l = typeof last === "string" && last.length > 0 ? last.charAt(0) : "P";
+    typeof first === "string" && first.length > 0
+      ? first.charAt(0)
+      : translate(sharedComponentTranslationKeys.userProfile.fallbackFirstInitial);
+  const l =
+    typeof last === "string" && last.length > 0
+      ? last.charAt(0)
+      : translate(sharedComponentTranslationKeys.userProfile.fallbackLastInitial);
   return `${f}${l}`.toUpperCase();
 }
 
-function toProviderLabel(provider: string) {
+function toProviderLabel(
+  provider: string,
+  translate: SharedComponentTranslationResolver
+) {
   const normalized = provider.trim();
   if (!normalized) {
-    return "Provider";
+    return translate(sharedComponentTranslationKeys.userProfile.fallbackProvider);
   }
   return normalized.charAt(0).toUpperCase() + normalized.slice(1).toLowerCase();
 }
@@ -55,6 +73,8 @@ export function UserProfile({
   signedInCommands,
   signedOutCommands,
 }: UserProfileProps) {
+  const { t } = useI18n();
+  const translate = useMemo(() => createSharedComponentTranslationResolver(t), [t]);
   const avatarRef = useRef<HTMLButtonElement | null>(null);
   const [menuVisible, setMenuVisible] = useState(false);
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(
@@ -94,27 +114,39 @@ export function UserProfile({
     setMenuPosition({ x: rect.left + rect.width, y: rect.top + rect.height + 4 });
   }, [menuVisible]);
 
-  const defaultSignedInCommands: UserProfileCommand[] = [
-    {
-      name: "Settings",
-      action: () => {
-        void onOpenSettings?.();
+  const defaultSignedInCommands = useMemo<UserProfileCommand[]>(
+    () => [
+      {
+        name: translate(sharedComponentTranslationKeys.userProfile.settings),
+        action: () => {
+          void onOpenSettings?.();
+        },
       },
-    },
-    {
-      name: "Logout",
-      action: () => {
-        void onLogout?.();
+      {
+        name: translate(sharedComponentTranslationKeys.userProfile.logout),
+        action: () => {
+          void onLogout?.();
+        },
       },
-    },
-  ];
+    ],
+    [onLogout, onOpenSettings, translate]
+  );
 
-  const defaultSignedOutCommands: UserProfileCommand[] = providers.map((provider) => ({
-    name: `Sign in with ${toProviderLabel(provider)}`,
-    action: () => {
-      void onLogin?.(provider);
-    },
-  }));
+  const defaultSignedOutCommands = useMemo<UserProfileCommand[]>(
+    () =>
+      providers.map((provider) => ({
+        name: translate(
+          sharedComponentTranslationKeys.userProfile.signInWithProvider,
+          {
+            provider: toProviderLabel(provider, translate),
+          }
+        ),
+        action: () => {
+          void onLogin?.(provider);
+        },
+      })),
+    [onLogin, providers, translate]
+  );
 
   const commands = user
     ? signedInCommands ?? defaultSignedInCommands
@@ -154,14 +186,18 @@ export function UserProfile({
         className={`${styles.userProfileAvatar} ${
           user?.avatarUrl ? styles.hasAvatar : styles.noAvatar
         }`}
-        aria-label="Open user menu"
+        aria-label={translate(sharedComponentTranslationKeys.userProfile.openMenu)}
         aria-expanded={menuVisible}
       >
         {user?.avatarUrl ? (
-          <img src={user.avatarUrl} alt="Avatar" className={styles.userProfileAvatarImage} />
+          <img
+            src={user.avatarUrl}
+            alt={translate(sharedComponentTranslationKeys.userProfile.avatarAlt)}
+            className={styles.userProfileAvatarImage}
+          />
         ) : (
           <span className={styles.userProfileInitials}>
-            {getInitials(user?.firstName, user?.lastName)}
+            {getInitials(user?.firstName, user?.lastName, translate)}
           </span>
         )}
       </button>

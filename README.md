@@ -31,6 +31,7 @@ If a product needs auth/profile behavior, wire it via callbacks/props from the h
 - `ConfirmationDialog`: reusable confirmation dialog with optional typed challenge flow for destructive actions
 - `StatusPanel`: reusable status/alert surface for loading, empty, warning, and retryable error states
 - Built-in interaction analytics forwarding through `@plasius/analytics`
+- Package-owned default display text resolved through `@plasius/translations`
 
 ## Install
 
@@ -105,6 +106,22 @@ const sharedMetadata: SharedComponentsMetadataInput = {
 
 `Header`, `Footer`, and `ContactDetails` require a branding metadata reference.
 Provide it once with `SharedComponentsBrandingProvider` (recommended), or per component using the `metadata` prop.
+
+## Translations
+
+Package-owned labels, default action names, accessibility labels, and fallback helper text are exposed as `en-GB` dictionaries and resolved through `@plasius/translations`.
+Components keep English fallback defaults when a host has not loaded the package dictionary, while host applications can load or override the same keys through the shared translator.
+
+```tsx
+import { getTranslator } from "@plasius/translations";
+import { sharedComponentsTranslations } from "@plasius/sharedcomponents";
+
+const i18n = getTranslator();
+
+for (const [language, dictionary] of Object.entries(sharedComponentsTranslations)) {
+  i18n.loadTranslations(language, dictionary);
+}
+```
 
 ## Interaction Analytics
 

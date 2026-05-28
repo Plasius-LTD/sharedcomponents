@@ -9,13 +9,13 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
-  - (placeholder)
+  - Added `en-GB` shared component translation dictionaries and exported translation keys/helpers for `@plasius/translations`.
 
 - **Changed**
   - Exposed `npm run typecheck` as the canonical TypeScript validation gate and routed audit/workflow checks through the same command.
 
 - **Fixed**
-  - (placeholder)
+  - Resolved embedded English defaults in shared UI chrome by routing package-owned display text through `@plasius/translations`.
 
 - **Security**
   - (placeholder)
