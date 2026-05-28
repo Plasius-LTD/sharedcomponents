@@ -15,6 +15,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - Exposed `npm run typecheck` as the canonical TypeScript validation gate and routed audit/workflow checks through the same command.
 
 - **Fixed**
+  - Updated the npm publish workflow to use release-prep PRs and release tags instead of direct protected-branch commits.
   - Resolved embedded English defaults in shared UI chrome by routing package-owned display text through `@plasius/translations`.
 
 - **Security**
