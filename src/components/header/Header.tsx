@@ -5,10 +5,15 @@ import {
   type MouseEvent,
   type ReactNode,
 } from "react";
+import { useI18n } from "@plasius/translations";
 import { ContextMenu } from "../context-menu/index.js";
 import type { SharedComponentsMetadataInput } from "../../metadata/white-label.js";
 import { useSharedComponentsBrandingMetadata } from "../../metadata/provider.js";
 import { trackSharedComponentsInteraction } from "../../analytics/tracker.js";
+import {
+  createSharedComponentTranslationResolver,
+  sharedComponentTranslationKeys,
+} from "../../i18n.js";
 import styles from "./Header.module.css";
 
 export interface HeaderNavItem {
@@ -48,10 +53,17 @@ export function Header({
   className,
   onNavigate,
 }: HeaderProps) {
+  const { t } = useI18n();
+  const translate = createSharedComponentTranslationResolver(t);
   const resolvedMetadata = useSharedComponentsBrandingMetadata("Header", metadata);
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(
     null
   );
+  const primaryNavigationLabel = translate(
+    sharedComponentTranslationKeys.header.primaryNavigation
+  );
+  const homeLabel = translate(sharedComponentTranslationKeys.header.home);
+  const toggleMenuLabel = translate(sharedComponentTranslationKeys.header.toggleMenu);
 
   const links = useMemo(
     () =>
@@ -121,14 +133,14 @@ export function Header({
 
   return (
     <header className={[styles.header, className].filter(Boolean).join(" ")}>
-      <nav className={styles.headerBar} aria-label="Primary navigation">
+      <nav className={styles.headerBar} aria-label={primaryNavigationLabel}>
         <a
           href={homeHref}
           className={styles.brandLink}
-          aria-label="Home"
+          aria-label={homeLabel}
           onClick={() =>
             trackInteraction("brand_click", {
-              label: "Home",
+              label: homeLabel,
               href: homeHref,
               variant: "desktop",
             })
@@ -168,7 +180,7 @@ export function Header({
             type="button"
             className={styles.mobileMenuToggle}
             onClick={toggleMobileMenu}
-            aria-label="Toggle navigation menu"
+            aria-label={toggleMenuLabel}
             aria-expanded={menuOpen}
             aria-controls="header-mobile-menu"
           >

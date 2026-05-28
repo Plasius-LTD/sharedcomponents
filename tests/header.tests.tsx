@@ -60,6 +60,35 @@ describe("Header", () => {
     );
   });
 
+  it("closes the mobile context menu on Escape", () => {
+    render(
+      <Header
+        metadata={fakeMetadata}
+        items={[{ name: "Internal", url: "/internal" }]}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle navigation menu" }));
+    expect(screen.getByRole("menu")).toBeTruthy();
+
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("runs internal mobile navigation commands", () => {
+    render(
+      <Header
+        metadata={fakeMetadata}
+        items={[{ name: "Internal", url: "/internal" }]}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle navigation menu" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Internal" }));
+
+    expect(screen.queryByRole("menu")).toBeNull();
+  });
+
   it("requires branding metadata reference", () => {
     expect(() =>
       render(<Header items={[{ name: "About", url: "/about" }]} />)

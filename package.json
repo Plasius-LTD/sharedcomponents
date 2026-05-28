@@ -34,7 +34,8 @@
   "author": "Plasius LTD <development@plasius.co.uk>",
   "license": "MIT",
   "dependencies": {
-    "@plasius/analytics": "^1.1.11"
+    "@plasius/analytics": "^1.1.11",
+    "@plasius/translations": "^1.0.17"
   },
   "peerDependencies": {
     "react": "^19"

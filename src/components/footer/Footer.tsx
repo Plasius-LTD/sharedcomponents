@@ -5,11 +5,16 @@ import {
   useState,
   type MouseEvent,
 } from "react";
+import { useI18n } from "@plasius/translations";
 import { ContextMenu } from "../context-menu/index.js";
 import type { SharedComponentsMetadataInput } from "../../metadata/white-label.js";
 import { toFooterBranding } from "../../metadata/white-label.js";
 import { useSharedComponentsBrandingMetadata } from "../../metadata/provider.js";
 import { trackSharedComponentsInteraction } from "../../analytics/tracker.js";
+import {
+  createSharedComponentTranslationResolver,
+  sharedComponentTranslationKeys,
+} from "../../i18n.js";
 import styles from "./Footer.module.css";
 
 export interface FooterNavItem {
@@ -47,10 +52,24 @@ export function Footer({
   className,
   onNavigate,
 }: FooterProps) {
+  const { t } = useI18n();
+  const translate = createSharedComponentTranslationResolver(t);
   const resolvedMetadata = useSharedComponentsBrandingMetadata("Footer", metadata);
   const branding = toFooterBranding(resolvedMetadata);
   const resolvedCompanyName = companyName ?? branding.companyName;
   const resolvedContactEmail = contactEmail ?? branding.contactEmail;
+  const currentYear = new Date().getFullYear();
+  const contactLabel = translate(sharedComponentTranslationKeys.footer.contactUs);
+  const toggleFooterMenuLabel = translate(
+    sharedComponentTranslationKeys.footer.toggleMenu
+  );
+  const rightsReservedText = translate(
+    sharedComponentTranslationKeys.footer.rightsReserved,
+    {
+      year: currentYear,
+      companyName: resolvedCompanyName,
+    }
+  );
   const menuToggleRef = useRef<HTMLButtonElement | null>(null);
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(
     null
@@ -127,21 +146,19 @@ export function Footer({
   return (
     <footer className={[styles.footer, className].filter(Boolean).join(" ")}>
       <div className={styles.footerLeft}>
-        <p className={styles.footerMeta}>
-          &copy; {new Date().getFullYear()} {resolvedCompanyName}. All rights reserved.
-        </p>
+        <p className={styles.footerMeta}>{rightsReservedText}</p>
         <a
           href={`mailto:${resolvedContactEmail}`}
           className={styles.footerMetaLink}
           onClick={() =>
             trackInteraction("contact_click", {
-              label: "Contact us",
+              label: contactLabel,
               href: `mailto:${resolvedContactEmail}`,
               variant: "desktop",
             })
           }
         >
-          Contact us
+          {contactLabel}
         </a>
       </div>
 
@@ -176,7 +193,7 @@ export function Footer({
           type="button"
           className={styles.menuToggle}
           onClick={toggleMobileMenu}
-          aria-label="Toggle footer menu"
+          aria-label={toggleFooterMenuLabel}
           aria-expanded={menuOpen}
           aria-controls="footer-mobile-menu"
         >
