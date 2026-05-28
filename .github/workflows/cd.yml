@@ -64,13 +64,26 @@ jobs:
         run: npm run build --if-present
 
       - name: Test with coverage
-        run: npm run test:coverage
+        run: npm run test:coverage -- --coverage.reporter=lcov --coverage.reporter=text-summary
 
       - name: Pack check
         run: npm run pack:check
 
       - name: Install Codecov CLI
         run: python3 -m pip install --upgrade codecov-cli
+
+      - name: Locate coverage report
+        run: |
+          set -euo pipefail
+
+          LCOV_FILE="$(find coverage -type f -name lcov.info | head -n 1 || true)"
+          if [ -z "$LCOV_FILE" ]; then
+            echo "No lcov.info found under coverage/."
+            exit 1
+          fi
+
+          echo "Using coverage report: $LCOV_FILE"
+          echo "LCOV_FILE=$LCOV_FILE" >> "$GITHUB_ENV"
 
       - name: Upload coverage to Codecov
         env:
@@ -79,7 +92,7 @@ jobs:
           codecovcli --verbose upload-process --disable-search --fail-on-error \
             -n "release-${GITHUB_RUN_ID}" \
             -F unittests \
-            -f ./coverage/lcov.info
+            -f "$LCOV_FILE"
 
       - name: Prepare release metadata
         id: release
