@@ -1,4 +1,9 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { useI18n } from "@plasius/translations";
+import {
+  createSharedComponentTranslationResolver,
+  sharedComponentTranslationKeys,
+} from "../../i18n.js";
 import styles from "./ConfirmationDialog.module.css";
 
 export type ConfirmationDialogTone = "default" | "danger";
@@ -28,20 +33,22 @@ export function ConfirmationDialog({
   open,
   title,
   description,
-  summaryTitle = "Summary",
+  summaryTitle,
   summaryItems = [],
-  challengeLabel = "Type the confirmation value to continue",
+  challengeLabel,
   challengeValue,
-  challengePlaceholder = "Type confirmation value",
+  challengePlaceholder,
   confirmLabel,
-  confirmBusyLabel = "Submitting...",
-  cancelLabel = "Cancel",
-  continueLabel = "Continue",
+  confirmBusyLabel,
+  cancelLabel,
+  continueLabel,
   busy = false,
   tone = "default",
   onCancel,
   onConfirm,
 }: ConfirmationDialogProps) {
+  const { t } = useI18n();
+  const translate = createSharedComponentTranslationResolver(t);
   const [step, setStep] = useState<ConfirmationStep>("review");
   const [typedValue, setTypedValue] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -119,6 +126,20 @@ export function ConfirmationDialog({
   }
 
   const isDanger = tone === "danger";
+  const summaryTitleText =
+    summaryTitle ?? translate(sharedComponentTranslationKeys.confirmationDialog.summaryTitle);
+  const challengeLabelText =
+    challengeLabel ?? translate(sharedComponentTranslationKeys.confirmationDialog.challengeLabel);
+  const challengePlaceholderText =
+    challengePlaceholder
+    ?? translate(sharedComponentTranslationKeys.confirmationDialog.challengePlaceholder);
+  const confirmBusyLabelText =
+    confirmBusyLabel
+    ?? translate(sharedComponentTranslationKeys.confirmationDialog.confirmBusy);
+  const cancelLabelText =
+    cancelLabel ?? translate(sharedComponentTranslationKeys.confirmationDialog.cancel);
+  const continueLabelText =
+    continueLabel ?? translate(sharedComponentTranslationKeys.confirmationDialog.continue);
 
   return (
     <div className={styles.overlay}>
@@ -140,8 +161,8 @@ export function ConfirmationDialog({
         ) : null}
 
         {step === "review" ? (
-          <section className={styles.summary} aria-label={summaryTitle}>
-            <h3 className={styles.summaryTitle}>{summaryTitle}</h3>
+          <section className={styles.summary} aria-label={summaryTitleText}>
+            <h3 className={styles.summaryTitle}>{summaryTitleText}</h3>
             {summaryItems.length > 0 ? (
               <ul className={styles.summaryList}>
                 {summaryItems.map((item) => (
@@ -149,26 +170,36 @@ export function ConfirmationDialog({
                 ))}
               </ul>
             ) : (
-              <p className={styles.summaryEmpty}>Review this action before continuing.</p>
+              <p className={styles.summaryEmpty}>
+                {translate(sharedComponentTranslationKeys.confirmationDialog.summaryEmpty)}
+              </p>
             )}
           </section>
         ) : (
-          <section className={styles.challenge} aria-label="Confirmation challenge">
+          <section
+            className={styles.challenge}
+            aria-label={translate(
+              sharedComponentTranslationKeys.confirmationDialog.challengeSectionLabel,
+            )}
+          >
             <label className={styles.challengeLabel}>
-              {challengeLabel}
+              {challengeLabelText}
               <input
                 className={styles.challengeInput}
                 type="text"
                 value={typedValue}
                 onChange={(event) => setTypedValue(event.target.value)}
-                placeholder={challengePlaceholder}
+                placeholder={challengePlaceholderText}
                 autoComplete="off"
                 spellCheck={false}
               />
             </label>
             {shouldChallenge ? (
               <p className={styles.challengeHint}>
-                Enter exactly: <code>{challengeValue}</code>
+                {translate(
+                  sharedComponentTranslationKeys.confirmationDialog.challengeHint,
+                )}{" "}
+                <code>{challengeValue}</code>
               </p>
             ) : null}
           </section>
@@ -182,7 +213,7 @@ export function ConfirmationDialog({
             onClick={onCancel}
             disabled={submitting || busy}
           >
-            {cancelLabel}
+            {cancelLabelText}
           </button>
 
           {step === "review" && shouldChallenge ? (
@@ -192,7 +223,7 @@ export function ConfirmationDialog({
               onClick={() => setStep("challenge")}
               disabled={submitting || busy}
             >
-              {continueLabel}
+              {continueLabelText}
             </button>
           ) : (
             <button
@@ -203,7 +234,7 @@ export function ConfirmationDialog({
               }}
               disabled={confirmDisabled}
             >
-              {submitting || busy ? confirmBusyLabel : confirmLabel}
+              {submitting || busy ? confirmBusyLabelText : confirmLabel}
             </button>
           )}
         </div>

@@ -74,6 +74,34 @@ describe("ContactDetails", () => {
     expect(screen.getByRole("link", { name: "override@example.com" })).toBeTruthy();
   });
 
+  it("supports all top-level contact detail overrides", () => {
+    render(
+      <ContactDetails
+        metadata={fakeMetadata}
+        teamName="Override Team"
+        companyName="Override Org"
+        addressLines={["Override Line"]}
+        email="override@example.com"
+        website="https://override.example.com"
+        websiteLabel="override.example.com"
+      />
+    );
+
+    expect(screen.getByText("Override Team")).toBeTruthy();
+    expect(screen.getByText("Override Org")).toBeTruthy();
+    expect(screen.getByText("Override Line")).toBeTruthy();
+    expect(
+      screen
+        .getByRole("link", { name: "override@example.com" })
+        .getAttribute("href")
+    ).toBe("mailto:override@example.com");
+    expect(
+      screen
+        .getByRole("link", { name: "override.example.com" })
+        .getAttribute("href")
+    ).toBe("https://override.example.com");
+  });
+
   it("tracks email and website interactions when analytics is configured", () => {
     const metadataWithAnalytics: SharedComponentsMetadataInput = {
       ...fakeMetadata,
