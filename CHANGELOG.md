@@ -9,6 +9,20 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [1.0.19] - 2026-06-22
+
+- **Added**
   - Added `en-GB` shared component translation dictionaries and exported translation keys/helpers for `@plasius/translations`.
 
 - **Changed**
@@ -224,7 +238,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ---
 
-[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.0.16...HEAD
+[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.0.19...HEAD
 
 ## [1.0.0] - 2026-02-11
 
@@ -251,3 +265,4 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 [1.0.14]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.14
 [1.0.15]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.15
 [1.0.16]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.16
+[1.0.19]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.19
