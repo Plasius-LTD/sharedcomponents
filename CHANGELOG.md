@@ -9,7 +9,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
-  - (placeholder)
+  - Added opt-in polished-metal `Header` and `Footer` appearances with active-link support for host shell restyles.
 
 - **Changed**
   - (placeholder)

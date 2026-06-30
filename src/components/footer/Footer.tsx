@@ -24,11 +24,15 @@ export interface FooterNavItem {
   external?: boolean;
 }
 
+export type FooterAppearance = "default" | "polishedMetal";
+
 export interface FooterProps {
   items: FooterNavItem[];
   metadata?: SharedComponentsMetadataInput;
   companyName?: string;
   contactEmail?: string;
+  appearance?: FooterAppearance;
+  activeHref?: string;
   className?: string;
   onNavigate?: (
     item: FooterNavItem,
@@ -49,6 +53,8 @@ export function Footer({
   metadata,
   companyName,
   contactEmail,
+  appearance = "default",
+  activeHref,
   className,
   onNavigate,
 }: FooterProps) {
@@ -103,6 +109,13 @@ export function Footer({
       })),
     [items]
   );
+  const footerClasses = [
+    styles.footer,
+    appearance === "polishedMetal" ? styles.polishedMetal : undefined,
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const closeMenu = () => setMenuPosition(null);
 
@@ -144,7 +157,7 @@ export function Footer({
   }, [menuOpen]);
 
   return (
-    <footer className={[styles.footer, className].filter(Boolean).join(" ")}>
+    <footer className={footerClasses}>
       <div className={styles.footerLeft}>
         <p className={styles.footerMeta}>{rightsReservedText}</p>
         <a
@@ -168,7 +181,13 @@ export function Footer({
             <a
               key={`${item.name}-${index}`}
               href={item.href}
-              className={styles.footerButton}
+              className={[
+                styles.footerButton,
+                activeHref === item.href ? styles.activeFooterButton : undefined,
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              aria-current={activeHref === item.href ? "page" : undefined}
               target={item.external ? "_blank" : undefined}
               rel={item.external ? "noopener noreferrer" : undefined}
               onClick={(event: MouseEvent<HTMLAnchorElement>) => {

@@ -23,12 +23,16 @@ export interface HeaderNavItem {
   external?: boolean;
 }
 
+export type HeaderAppearance = "default" | "polishedMetal";
+
 export interface HeaderProps {
   items: HeaderNavItem[];
   metadata?: SharedComponentsMetadataInput;
   brand?: ReactNode;
   homeHref?: string;
   profileSlot?: ReactNode;
+  appearance?: HeaderAppearance;
+  activeHref?: string;
   className?: string;
   onNavigate?: (
     item: HeaderNavItem,
@@ -50,6 +54,8 @@ export function Header({
   brand,
   homeHref = "/",
   profileSlot,
+  appearance = "default",
+  activeHref,
   className,
   onNavigate,
 }: HeaderProps) {
@@ -75,6 +81,13 @@ export function Header({
   );
 
   const menuOpen = menuPosition !== null;
+  const headerClasses = [
+    styles.header,
+    appearance === "polishedMetal" ? styles.polishedMetal : undefined,
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const closeMenu = () => setMenuPosition(null);
 
@@ -132,7 +145,7 @@ export function Header({
   }, [menuOpen]);
 
   return (
-    <header className={[styles.header, className].filter(Boolean).join(" ")}>
+    <header className={headerClasses}>
       <nav className={styles.headerBar} aria-label={primaryNavigationLabel}>
         <a
           href={homeHref}
@@ -156,7 +169,13 @@ export function Header({
             <a
               key={`${item.name}-${index}`}
               href={item.href}
-              className={styles.headerButton}
+              className={[
+                styles.headerButton,
+                activeHref === item.href ? styles.activeHeaderButton : undefined,
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              aria-current={activeHref === item.href ? "page" : undefined}
               target={item.external ? "_blank" : undefined}
               rel={item.external ? "noopener noreferrer" : undefined}
               onClick={(event: MouseEvent<HTMLAnchorElement>) => {

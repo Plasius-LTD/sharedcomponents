@@ -38,6 +38,32 @@ describe("Header", () => {
     );
   });
 
+  it("supports polished metal appearance and active navigation state", () => {
+    const { container } = render(
+      <Header
+        metadata={fakeMetadata}
+        brand={<span>Acme Shell</span>}
+        appearance="polishedMetal"
+        activeHref="/about"
+        items={[
+          { name: "About", url: "/about" },
+          { name: "Contact", url: "/contact" },
+        ]}
+      />
+    );
+
+    expect(container.querySelector("[class*='polishedMetal']")).toBeTruthy();
+    expect(screen.getByText("Acme Shell")).toBeTruthy();
+    expect(
+      screen.getByRole("link", { name: "About" }).getAttribute("aria-current")
+    ).toBe("page");
+    expect(
+      screen.getByRole("link", { name: "Contact" }).getAttribute("aria-current")
+    ).toBeNull();
+    screen.getByRole("link", { name: "About" }).focus();
+    expect(document.activeElement).toBe(screen.getByRole("link", { name: "About" }));
+  });
+
   it("opens mobile context menu and executes external link command", () => {
     const openSpy = vi
       .spyOn(window, "open")
