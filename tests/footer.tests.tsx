@@ -42,6 +42,29 @@ describe("Footer", () => {
     );
   });
 
+  it("supports polished metal appearance and active navigation state", () => {
+    const { container } = render(
+      <Footer
+        metadata={fakeMetadata}
+        appearance="polishedMetal"
+        activeHref="/privacy"
+        items={fakeFooterItems}
+      />
+    );
+
+    expect(container.querySelector("[class*='polishedMetal']")).toBeTruthy();
+    expect(
+      screen.getByRole("link", { name: "Privacy" }).getAttribute("aria-current")
+    ).toBe("page");
+    expect(
+      screen.getByRole("link", { name: "Docs" }).getAttribute("aria-current")
+    ).toBeNull();
+    screen.getByRole("link", { name: "Contact us" }).focus();
+    expect(document.activeElement).toBe(
+      screen.getByRole("link", { name: "Contact us" })
+    );
+  });
+
   it("renders branding directly from metadata object", () => {
     render(<Footer metadata={fakeMetadata} items={fakeFooterItems} />);
 

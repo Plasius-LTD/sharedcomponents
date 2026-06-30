@@ -33,6 +33,45 @@
   border-top: 1px solid var(--footerBorder);
 }
 
+.polishedMetal {
+  --footerMetalHighlight: rgba(255, 255, 255, 0.84);
+  --footerMetalMid: #c7ccd4;
+  --footerMetalLow: #8d949f;
+  --footerMetalEdge: rgba(65, 73, 86, 0.55);
+  --footerMetalInk: #172033;
+  --footerMetalMuted: #465164;
+  --footerMetalAccent: #1d6fe8;
+
+  min-height: 72px;
+  background:
+    linear-gradient(180deg, var(--footerMetalHighlight) 0%, var(--footerMetalMid) 48%, var(--footerMetalLow) 100%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.16) 0 1px, rgba(40, 48, 60, 0.08) 1px 3px);
+  background-blend-mode: screen, normal;
+  border-top: 1px solid var(--footerMetalEdge);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.84),
+    inset 0 -1px rgba(45, 54, 67, 0.28),
+    0 -2px 8px rgba(15, 23, 42, 0.16);
+}
+
+[data-theme="dark"] .polishedMetal {
+  --footerMetalHighlight: rgba(79, 88, 103, 0.96);
+  --footerMetalMid: #2a313d;
+  --footerMetalLow: #141923;
+  --footerMetalEdge: rgba(226, 232, 240, 0.2);
+  --footerMetalInk: #edf2f8;
+  --footerMetalMuted: #b9c2d0;
+  --footerMetalAccent: #7bb6ff;
+
+  background:
+    linear-gradient(180deg, var(--footerMetalHighlight) 0%, var(--footerMetalMid) 48%, var(--footerMetalLow) 100%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0 1px, rgba(2, 6, 23, 0.2) 1px 3px);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.18),
+    inset 0 -1px rgba(2, 6, 23, 0.82),
+    0 -2px 12px rgba(2, 6, 23, 0.44);
+}
+
 .footerLeft {
   display: flex;
   flex-direction: column;
@@ -44,6 +83,16 @@
   margin: 0;
   color: var(--footerTextSecondary);
   font-size: 0.8rem;
+}
+
+.polishedMetal .footerMeta {
+  color: var(--footerMetalMuted);
+  font-weight: 650;
+  text-shadow: 0 1px rgba(255, 255, 255, 0.48);
+}
+
+[data-theme="dark"] .polishedMetal .footerMeta {
+  text-shadow: 0 -1px rgba(2, 6, 23, 0.82);
 }
 
 .footerMetaLink {
@@ -79,6 +128,82 @@
   text-decoration: underline;
 }
 
+.polishedMetal .footerButton,
+.polishedMetal .footerMetaLink {
+  position: relative;
+  color: var(--footerMetalInk);
+  font-weight: 750;
+  letter-spacing: 0;
+}
+
+.polishedMetal .footerButton {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 5px 11px;
+  border: 1px solid rgba(55, 65, 81, 0.3);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(189, 196, 207, 0.66) 52%, rgba(139, 148, 162, 0.62)),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.14) 0 1px, rgba(40, 48, 60, 0.07) 1px 3px);
+  background-blend-mode: screen, normal;
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.88),
+    inset 0 -1px rgba(65, 73, 86, 0.3),
+    0 1px 2px rgba(15, 23, 42, 0.16);
+  font-size: 0.84rem;
+  line-height: 1.1;
+}
+
+.polishedMetal .footerButton:hover,
+.polishedMetal .footerMetaLink:hover {
+  color: var(--footerMetalInk);
+}
+
+.polishedMetal .footerButton:hover {
+  text-decoration: none;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(204, 212, 223, 0.78) 52%, rgba(153, 163, 178, 0.72)),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.16) 0 1px, rgba(40, 48, 60, 0.07) 1px 3px);
+}
+
+.polishedMetal .footerButton:focus-visible,
+.polishedMetal .footerMetaLink:focus-visible,
+.polishedMetal .menuToggle:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--footerMetalAccent) 72%, transparent);
+  outline-offset: 2px;
+}
+
+.polishedMetal .activeFooterButton::after {
+  position: absolute;
+  left: 9px;
+  right: 9px;
+  bottom: 3px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--footerMetalAccent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--footerMetalAccent) 60%, transparent);
+  content: "";
+}
+
+[data-theme="dark"] .polishedMetal .footerButton {
+  border-color: rgba(226, 232, 240, 0.18);
+  background:
+    linear-gradient(180deg, rgba(89, 99, 116, 0.74), rgba(41, 48, 61, 0.76) 52%, rgba(18, 23, 32, 0.84)),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0 1px, rgba(2, 6, 23, 0.16) 1px 3px);
+  color: var(--footerMetalInk);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.16),
+    inset 0 -1px rgba(2, 6, 23, 0.76),
+    0 1px 2px rgba(2, 6, 23, 0.5);
+}
+
+[data-theme="dark"] .polishedMetal .footerButton:hover {
+  background:
+    linear-gradient(180deg, rgba(104, 116, 135, 0.82), rgba(48, 56, 70, 0.8) 52%, rgba(22, 28, 39, 0.88)),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0 1px, rgba(2, 6, 23, 0.16) 1px 3px);
+}
+
 .footerRight {
   display: flex;
   justify-content: flex-end;
@@ -98,10 +223,32 @@
   gap: 4px;
 }
 
+.polishedMetal .menuToggle {
+  border: 1px solid rgba(55, 65, 81, 0.28);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(184, 192, 204, 0.42)),
+    rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.78),
+    inset 0 -1px rgba(65, 73, 86, 0.26);
+}
+
+[data-theme="dark"] .polishedMetal .menuToggle {
+  border-color: rgba(226, 232, 240, 0.18);
+  background:
+    linear-gradient(180deg, rgba(87, 97, 113, 0.62), rgba(18, 23, 32, 0.68)),
+    rgba(15, 23, 42, 0.32);
+}
+
 .menuToggle span {
   width: 24px;
   height: 2px;
   background-color: var(--footerTextPrimary);
+}
+
+.polishedMetal .menuToggle span {
+  background-color: var(--footerMetalInk);
 }
 
 @media (max-width: 768px) {

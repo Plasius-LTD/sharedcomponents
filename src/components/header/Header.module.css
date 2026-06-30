@@ -42,18 +42,95 @@
   box-shadow: var(--headerShadow);
 }
 
+.polishedMetal .headerBar {
+  --headerMetalHighlight: rgba(255, 255, 255, 0.86);
+  --headerMetalMid: #c7ccd4;
+  --headerMetalLow: #8b929d;
+  --headerMetalEdge: rgba(65, 73, 86, 0.55);
+  --headerMetalInk: #172033;
+  --headerMetalMuted: #465164;
+  --headerMetalAccent: #1d6fe8;
+
+  min-height: 56px;
+  padding: 5px 12px;
+  background:
+    linear-gradient(180deg, var(--headerMetalHighlight) 0%, var(--headerMetalMid) 48%, var(--headerMetalLow) 100%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.18) 0 1px, rgba(40, 48, 60, 0.08) 1px 3px);
+  background-blend-mode: screen, normal;
+  color: var(--headerMetalInk);
+  border-bottom: 1px solid var(--headerMetalEdge);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.9),
+    inset 0 -1px rgba(45, 54, 67, 0.32),
+    0 2px 8px rgba(15, 23, 42, 0.18);
+}
+
+[data-theme="dark"] .polishedMetal .headerBar {
+  --headerMetalHighlight: rgba(79, 88, 103, 0.98);
+  --headerMetalMid: #2a313d;
+  --headerMetalLow: #141923;
+  --headerMetalEdge: rgba(226, 232, 240, 0.2);
+  --headerMetalInk: #edf2f8;
+  --headerMetalMuted: #b9c2d0;
+  --headerMetalAccent: #7bb6ff;
+
+  background:
+    linear-gradient(180deg, var(--headerMetalHighlight) 0%, var(--headerMetalMid) 48%, var(--headerMetalLow) 100%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0 1px, rgba(2, 6, 23, 0.2) 1px 3px);
+  border-bottom-color: var(--headerMetalEdge);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.22),
+    inset 0 -1px rgba(2, 6, 23, 0.82),
+    0 2px 12px rgba(2, 6, 23, 0.48);
+}
+
 .brandLink {
   display: inline-flex;
   align-items: center;
+  gap: 8px;
   min-width: 44px;
   min-height: 44px;
   color: inherit;
   text-decoration: none;
 }
 
+.polishedMetal .brandLink {
+  padding: 3px 9px 3px 4px;
+  border: 1px solid rgba(63, 72, 86, 0.28);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(210, 216, 225, 0.32)),
+    rgba(255, 255, 255, 0.24);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.82),
+    inset 0 -1px rgba(64, 73, 86, 0.24);
+}
+
+[data-theme="dark"] .polishedMetal .brandLink {
+  border-color: rgba(226, 232, 240, 0.18);
+  background:
+    linear-gradient(180deg, rgba(88, 98, 114, 0.58), rgba(20, 25, 35, 0.48)),
+    rgba(15, 23, 42, 0.42);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.16),
+    inset 0 -1px rgba(2, 6, 23, 0.72);
+}
+
 .brandText {
   font-size: 1rem;
   font-weight: 700;
+}
+
+.polishedMetal .brandText {
+  color: var(--headerMetalInk);
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1;
+  text-shadow: 0 1px rgba(255, 255, 255, 0.54);
+}
+
+[data-theme="dark"] .polishedMetal .brandText {
+  text-shadow: 0 -1px rgba(2, 6, 23, 0.86);
 }
 
 .headerItems {
@@ -80,6 +157,80 @@
   background: var(--headerButtonHover);
 }
 
+.polishedMetal .headerButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(55, 65, 81, 0.34);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(189, 196, 207, 0.72) 52%, rgba(139, 148, 162, 0.7)),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.16) 0 1px, rgba(40, 48, 60, 0.07) 1px 3px);
+  background-blend-mode: screen, normal;
+  color: var(--headerMetalInk);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.94),
+    inset 0 -1px rgba(65, 73, 86, 0.34),
+    0 1px 2px rgba(15, 23, 42, 0.2);
+  font-size: 0.85rem;
+  font-weight: 750;
+  line-height: 1.1;
+  letter-spacing: 0;
+  transition: background 0.16s ease, box-shadow 0.16s ease, transform 0.1s ease;
+}
+
+.polishedMetal .headerButton:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(203, 211, 222, 0.82) 52%, rgba(152, 162, 178, 0.78)),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.18) 0 1px, rgba(40, 48, 60, 0.07) 1px 3px);
+}
+
+.polishedMetal .headerButton:focus-visible,
+.polishedMetal .brandLink:focus-visible,
+.polishedMetal .mobileMenuToggle:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--headerMetalAccent) 72%, transparent);
+  outline-offset: 2px;
+}
+
+.polishedMetal .headerButton:active {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 1px 3px rgba(15, 23, 42, 0.28),
+    inset 0 -1px rgba(255, 255, 255, 0.38);
+}
+
+.polishedMetal .activeHeaderButton::after {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 3px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--headerMetalAccent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--headerMetalAccent) 60%, transparent);
+  content: "";
+}
+
+[data-theme="dark"] .polishedMetal .headerButton {
+  border-color: rgba(226, 232, 240, 0.18);
+  background:
+    linear-gradient(180deg, rgba(89, 99, 116, 0.78), rgba(41, 48, 61, 0.78) 52%, rgba(18, 23, 32, 0.86)),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0 1px, rgba(2, 6, 23, 0.16) 1px 3px);
+  color: var(--headerMetalInk);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.16),
+    inset 0 -1px rgba(2, 6, 23, 0.78),
+    0 1px 2px rgba(2, 6, 23, 0.55);
+}
+
+[data-theme="dark"] .polishedMetal .headerButton:hover {
+  background:
+    linear-gradient(180deg, rgba(104, 116, 135, 0.84), rgba(48, 56, 70, 0.82) 52%, rgba(22, 28, 39, 0.9)),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0 1px, rgba(2, 6, 23, 0.16) 1px 3px);
+}
+
 .headerButton:active {
   transform: translate(1px, 2px);
   box-shadow: none;
@@ -104,11 +255,33 @@
   cursor: pointer;
 }
 
+.polishedMetal .mobileMenuToggle {
+  border: 1px solid rgba(55, 65, 81, 0.28);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(184, 192, 204, 0.42)),
+    rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.78),
+    inset 0 -1px rgba(65, 73, 86, 0.26);
+}
+
+[data-theme="dark"] .polishedMetal .mobileMenuToggle {
+  border-color: rgba(226, 232, 240, 0.18);
+  background:
+    linear-gradient(180deg, rgba(87, 97, 113, 0.62), rgba(18, 23, 32, 0.68)),
+    rgba(15, 23, 42, 0.32);
+}
+
 .mobileMenuToggle span {
   width: 24px;
   height: 2px;
   background-color: var(--headerText);
   transition: background-color 0.2s ease-in-out;
+}
+
+.polishedMetal .mobileMenuToggle span {
+  background-color: var(--headerMetalInk);
 }
 
 @media (max-width: 768px) {
