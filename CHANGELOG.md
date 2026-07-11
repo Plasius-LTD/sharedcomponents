@@ -12,6 +12,20 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - (placeholder)
 
 - **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [1.0.22] - 2026-07-11
+
+- **Added**
+  - (placeholder)
+
+- **Changed**
   - Refreshed published internal dependencies and compatible stable development dependencies for the next release.
   - Retained TypeScript `^6.0.3` because the current `@typescript-eslint` parser release requires TypeScript `<6.1.0`; TypeScript 7 remains blocked until that peer constraint changes.
 
@@ -267,7 +281,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ---
 
-[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.0.21...HEAD
+[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.0.22...HEAD
 
 ## [1.0.0] - 2026-02-11
 
@@ -297,3 +311,4 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 [1.0.19]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.19
 [1.0.20]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.20
 [1.0.21]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.21
+[1.0.22]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.22
