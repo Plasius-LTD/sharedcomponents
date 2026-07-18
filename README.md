@@ -27,6 +27,8 @@ If a product needs auth/profile behavior, wire it via callbacks/props from the h
 - `Footer`: configurable legal/footer links with mobile context menu
 - `ContactDetails`: reusable legal contact block with configurable details
 - `ContextMenu`: generic context menu surface
+- `ActionMenu`: controlled touch-first overflow menu with an anchored popover and phone-sheet presentation
+- `ReviewSheet`: controlled responsive review surface with non-modal side-sheet and modal phone behavior
 - `UserProfile`: optional generic avatar/menu shell driven by callbacks
 - `ConfirmationDialog`: reusable confirmation dialog with optional typed challenge flow for destructive actions
 - `StatusPanel`: reusable status/alert surface for loading, empty, warning, and retryable error states
@@ -48,6 +50,7 @@ When CJS output is emitted under `dist-cjs/*.js` with `type: module`, `dist-cjs/
 ## Usage
 
 ```tsx
+import { useState } from "react";
 import {
   ContactDetails,
   Footer,
@@ -106,6 +109,74 @@ const sharedMetadata: SharedComponentsMetadataInput = {
 
 `Header`, `Footer`, and `ContactDetails` require a branding metadata reference.
 Provide it once with `SharedComponentsBrandingProvider` (recommended), or per component using the `metadata` prop.
+
+## Touch-first action and review surfaces
+
+`ActionMenu` and `ReviewSheet` are controlled presentation components. The host
+owns open state, authorization, draft state, validation, and persistence. At
+widths above `40rem`, `ActionMenu` is anchored to its trigger and `ReviewSheet`
+is a non-modal right-side overlay. At `40rem` and below, both adapt to
+full-width touch sheets; the review surface contains keyboard focus and marks
+itself modal.
+
+```tsx
+import {
+  ActionMenu,
+  ReviewSheet,
+  type ReviewSheetCloseReason,
+} from "@plasius/sharedcomponents";
+
+const [actionsOpen, setActionsOpen] = useState(false);
+const [reviewOpen, setReviewOpen] = useState(false);
+
+function closeReview(_reason: ReviewSheetCloseReason) {
+  setReviewOpen(false);
+}
+
+<ActionMenu
+  open={actionsOpen}
+  label="User actions"
+  triggerLabel="Open user actions"
+  trigger={<span aria-hidden="true">•••</span>}
+  items={[
+    {
+      id: "review",
+      label: "Review change",
+      onSelect: () => setReviewOpen(true),
+    },
+    {
+      id: "remove",
+      label: "Remove avatar",
+      tone: "danger",
+      onSelect: () => setReviewOpen(true),
+    },
+  ]}
+  onOpenChange={setActionsOpen}
+/>;
+
+<ReviewSheet
+  open={reviewOpen}
+  title="Review user change"
+  description="Check the before and after values before committing."
+  closeLabel="Close review"
+  onClose={closeReview}
+  footer={<button type="button">Commit change</button>}
+>
+  <dl>{/* caller-owned review details */}</dl>
+</ReviewSheet>;
+```
+
+Both components provide 44×44 CSS-pixel minimum touch targets, Escape and
+outside-pointer dismissal, safe-area padding, reduced-motion handling,
+high-contrast focus indicators, and caller-translatable accessible labels.
+`ActionMenu` implements wrapping arrow, Home, and End navigation and returns
+focus to its trigger. `ReviewSheet` reports why close was requested and returns
+focus for explicit close and Escape; an outside selection on a larger screen
+may receive focus without the component stealing it back.
+
+See [Touch-first action surfaces](./docs/touch-first-action-surfaces.md) for the
+complete API and host responsibilities. Existing `ContextMenu` behavior and
+coordinate-based API remain unchanged.
 
 ## Translations
 

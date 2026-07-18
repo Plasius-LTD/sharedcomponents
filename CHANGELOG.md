@@ -9,7 +9,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
-  - (placeholder)
+  - Added controlled, accessible `ActionMenu` and `ReviewSheet` primitives with touch-sized controls, responsive popover/sheet presentations, keyboard and focus management, safe-area support, and reduced-motion behavior (task #38).
 
 - **Changed**
   - (placeholder)
