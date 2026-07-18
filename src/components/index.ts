@@ -5,3 +5,5 @@ export * from "./context-menu/index.js";
 export * from "./user-profile/index.js";
 export * from "./confirmation-dialog/index.js";
 export * from "./status-panel/index.js";
+export * from "./action-menu/index.js";
+export * from "./review-sheet/index.js";
