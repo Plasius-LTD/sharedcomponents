@@ -24,7 +24,7 @@
     "audit:deps": "npm ls --all --omit=optional --omit=peer > /dev/null 2>&1 || true",
     "audit:npm": "npm audit --audit-level=moderate || true",
     "audit:test": "vitest run --coverage",
-    "audit:all": "npm-run-all -l audit:ts audit:eslint audit:deps audit:npm audit:test",
+    "audit:all": "npm run audit:ts && npm run audit:eslint && npm run audit:deps && npm run audit:npm && npm run audit:test",
     "build:cjs": "tsc -p tsconfig.json --module commonjs --moduleResolution node --outDir dist-cjs --tsBuildInfoFile dist-cjs/tsconfig.tsbuildinfo --listEmittedFiles && (rsync -av --include '*/' --include '*.module.css' --exclude '*' src/ dist-cjs/ || true) && node scripts/write-cjs-package-json.cjs",
     "lint": "eslint .",
     "prepare": "npm run build",
@@ -51,7 +51,6 @@
     "eslint": "^10.7.0",
     "globals": "^17.7.0",
     "jsdom": "^29.1.1",
-    "npm-run-all": "^4.1.5",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "tsx": "^4.23.0",
@@ -109,6 +108,9 @@
     "node": ">=24"
   },
   "overrides": {
-    "minimatch": "^10.2.1"
+    "brace-expansion": "^5.0.8",
+    "esbuild": "^0.28.1",
+    "minimatch": "^10.2.1",
+    "postcss": "^8.5.23"
   }
 }
