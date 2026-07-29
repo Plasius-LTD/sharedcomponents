@@ -1,0 +1,184 @@
+.root {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--shared-rich-editor-text, #172033);
+}
+
+.loading {
+  min-height: 44px;
+  padding: 0.75rem;
+  color: var(--shared-rich-editor-muted, #475569);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  padding: 0.3rem;
+  border: 1px solid var(--shared-rich-editor-border, #64748b);
+  border-radius: 0.65rem 0.65rem 0 0;
+  background: var(--shared-rich-editor-toolbar, #f8fafc);
+}
+
+.toolbarButton {
+  display: inline-grid;
+  box-sizing: border-box;
+  min-width: 44px;
+  min-height: 44px;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 0.45rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.toolbarButton:hover:not(:disabled) {
+  background: var(--shared-rich-editor-hover, #e2e8f0);
+}
+
+.toolbarButton[aria-pressed="true"] {
+  border-color: currentcolor;
+  background: var(--shared-rich-editor-selected, #dbeafe);
+  box-shadow: inset 0 -3px 0 currentcolor;
+}
+
+.toolbarButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.toolbarButton:focus-visible,
+.editor:focus-visible {
+  outline: 3px solid var(--shared-focus-color, #005fcc);
+  outline-offset: 2px;
+}
+
+.toolbarSeparator {
+  align-self: stretch;
+  width: 1px;
+  margin: 0.25rem;
+  background: var(--shared-rich-editor-border, #64748b);
+}
+
+.bold {
+  font-weight: 800;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
+.editor {
+  position: relative;
+  box-sizing: border-box;
+  min-height: 9rem;
+  max-height: min(24rem, 50dvh);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 0.75rem;
+  border: 1px solid var(--shared-rich-editor-border, #64748b);
+  border-radius: 0 0 0.65rem 0.65rem;
+  background: var(--shared-rich-editor-background, #ffffff);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.editor[data-empty="true"]::before {
+  position: absolute;
+  color: var(--shared-rich-editor-placeholder, #64748b);
+  content: attr(data-placeholder);
+  pointer-events: none;
+}
+
+.editor[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.block {
+  min-height: 1.5em;
+  margin-inline-start: calc(var(--feedback-depth, 0) * 1.25rem);
+}
+
+.listItem {
+  position: relative;
+  padding-inline-start: 1.15rem;
+}
+
+.listItem::before {
+  position: absolute;
+  inset-inline-start: 0.2rem;
+  content: "•";
+}
+
+.textNode {
+  white-space: pre-wrap;
+}
+
+.counter {
+  justify-self: end;
+  color: var(--shared-rich-editor-muted, #475569);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-theme="dark"] .root {
+  color: var(--shared-rich-editor-text, #f1f5f9);
+}
+
+[data-theme="dark"] .loading,
+[data-theme="dark"] .counter {
+  color: var(--shared-rich-editor-muted, #cbd5e1);
+}
+
+[data-theme="dark"] .toolbar {
+  border-color: var(--shared-rich-editor-border, #94a3b8);
+  background: var(--shared-rich-editor-toolbar, #1e293b);
+}
+
+[data-theme="dark"] .toolbarButton:hover:not(:disabled) {
+  background: var(--shared-rich-editor-hover, #334155);
+}
+
+[data-theme="dark"] .toolbarButton[aria-pressed="true"] {
+  background: var(--shared-rich-editor-selected, #1e3a8a);
+}
+
+[data-theme="dark"] .toolbarSeparator {
+  background: var(--shared-rich-editor-border, #94a3b8);
+}
+
+[data-theme="dark"] .editor {
+  border-color: var(--shared-rich-editor-border, #94a3b8);
+  background: var(--shared-rich-editor-background, #0f172a);
+}
+
+[data-theme="dark"] .editor[data-empty="true"]::before {
+  color: var(--shared-rich-editor-placeholder, #cbd5e1);
+}
+
+[data-theme="dark"] .toolbarButton:focus-visible,
+[data-theme="dark"] .editor:focus-visible {
+  outline-color: var(--shared-focus-color, #7dd3fc);
+}
+
+@media (forced-colors: active) {
+  .toolbar,
+  .editor,
+  .toolbarButton[aria-pressed="true"] {
+    border-color: CanvasText;
+  }
+
+  .toolbarButton[aria-pressed="true"] {
+    outline: 2px solid Highlight;
+  }
+}

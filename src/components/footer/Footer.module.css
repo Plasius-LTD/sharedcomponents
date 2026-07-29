@@ -112,6 +112,7 @@
 
 .footerItems {
   display: flex;
+  align-items: center;
   justify-content: center;
   gap: 8px;
 }
@@ -128,8 +129,59 @@
   text-decoration: underline;
 }
 
+.footerActionButton {
+  display: inline-grid;
+  box-sizing: border-box;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--footerBorder);
+  border-radius: 0.65rem;
+  background: transparent;
+  color: var(--footerLink);
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.footerActionButton:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--footerLink) 10%, transparent);
+  color: var(--footerLinkHover);
+}
+
+.footerActionButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.footerActionIcon {
+  display: inline-grid;
+  max-width: 28px;
+  max-height: 28px;
+  place-items: center;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.footerActionIcon > svg,
+.footerActionIcon > img {
+  width: 24px;
+  height: 24px;
+}
+
+.footerButton:focus-visible,
+.footerMetaLink:focus-visible,
+.footerActionButton:focus-visible,
+.menuToggle:focus-visible {
+  outline: 3px solid var(--shared-focus-color, #005fcc);
+  outline-offset: 2px;
+}
+
 .polishedMetal .footerButton,
-.polishedMetal .footerMetaLink {
+.polishedMetal .footerMetaLink,
+.polishedMetal .footerActionButton {
   position: relative;
   color: var(--footerMetalInk);
   font-weight: 750;
@@ -156,7 +208,8 @@
 }
 
 .polishedMetal .footerButton:hover,
-.polishedMetal .footerMetaLink:hover {
+.polishedMetal .footerMetaLink:hover,
+.polishedMetal .footerActionButton:hover:not(:disabled) {
   color: var(--footerMetalInk);
 }
 
@@ -169,6 +222,7 @@
 
 .polishedMetal .footerButton:focus-visible,
 .polishedMetal .footerMetaLink:focus-visible,
+.polishedMetal .footerActionButton:focus-visible,
 .polishedMetal .menuToggle:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--footerMetalAccent) 72%, transparent);
   outline-offset: 2px;
@@ -196,6 +250,39 @@
     inset 0 1px rgba(255, 255, 255, 0.16),
     inset 0 -1px rgba(2, 6, 23, 0.76),
     0 1px 2px rgba(2, 6, 23, 0.5);
+}
+
+.polishedMetal .footerActionButton {
+  border-color: rgba(55, 65, 81, 0.3);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.72),
+      rgba(189, 196, 207, 0.66) 52%,
+      rgba(139, 148, 162, 0.62)
+    );
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.88),
+    inset 0 -1px rgba(65, 73, 86, 0.3),
+    0 1px 2px rgba(15, 23, 42, 0.16);
+}
+
+[data-theme="dark"] .polishedMetal .footerActionButton {
+  border-color: rgba(226, 232, 240, 0.18);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(89, 99, 116, 0.74),
+      rgba(41, 48, 61, 0.76) 52%,
+      rgba(18, 23, 32, 0.84)
+    );
+  color: var(--footerMetalInk);
+}
+
+@media (forced-colors: active) {
+  .footerActionButton {
+    border-color: ButtonText;
+  }
 }
 
 [data-theme="dark"] .polishedMetal .footerButton:hover {

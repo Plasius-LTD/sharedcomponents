@@ -4,6 +4,7 @@ import {
   useRef,
   useState,
   type MouseEvent,
+  type ReactNode,
 } from "react";
 import { useI18n } from "@plasius/translations";
 import { ContextMenu } from "../context-menu/index.js";
@@ -24,10 +25,39 @@ export interface FooterNavItem {
   external?: boolean;
 }
 
+/** A new, explicitly discriminated footer navigation link. */
+export interface FooterLinkItem extends FooterNavItem {
+  kind: "link";
+  /** Stable caller-owned identity used for React and analytics context. */
+  id: string;
+}
+
+/** A footer command which invokes host-owned behavior and never navigates. */
+export interface FooterActionItem {
+  kind: "action";
+  /** Stable caller-owned identity used for React and analytics context. */
+  id: string;
+  /** Accessible action name, also shown in the mobile menu. */
+  name: string;
+  /** Decorative desktop icon. The accessible name comes from `name`. */
+  icon: ReactNode;
+  /** Prevents desktop and mobile invocation. */
+  disabled?: boolean;
+  /** Runs after an eligible pointer or mobile-menu selection. */
+  onSelect: (event?: MouseEvent<HTMLButtonElement>) => void;
+}
+
+/** Discriminated item model for new footer integrations. */
+export type FooterItem = FooterLinkItem | FooterActionItem;
+
 export type FooterAppearance = "default" | "polishedMetal";
 
 export interface FooterProps {
-  items: FooterNavItem[];
+  /**
+   * Ordered footer items. Legacy link objects remain accepted so existing
+   * callers can migrate to the discriminated `FooterItem` API incrementally.
+   */
+  items: readonly (FooterItem | FooterNavItem)[];
   metadata?: SharedComponentsMetadataInput;
   companyName?: string;
   contactEmail?: string;
@@ -46,6 +76,12 @@ function resolveHref(item: FooterNavItem): string {
     return `/${item.folder}/${item.url}`;
   }
   return item.url;
+}
+
+function isFooterAction(
+  item: FooterItem | FooterNavItem,
+): item is FooterActionItem {
+  return "kind" in item && item.kind === "action";
 }
 
 export function Footer({
@@ -101,12 +137,22 @@ export function Footer({
     });
   };
 
-  const links = useMemo(
+  const resolvedItems = useMemo(
     () =>
-      items.map((item) => ({
-        ...item,
-        href: resolveHref(item),
-      })),
+      items.map((item, index) =>
+        isFooterAction(item)
+          ? item
+          : {
+              ...item,
+              kind: "link" as const,
+              id:
+                "id" in item && typeof item.id === "string"
+                  ? item.id
+                  : `legacy-link-${index}`,
+              href: resolveHref(item),
+              source: item,
+            },
+      ),
     [items]
   );
   const footerClasses = [
@@ -177,32 +223,59 @@ export function Footer({
 
       <div className={styles.footerCenter}>
         <div className={styles.footerItems}>
-          {links.map((item: FooterNavItem & { href: string }, index: number) => (
-            <a
-              key={`${item.name}-${index}`}
-              href={item.href}
-              className={[
-                styles.footerButton,
-                activeHref === item.href ? styles.activeFooterButton : undefined,
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              aria-current={activeHref === item.href ? "page" : undefined}
-              target={item.external ? "_blank" : undefined}
-              rel={item.external ? "noopener noreferrer" : undefined}
-              onClick={(event: MouseEvent<HTMLAnchorElement>) => {
-                trackInteraction("nav_click", {
-                  label: item.name,
-                  href: item.href,
-                  variant: "desktop",
-                  context: { external: !!item.external },
-                });
-                onNavigate?.(item, item.href, event);
-              }}
-            >
-              {item.name}
-            </a>
-          ))}
+          {resolvedItems.map((item) =>
+            item.kind === "action" ? (
+              <button
+                key={item.id}
+                type="button"
+                className={styles.footerActionButton}
+                data-footer-item-kind="action"
+                aria-label={item.name}
+                title={item.name}
+                disabled={item.disabled}
+                onClick={(event) => {
+                  trackInteraction("action_click", {
+                    label: item.name,
+                    variant: "desktop",
+                    context: { actionId: item.id },
+                  });
+                  item.onSelect(event);
+                }}
+              >
+                <span className={styles.footerActionIcon} aria-hidden="true">
+                  {item.icon}
+                </span>
+              </button>
+            ) : (
+              <a
+                key={item.id}
+                href={item.href}
+                className={[
+                  styles.footerButton,
+                  activeHref === item.href
+                    ? styles.activeFooterButton
+                    : undefined,
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                aria-current={activeHref === item.href ? "page" : undefined}
+                target={item.external ? "_blank" : undefined}
+                rel={item.external ? "noopener noreferrer" : undefined}
+                data-footer-item-kind="link"
+                onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+                  trackInteraction("nav_click", {
+                    label: item.name,
+                    href: item.href,
+                    variant: "desktop",
+                    context: { external: !!item.external },
+                  });
+                  onNavigate?.(item.source, item.href, event);
+                }}
+              >
+                {item.name}
+              </a>
+            ),
+          )}
         </div>
       </div>
 
@@ -226,9 +299,19 @@ export function Footer({
             id="footer-mobile-menu"
             position={menuPosition}
             onClose={closeMenu}
-            commands={links.map((item: FooterNavItem & { href: string }) => ({
+            commands={resolvedItems.map((item) => ({
               name: item.name,
+              disabled: item.kind === "action" ? item.disabled : false,
               action: () => {
+                if (item.kind === "action") {
+                  trackInteraction("action_click", {
+                    label: item.name,
+                    variant: "mobile",
+                    context: { actionId: item.id },
+                  });
+                  item.onSelect();
+                  return;
+                }
                 trackInteraction("nav_click", {
                   label: item.name,
                   href: item.href,
