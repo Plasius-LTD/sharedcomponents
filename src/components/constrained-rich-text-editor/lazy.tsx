@@ -1,6 +1,5 @@
 import { lazy, Suspense } from "react";
 import type { ConstrainedRichTextEditorProps } from "./ConstrainedRichTextEditor.js";
-import styles from "./ConstrainedRichTextEditor.module.css";
 
 const LazyEditorImplementation = lazy(async () => {
   const module = await import("./ConstrainedRichTextEditor.js");
@@ -18,9 +17,9 @@ export function ConstrainedRichTextEditor(
     <Suspense
       fallback={
         <div
-          className={styles.loading}
           role="status"
           aria-live="polite"
+          style={{ minBlockSize: "3rem" }}
         >
           {props.labels.loading}
         </div>

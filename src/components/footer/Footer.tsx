@@ -164,6 +164,10 @@ export function Footer({
     .join(" ");
 
   const closeMenu = () => setMenuPosition(null);
+  const closeMenuAndRestoreFocus = () => {
+    setMenuPosition(null);
+    menuToggleRef.current?.focus();
+  };
 
   const toggleMobileMenu = () => {
     if (!menuToggleRef.current) {
@@ -187,7 +191,7 @@ export function Footer({
     const handleResize = () => closeMenu();
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        closeMenu();
+        closeMenuAndRestoreFocus();
       }
     };
 
@@ -286,6 +290,7 @@ export function Footer({
           className={styles.menuToggle}
           onClick={toggleMobileMenu}
           aria-label={toggleFooterMenuLabel}
+          aria-haspopup="menu"
           aria-expanded={menuOpen}
           aria-controls="footer-mobile-menu"
         >
@@ -297,8 +302,10 @@ export function Footer({
         {menuPosition ? (
           <ContextMenu
             id="footer-mobile-menu"
+            label={toggleFooterMenuLabel}
             position={menuPosition}
             onClose={closeMenu}
+            onEscape={closeMenuAndRestoreFocus}
             commands={resolvedItems.map((item) => ({
               name: item.name,
               disabled: item.kind === "action" ? item.disabled : false,

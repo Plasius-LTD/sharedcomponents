@@ -1,3 +1,4 @@
+import axe from "axe-core";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Header } from "../src/components/header/Header.js";
@@ -99,6 +100,35 @@ describe("Header", () => {
 
     fireEvent.keyDown(window, { key: "Escape" });
     expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("names and relates the mobile menu and restores its opener on Escape", async () => {
+    const { container } = render(
+      <Header
+        metadata={fakeMetadata}
+        items={[{ name: "Internal", url: "/internal" }]}
+      />,
+    );
+
+    const toggle = screen.getByRole("button", {
+      name: "Toggle navigation menu",
+    });
+    expect(toggle.getAttribute("aria-haspopup")).toBe("menu");
+    expect(toggle.getAttribute("aria-controls")).toBe("header-mobile-menu");
+    toggle.focus();
+    fireEvent.click(toggle);
+
+    expect(
+      screen.getByRole("menu", { name: "Toggle navigation menu" }),
+    ).toBeTruthy();
+    expect((await axe.run(container)).violations).toEqual([]);
+
+    fireEvent.keyDown(
+      screen.getByRole("menuitem", { name: "Internal" }),
+      { key: "Escape" },
+    );
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(document.activeElement).toBe(toggle);
   });
 
   it("runs internal mobile navigation commands", () => {

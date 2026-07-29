@@ -20,7 +20,7 @@ export default defineConfig({
     include: ["tests/**/*.{test,tests}.{ts,tsx}"],
     setupFiles: ["tests/setup.ts"],
     coverage: {
-      reporter: ["text", "json", "html"],
+      reporter: ["text", "json", "html", "lcov"],
       exclude: ["**/node_modules/**", "dist", "dist-cjs", "**/types/**"],
     },
   },
