@@ -178,4 +178,66 @@ describe("Footer", () => {
       })
     );
   });
+
+  it("renders and invokes discriminated icon actions on desktop and mobile", () => {
+    const onSelect = vi.fn();
+    const items = [
+      { kind: "link" as const, id: "privacy", name: "Privacy", url: "/privacy" },
+      {
+        kind: "action" as const,
+        id: "feedback",
+        name: "Rate us or report a bug",
+        icon: <span>!</span>,
+        onSelect,
+      },
+    ];
+
+    render(<Footer metadata={fakeMetadata} items={items} />);
+
+    const action = screen.getByRole("button", {
+      name: "Rate us or report a bug",
+    });
+    expect(action.getAttribute("data-footer-item-kind")).toBe("action");
+    fireEvent.click(action);
+    expect(onSelect).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
+    fireEvent.click(
+      screen.getByRole("menuitem", { name: "Rate us or report a bug" }),
+    );
+    expect(onSelect).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps disabled footer actions unavailable in both presentations", () => {
+    const onSelect = vi.fn();
+    render(
+      <Footer
+        metadata={fakeMetadata}
+        items={[
+          {
+            kind: "action",
+            id: "feedback",
+            name: "Feedback unavailable",
+            icon: <span>!</span>,
+            disabled: true,
+            onSelect,
+          },
+        ]}
+      />,
+    );
+
+    expect(
+      (screen.getByRole("button", {
+        name: "Feedback unavailable",
+      }) as HTMLButtonElement).disabled,
+    ).toBe(true);
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
+    expect(
+      (screen.getByRole("menuitem", {
+        name: "Feedback unavailable",
+      }) as HTMLButtonElement).disabled,
+    ).toBe(true);
+    expect(onSelect).not.toHaveBeenCalled();
+  });
 });

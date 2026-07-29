@@ -25,6 +25,8 @@ If a product needs auth/profile behavior, wire it via callbacks/props from the h
 
 - `Header`: configurable nav with optional profile slot and mobile context menu
 - `Footer`: configurable legal/footer links with mobile context menu
+- `StarRating`: controlled, touch-sized one-to-five native radiogroup
+- `ConstrainedRichTextEditor`: lazy, allowlisted transient rich-text editor
 - `ContactDetails`: reusable legal contact block with configurable details
 - `ContextMenu`: generic context menu surface
 - `ActionMenu`: controlled touch-first overflow menu with an anchored popover and phone-sheet presentation
@@ -177,6 +179,99 @@ may receive focus without the component stealing it back.
 See [Touch-first action surfaces](./docs/touch-first-action-surfaces.md) for the
 complete API and host responsibilities. Existing `ContextMenu` behavior and
 coordinate-based API remain unchanged.
+
+## Privacy-safe feedback controls
+
+`Footer` accepts explicit links and host-owned actions. Actions render as
+44×44 native buttons on desktop and as disabled-aware mobile menu commands:
+
+```tsx
+const feedbackItems = [
+  {
+    kind: "link" as const,
+    id: "privacy",
+    name: "Privacy",
+    url: "/privacy",
+  },
+  {
+    kind: "action" as const,
+    id: "feedback",
+    name: "Rate us or report a bug",
+    icon: <span aria-hidden="true">★</span>,
+    onSelect: () => setFeedbackOpen(true),
+  },
+];
+
+<Footer items={feedbackItems} />;
+```
+
+`StarRating` exposes exactly five caller-translated native radio options with
+Arrow/Home/End keyboard behavior and visible shape, border, and text state.
+`ConstrainedRichTextEditor` is dynamically loaded and emits only the transient
+feedback AST: paragraphs or bullet items, depths 0–4, and bold/italic/underline
+text leaves. Its exact 4,000-Unicode-code-point budget includes inter-block
+newlines and is bounded again at 8,000 UTF-16 code units.
+
+```tsx
+import {
+  ConstrainedRichTextEditor,
+  StarRating,
+  type FeedbackRichTextDocument,
+  type StarRatingValue,
+} from "@plasius/sharedcomponents";
+
+const [rating, setRating] = useState<StarRatingValue | null>(null);
+const [narrative, setNarrative] =
+  useState<FeedbackRichTextDocument | null>(null);
+
+<StarRating
+  label="Overall satisfaction"
+  labels={["Very poor", "Poor", "Fair", "Good", "Excellent"]}
+  value={rating}
+  onChange={setRating}
+  required
+/>;
+
+<ConstrainedRichTextEditor
+  labels={{
+    editor: "Tell us more",
+    toolbar: "Text formatting",
+    bold: "Bold",
+    italic: "Italic",
+    underline: "Underline",
+    bullets: "Bulleted list",
+    indent: "Increase indent",
+    outdent: "Decrease indent",
+    loading: "Loading editor",
+  }}
+  placeholder="Optional details"
+  value={narrative}
+  onChange={setNarrative}
+/>;
+```
+
+The editor uses no `innerHTML`, `dangerouslySetInnerHTML`, or `execCommand`.
+Paste is plain text only; links, images, attachments, code, mentions, embedded
+metadata, HTML/link syntax, arbitrary formatting, and drops are not
+represented. The AST and
+`extractFeedbackRichText` output remain sensitive live-browser data: hosts must
+redact, validate, and encrypt before sending, and must never log, persist,
+cache, or attach them to analytics.
+
+Runtime model helpers are intentionally isolated from the root entry so the
+editor model does not join the application shell. Import them only inside the
+lazy feedback flow:
+
+```tsx
+import {
+  extractFeedbackRichText,
+  normaliseFeedbackRichTextDocument,
+} from "@plasius/sharedcomponents/feedback-rich-text-model";
+```
+
+See [Privacy-safe feedback primitives](./docs/privacy-safe-feedback-primitives.md)
+and [ADR-0005](./docs/adrs/adr-0005-privacy-constrained-feedback-primitives.md)
+for the complete host boundary and schema-compatibility contract.
 
 ## Translations
 

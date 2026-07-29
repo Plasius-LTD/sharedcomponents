@@ -25,6 +25,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 - **Added**
   - Added controlled, accessible `ActionMenu` and `ReviewSheet` primitives with touch-sized controls, responsive popover/sheet presentations, keyboard and focus management, safe-area support, and reduced-motion behavior (task #38).
+  - Added discriminated desktop/mobile footer actions, an accessible one-to-five `StarRating`, and a lazy constrained rich-text editor with keyboard formatting, exact schema-compatible limits, and plain-text-only paste (task #39).
 
 - **Changed**
   - (placeholder)
@@ -35,6 +36,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 - **Security**
   - Added fail-closed source and npm-package admission for the administrative contributor registry and pinned the CI/CD runtime to Node.js 24.18.0 LTS.
   - (placeholder)
+  - The constrained editor emits only an allowlisted transient AST, normalises Unicode, rejects unsupported browser edit/drop operations, and uses no raw HTML injection sink.
 
 ## [1.0.23] - 2026-07-13
 

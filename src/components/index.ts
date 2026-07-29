@@ -7,3 +7,5 @@ export * from "./confirmation-dialog/index.js";
 export * from "./status-panel/index.js";
 export * from "./action-menu/index.js";
 export * from "./review-sheet/index.js";
+export * from "./star-rating/index.js";
+export * from "./constrained-rich-text-editor/index.js";
