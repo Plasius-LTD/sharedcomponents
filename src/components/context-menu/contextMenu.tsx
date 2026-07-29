@@ -5,6 +5,7 @@ import { resolveMenuPosition } from "./positioning.js";
 export interface ContextMenuCommand {
   name: string;
   shortcut?: string;
+  disabled?: boolean;
   action: () => void;
 }
 
@@ -93,7 +94,11 @@ export function ContextMenu({
             key={idx}
             type="button"
             className={styles.menuItem}
+            disabled={cmd.disabled}
             onClick={() => {
+              if (cmd.disabled) {
+                return;
+              }
               cmd.action();
               onClose();
             }}

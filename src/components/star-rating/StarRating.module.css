@@ -1,0 +1,121 @@
+.fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--shared-star-rating-text, #172033);
+}
+
+.legend {
+  margin-block-end: 0.45rem;
+  font-weight: 650;
+}
+
+.radiogroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  width: fit-content;
+}
+
+.option {
+  position: relative;
+  display: inline-grid;
+  min-width: 44px;
+  min-height: 44px;
+  place-items: center;
+}
+
+.input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.star {
+  display: inline-grid;
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 2px solid transparent;
+  border-radius: 0.65rem;
+  color: var(--shared-star-rating-empty, #475569);
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.filled {
+  color: var(--shared-star-rating-filled, #9a6700);
+}
+
+.selected {
+  border-color: currentcolor;
+  box-shadow: inset 0 0 0 2px var(--shared-star-rating-background, #ffffff);
+  transform: scale(1.05);
+}
+
+.input:focus-visible + .star {
+  outline: 3px solid var(--shared-focus-color, #005fcc);
+  outline-offset: 2px;
+}
+
+.input:disabled + .star {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.selectedText {
+  display: block;
+  min-height: 1.4em;
+  margin-block-start: 0.35rem;
+  color: var(--shared-star-rating-muted, #334155);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .fieldset {
+  color: var(--shared-star-rating-text, #f1f5f9);
+}
+
+[data-theme="dark"] .star {
+  color: var(--shared-star-rating-empty, #cbd5e1);
+}
+
+[data-theme="dark"] .filled {
+  color: var(--shared-star-rating-filled, #fbbf24);
+}
+
+[data-theme="dark"] .selected {
+  box-shadow: inset 0 0 0 2px
+    var(--shared-star-rating-background, #0f172a);
+}
+
+[data-theme="dark"] .selectedText {
+  color: var(--shared-star-rating-muted, #e2e8f0);
+}
+
+[data-theme="dark"] .input:focus-visible + .star {
+  outline-color: var(--shared-focus-color, #7dd3fc);
+}
+
+@media (forced-colors: active) {
+  .star {
+    color: CanvasText;
+  }
+
+  .selected {
+    border-color: Highlight;
+  }
+
+  .input:focus-visible + .star {
+    outline-color: Highlight;
+  }
+}
