@@ -32,11 +32,36 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 - **Fixed**
   - (placeholder)
+  - Preserve block-boundary Enter/caret behavior through an editor-private
+    view state without emitting empty AST nodes, keep collapsed Cut
+    non-destructive, and close mobile context menus when focus tabs away.
+  - Map constrained-editor selections at exact text, span, block, and root
+    boundaries; fail clipboard operations closed for invalid or cross-editor
+    selections; and keep native Tab focus when removing context menus.
+  - Name footer mobile menus, expose their popup relationship, and focus the
+    menu surface when every command is disabled.
+  - Intercept constrained-editor edits through native `beforeinput`, roll
+    escaped post-mutation input back to the canonical model, require a fresh
+    mapped selection for every mutation, and keep canonical recovery from
+    creating false focus-loss saves or stealing focus.
+  - Preserve the active ContextMenu command across equivalent rerenders, move
+    focus predictably when commands become unavailable, and name/relate
+    Header and UserProfile menus with Escape focus restoration.
 
 - **Security**
   - Added fail-closed source and npm-package admission for the administrative contributor registry and pinned the CI/CD runtime to Node.js 24.18.0 LTS.
   - (placeholder)
   - The constrained editor emits only an allowlisted transient AST, normalises Unicode, rejects unsupported browser edit/drop operations, and uses no raw HTML injection sink.
+  - Disable browser and third-party writing-assistance hooks on the transient
+    narrative editor so sensitive text is not intentionally shared with those
+    services.
+  - Bound hostile rich-text arrays and text before profile or normalisation
+    work, and keep the editor's full stylesheet in its lazy implementation
+    chunk instead of the initial application shell.
+  - Kept publication blocked until the editor consumes the released
+    `@plasius/schema ^1.4.0` pinned Unicode-profile helper.
+  - Fail closed for non-cancelable, empty, unknown, replacement, formatting,
+    paste, and drop input escapes without retaining browser-mutated DOM.
 
 ## [1.0.23] - 2026-07-13
 

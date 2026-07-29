@@ -66,6 +66,22 @@ interface FlatDocument {
   metadata: BlockMetadata[];
 }
 
+interface BoundedSourceNode {
+  text: string;
+  marks: FeedbackRichTextMark[];
+}
+
+interface BoundedSourceBlock {
+  type: FeedbackRichTextBlock["type"];
+  depth: number;
+  nodes: BoundedSourceNode[];
+}
+
+interface NormalisedText {
+  text: string;
+  inspectedCodeUnits: number;
+}
+
 export interface FeedbackRichTextMutation {
   value: FeedbackRichTextDocument | null;
   selectionStart: number;
@@ -86,22 +102,13 @@ const disallowedNarrativeSyntaxPattern =
  */
 const postProfileCompatibilityCodePointPattern = /[\u1C89\uA7F1]/u;
 
-function containsDisallowedUnicodeProfileCodePoint(text: string): boolean {
+/** @internal Raw pre-NFKC gate shared by model and editing transactions. */
+export function containsFeedbackRichTextUnsupportedCodePoint(
+  text: string,
+): boolean {
   return (
     unicodeUnassignedPattern.test(text) ||
     postProfileCompatibilityCodePointPattern.test(text)
-  );
-}
-
-function nodeContainsDisallowedUnicodeProfileCodePoint(node: unknown): boolean {
-  if (!node || typeof node !== "object") {
-    return false;
-  }
-  const candidate = node as Record<string, unknown>;
-  return (
-    candidate.type === "text" &&
-    typeof candidate.text === "string" &&
-    containsDisallowedUnicodeProfileCodePoint(candidate.text)
   );
 }
 
@@ -167,42 +174,24 @@ function documentsEqual(
 function normaliseMarks(
   marks: readonly FeedbackRichTextMark[] | undefined,
 ): FeedbackRichTextMark[] {
-  const boundedMarks = Array.isArray(marks)
-    ? marks.slice(0, FEEDBACK_RICH_TEXT_MARKS.length + 1)
-    : [];
-  return FEEDBACK_RICH_TEXT_MARKS.filter(
-    (mark) => boundedMarks.includes(mark),
+  if (!Array.isArray(marks)) {
+    return [];
+  }
+  const presentMarks = new Set<FeedbackRichTextMark>();
+  const visitCount = Math.min(
+    marks.length,
+    FEEDBACK_RICH_TEXT_MARKS.length + 1,
   );
-}
-
-function normaliseInlineText(text: string): string {
-  const boundedText = safeSlice(
-    text,
-    FEEDBACK_RICH_TEXT_MAX_CHARACTERS + 1,
-    FEEDBACK_RICH_TEXT_MAX_UTF16_CODE_UNITS + 1,
-  );
-  return stripControlCharacters(
-    boundedText
-      .normalize("NFKC")
-      .replace(unicodeFormatPattern, "")
-      .replace(/[\r\n]/g, " "),
-    false,
-  );
-}
-
-function normaliseInsertedText(text: string): string {
-  const boundedText = safeSlice(
-    text,
-    FEEDBACK_RICH_TEXT_MAX_CHARACTERS + 1,
-    FEEDBACK_RICH_TEXT_MAX_UTF16_CODE_UNITS + 1,
-  );
-  return stripControlCharacters(
-    boundedText
-      .replace(/\r\n?/g, "\n")
-      .normalize("NFKC")
-      .replace(unicodeFormatPattern, ""),
-    true,
-  ).replace(/\t/g, "  ");
+  for (let index = 0; index < visitCount; index += 1) {
+    const candidate = marks[index];
+    if (
+      candidate !== undefined &&
+      (FEEDBACK_RICH_TEXT_MARKS as readonly string[]).includes(candidate)
+    ) {
+      presentMarks.add(candidate);
+    }
+  }
+  return FEEDBACK_RICH_TEXT_MARKS.filter((mark) => presentMarks.has(mark));
 }
 
 function codePointLength(text: string): number {
@@ -237,38 +226,150 @@ function safeSlice(
   return result;
 }
 
-function mergeNodes(
-  nodes: readonly FeedbackRichTextNode[],
-): FeedbackRichTextNode[] {
-  const merged: FeedbackRichTextNode[] = [];
-  for (const node of nodes.slice(0, FEEDBACK_RICH_TEXT_MAX_NODES + 1)) {
-    if (
-      !node ||
-      node.type !== "text" ||
-      typeof node.text !== "string"
-    ) {
-      continue;
-    }
-    const text = normaliseInlineText(node.text);
-    if (!text) {
-      continue;
-    }
-    const marks = normaliseMarks(node.marks);
-    const previous = merged[merged.length - 1];
-    if (
-      previous &&
-      marksEqual(normaliseMarks(previous.marks), marks)
-    ) {
-      previous.text += text;
-      continue;
-    }
-    merged.push({
-      type: "text",
-      text,
-      ...(marks.length > 0 ? { marks } : {}),
-    });
+function normaliseBoundedText(
+  text: string,
+  maximumNormalisedCodeUnits: number,
+  allowNewlines: boolean,
+): NormalisedText {
+  if (maximumNormalisedCodeUnits <= 0 || text.length === 0) {
+    return { text: "", inspectedCodeUnits: 0 };
   }
-  return merged;
+  const normalised = text.normalize("NFKC");
+  const boundedNormalised = safeSlice(
+    normalised,
+    maximumNormalisedCodeUnits,
+    maximumNormalisedCodeUnits,
+  );
+  const withoutFormats = boundedNormalised.replace(unicodeFormatPattern, "");
+  const lineSafeText = allowNewlines
+    ? withoutFormats.replace(/\r\n?/g, "\n")
+    : withoutFormats.replace(/[\r\n]/g, " ");
+  const withoutControls = stripControlCharacters(lineSafeText, allowNewlines);
+  const expandedTabs = allowNewlines
+    ? withoutControls.replace(/\t/g, "  ")
+    : withoutControls;
+  return {
+    text: safeSlice(
+      expandedTabs,
+      maximumNormalisedCodeUnits,
+      maximumNormalisedCodeUnits,
+    ),
+    inspectedCodeUnits: boundedNormalised.length,
+  };
+}
+
+function normaliseInsertedText(text: string): string | null {
+  const boundedSource = safeSlice(
+    text,
+    FEEDBACK_RICH_TEXT_MAX_UTF16_CODE_UNITS,
+    FEEDBACK_RICH_TEXT_MAX_UTF16_CODE_UNITS,
+  );
+  if (containsFeedbackRichTextUnsupportedCodePoint(boundedSource)) {
+    return null;
+  }
+  return normaliseBoundedText(
+    boundedSource,
+    FEEDBACK_RICH_TEXT_MAX_UTF16_CODE_UNITS,
+    true,
+  ).text;
+}
+
+/**
+ * Snapshots only the closed raw envelope before profile checks or Unicode
+ * normalisation. Array and text work is therefore bounded even for adversarial
+ * proxies, dense oversized arrays, and very large strings.
+ */
+function readBoundedSourceDocument(
+  value: FeedbackRichTextDocument,
+): BoundedSourceBlock[] | null {
+  const sourceBlocks: BoundedSourceBlock[] = [];
+  let visitedNodes = 0;
+  let remainingSourceCodeUnits = FEEDBACK_RICH_TEXT_MAX_UTF16_CODE_UNITS;
+  const blockCount = Math.min(
+    value.children.length,
+    FEEDBACK_RICH_TEXT_MAX_BLOCKS,
+  );
+
+  for (
+    let blockIndex = 0;
+    blockIndex < blockCount &&
+    visitedNodes < FEEDBACK_RICH_TEXT_MAX_NODES &&
+    remainingSourceCodeUnits > 0;
+    blockIndex += 1
+  ) {
+    const candidate = value.children[blockIndex];
+    if (
+      !candidate ||
+      typeof candidate !== "object" ||
+      candidate.type !== "paragraph" &&
+        candidate.type !== "listItem"
+    ) {
+      continue;
+    }
+    if (
+      candidate.type === "listItem" &&
+      candidate.listType !== "bullet"
+    ) {
+      continue;
+    }
+    if (!Array.isArray(candidate.children)) {
+      continue;
+    }
+
+    const nodes: BoundedSourceNode[] = [];
+    const nodeVisitCount = Math.min(
+      candidate.children.length,
+      128,
+      FEEDBACK_RICH_TEXT_MAX_NODES - visitedNodes,
+    );
+    for (
+      let nodeIndex = 0;
+      nodeIndex < nodeVisitCount && remainingSourceCodeUnits > 0;
+      nodeIndex += 1
+    ) {
+      visitedNodes += 1;
+      const node = candidate.children[nodeIndex];
+      if (
+        !node ||
+        typeof node !== "object" ||
+        node.type !== "text" ||
+        typeof node.text !== "string"
+      ) {
+        continue;
+      }
+      const boundedText = safeSlice(
+        node.text,
+        remainingSourceCodeUnits,
+        remainingSourceCodeUnits,
+      );
+      remainingSourceCodeUnits -= boundedText.length;
+      if (containsFeedbackRichTextUnsupportedCodePoint(boundedText)) {
+        return null;
+      }
+      if (boundedText.length > 0) {
+        nodes.push({
+          text: boundedText,
+          marks: normaliseMarks(node.marks),
+        });
+      }
+    }
+
+    if (nodes.length > 0) {
+      const depth = Number.isFinite(candidate.depth)
+        ? Math.min(
+            FEEDBACK_RICH_TEXT_MAX_DEPTH,
+            Math.max(0, Math.trunc(candidate.depth)),
+          )
+        : 0;
+      sourceBlocks.push({
+        type: candidate.type,
+        depth,
+        nodes,
+      });
+    }
+  }
+
+  return sourceBlocks;
 }
 
 /**
@@ -289,77 +390,76 @@ export function normaliseFeedbackRichTextDocument(
     return null;
   }
 
+  const sourceBlocks = readBoundedSourceDocument(value);
+  if (sourceBlocks === null) {
+    return null;
+  }
+
   const blocks: FeedbackRichTextBlock[] = [];
   let remainingCodePoints = FEEDBACK_RICH_TEXT_MAX_CHARACTERS;
   let remainingCodeUnits = FEEDBACK_RICH_TEXT_MAX_UTF16_CODE_UNITS;
+  let remainingNormalisedInspectionCodeUnits =
+    FEEDBACK_RICH_TEXT_MAX_UTF16_CODE_UNITS;
   let totalNodes = 0;
 
-  for (const candidate of value.children.slice(0, FEEDBACK_RICH_TEXT_MAX_BLOCKS)) {
-    if (
-      !candidate ||
-      typeof candidate !== "object" ||
-      candidate.type !== "paragraph" &&
-      candidate.type !== "listItem"
-    ) {
-      continue;
-    }
-    if (
-      candidate.type === "listItem" &&
-      candidate.listType !== "bullet"
-    ) {
-      continue;
-    }
-    if (!Array.isArray(candidate.children)) {
-      continue;
-    }
-    if (
-      candidate.children.some(nodeContainsDisallowedUnicodeProfileCodePoint)
-    ) {
-      return null;
-    }
-
+  for (const candidate of sourceBlocks) {
     const separatorCost = blocks.length > 0 ? 1 : 0;
     if (
       remainingCodePoints <= separatorCost ||
-      remainingCodeUnits <= separatorCost
+      remainingCodeUnits <= separatorCost ||
+      remainingNormalisedInspectionCodeUnits <= 0
     ) {
       break;
     }
 
-    const sourceNodes = mergeNodes(candidate.children);
-    if (
-      sourceNodes.some((node) =>
-        disallowedNarrativeSyntaxPattern.test(node.text),
-      ) ||
-      disallowedNarrativeSyntaxPattern.test(
-        sourceNodes.map((node) => node.text).join(""),
-      )
-    ) {
-      return null;
-    }
     const acceptedNodes: FeedbackRichTextNode[] = [];
     let blockRemainingCodePoints = remainingCodePoints - separatorCost;
     let blockRemainingCodeUnits = remainingCodeUnits - separatorCost;
-    for (const sourceNode of sourceNodes) {
+    for (const sourceNode of candidate.nodes) {
       if (
-        totalNodes + acceptedNodes.length >= FEEDBACK_RICH_TEXT_MAX_NODES ||
-        acceptedNodes.length >= 128 ||
         blockRemainingCodePoints <= 0 ||
-        blockRemainingCodeUnits <= 0
+        blockRemainingCodeUnits <= 0 ||
+        remainingNormalisedInspectionCodeUnits <= 0
       ) {
         break;
       }
-      const text = safeSlice(
+      const normalisedText = normaliseBoundedText(
         sourceNode.text,
+        remainingNormalisedInspectionCodeUnits,
+        false,
+      );
+      remainingNormalisedInspectionCodeUnits -=
+        normalisedText.inspectedCodeUnits;
+      const text = safeSlice(
+        normalisedText.text,
         blockRemainingCodePoints,
         blockRemainingCodeUnits,
       );
       if (!text) {
         continue;
       }
+      const previous = acceptedNodes[acceptedNodes.length - 1];
+      if (
+        previous &&
+        marksEqual(normaliseMarks(previous.marks), sourceNode.marks)
+      ) {
+        previous.text += text;
+        blockRemainingCodePoints -= codePointLength(text);
+        blockRemainingCodeUnits -= text.length;
+        continue;
+      }
+      if (
+        totalNodes + acceptedNodes.length >= FEEDBACK_RICH_TEXT_MAX_NODES ||
+        acceptedNodes.length >= 128
+      ) {
+        break;
+      }
       acceptedNodes.push({
-        ...sourceNode,
+        type: "text",
         text,
+        ...(sourceNode.marks.length > 0
+          ? { marks: sourceNode.marks }
+          : {}),
       });
       blockRemainingCodePoints -= codePointLength(text);
       blockRemainingCodeUnits -= text.length;
@@ -369,23 +469,17 @@ export function normaliseFeedbackRichTextDocument(
       continue;
     }
 
-    const depth = Number.isFinite(candidate.depth)
-      ? Math.min(
-          FEEDBACK_RICH_TEXT_MAX_DEPTH,
-          Math.max(0, Math.trunc(candidate.depth)),
-        )
-      : 0;
     blocks.push(
       candidate.type === "listItem"
         ? {
             type: "listItem",
             listType: "bullet",
-            depth,
+            depth: candidate.depth,
             children: acceptedNodes,
           }
         : {
             type: "paragraph",
-            depth,
+            depth: candidate.depth,
             children: acceptedNodes,
           },
     );
@@ -426,11 +520,13 @@ export function normaliseFeedbackRichTextDocument(
 export function createFeedbackRichTextDocument(
   text: string,
 ): FeedbackRichTextDocument | null {
-  if (containsDisallowedUnicodeProfileCodePoint(text)) {
+  const normalisedText = normaliseInsertedText(text);
+  if (normalisedText === null) {
     return null;
   }
-  const blocks = normaliseInsertedText(text)
-    .split("\n")
+  const blocks = normalisedText
+    .split("\n", FEEDBACK_RICH_TEXT_MAX_BLOCKS + 1)
+    .slice(0, FEEDBACK_RICH_TEXT_MAX_BLOCKS)
     .filter((line) => line.length > 0)
     .map(
       (line): FeedbackRichTextBlock => ({
@@ -641,7 +737,8 @@ export function replaceFeedbackRichTextRange(
 ): FeedbackRichTextMutation {
   const flat = flattenDocument(value);
   const [start, end] = clampRange(flat.text, selectionStart, selectionEnd);
-  if (containsDisallowedUnicodeProfileCodePoint(insertedText)) {
+  const normalisedInsertion = normaliseInsertedText(insertedText);
+  if (normalisedInsertion === null) {
     return {
       value,
       selectionStart: start,
@@ -649,7 +746,6 @@ export function replaceFeedbackRichTextRange(
       violation: "unsupported-content",
     };
   }
-  const normalisedInsertion = normaliseInsertedText(insertedText);
   if (disallowedNarrativeSyntaxPattern.test(normalisedInsertion)) {
     return {
       value,

@@ -1,6 +1,7 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
   type MouseEvent,
   type ReactNode,
@@ -62,6 +63,7 @@ export function Header({
   const { t } = useI18n();
   const translate = createSharedComponentTranslationResolver(t);
   const resolvedMetadata = useSharedComponentsBrandingMetadata("Header", metadata);
+  const mobileMenuToggleRef = useRef<HTMLButtonElement | null>(null);
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(
     null
   );
@@ -90,6 +92,10 @@ export function Header({
     .join(" ");
 
   const closeMenu = () => setMenuPosition(null);
+  const closeMenuAndRestoreFocus = () => {
+    closeMenu();
+    mobileMenuToggleRef.current?.focus();
+  };
 
   const trackInteraction = (
     action: string,
@@ -129,7 +135,7 @@ export function Header({
     const handleResize = () => closeMenu();
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        closeMenu();
+        closeMenuAndRestoreFocus();
       }
     };
 
@@ -196,10 +202,12 @@ export function Header({
         <div className={styles.rightRail}>
           {profileSlot}
           <button
+            ref={mobileMenuToggleRef}
             type="button"
             className={styles.mobileMenuToggle}
             onClick={toggleMobileMenu}
             aria-label={toggleMenuLabel}
+            aria-haspopup="menu"
             aria-expanded={menuOpen}
             aria-controls="header-mobile-menu"
           >
@@ -229,6 +237,8 @@ export function Header({
             }))}
             position={menuPosition}
             onClose={closeMenu}
+            onEscape={closeMenuAndRestoreFocus}
+            label={toggleMenuLabel}
             id="header-mobile-menu"
           />
         ) : null}
