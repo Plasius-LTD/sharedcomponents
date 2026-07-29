@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import axe from "axe-core";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Footer } from "../src/components/footer/Footer.js";
 import { SharedComponentsBrandingProvider } from "../src/metadata/provider.js";
@@ -18,6 +19,7 @@ const fakeMetadata: SharedComponentsMetadataInput = {
 
 describe("Footer", () => {
   afterEach(() => {
+    vi.useRealTimers();
     resetAnalyticsMocks();
     __resetSharedComponentsAnalyticsClientsForTests();
     vi.restoreAllMocks();
@@ -108,14 +110,56 @@ describe("Footer", () => {
     );
   });
 
-  it("closes the mobile context menu on Escape", () => {
+  it("closes the mobile context menu on Escape and restores toggle focus", () => {
+    render(<Footer metadata={fakeMetadata} items={fakeFooterItems} />);
+
+    const toggle = screen.getByRole("button", { name: "Toggle footer menu" });
+    fireEvent.click(toggle);
+    expect(screen.getByRole("menu")).toBeTruthy();
+    expect(document.activeElement).toBe(
+      screen.getByRole("menuitem", { name: "Privacy" }),
+    );
+
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: "Escape" });
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(document.activeElement).toBe(toggle);
+  });
+
+  it("closes the mobile context menu when focus tabs away", () => {
+    vi.useFakeTimers();
     render(<Footer metadata={fakeMetadata} items={fakeFooterItems} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
+    const firstItem = screen.getByRole("menuitem", { name: "Privacy" });
+    expect(fireEvent.keyDown(firstItem, { key: "Tab" })).toBe(true);
     expect(screen.getByRole("menu")).toBeTruthy();
-
-    fireEvent.keyDown(window, { key: "Escape" });
+    act(() => {
+      vi.runOnlyPendingTimers();
+    });
     expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("names the popup menu, exposes its relationship, and passes axe", async () => {
+    const { container } = render(
+      <Footer metadata={fakeMetadata} items={fakeFooterItems} />,
+    );
+
+    const toggle = screen.getByRole("button", {
+      name: "Toggle footer menu",
+    });
+    expect(toggle.getAttribute("aria-haspopup")).toBe("menu");
+    fireEvent.click(toggle);
+    expect(
+      screen.getByRole("menu", { name: "Toggle footer menu" }),
+    ).toBeTruthy();
+
+    const result = await axe.run(container, {
+      runOnly: {
+        type: "tag",
+        values: ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"],
+      },
+    });
+    expect(result.violations).toEqual([]);
   });
 
   it("runs internal mobile navigation commands", () => {
@@ -233,6 +277,9 @@ describe("Footer", () => {
     ).toBe(true);
 
     fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
+    expect(document.activeElement).toBe(
+      screen.getByRole("menu", { name: "Toggle footer menu" }),
+    );
     expect(
       (screen.getByRole("menuitem", {
         name: "Feedback unavailable",

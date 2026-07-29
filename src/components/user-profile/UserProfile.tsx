@@ -1,4 +1,11 @@
-import { useRef, useState, useEffect, useCallback, useMemo } from "react";
+import {
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+  useId,
+  useMemo,
+} from "react";
 import { useI18n } from "@plasius/translations";
 import { ContextMenu } from "../context-menu/index.js";
 import type { SharedComponentsMetadataInput } from "../../metadata/white-label.js";
@@ -74,8 +81,13 @@ export function UserProfile({
   signedOutCommands,
 }: UserProfileProps) {
   const { t } = useI18n();
+  const generatedMenuId = useId();
   const translate = useMemo(() => createSharedComponentTranslationResolver(t), [t]);
   const avatarRef = useRef<HTMLButtonElement | null>(null);
+  const menuId = `user-profile-menu-${generatedMenuId}`;
+  const menuLabel = translate(
+    sharedComponentTranslationKeys.userProfile.openMenu,
+  );
   const [menuVisible, setMenuVisible] = useState(false);
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(
     null
@@ -168,6 +180,10 @@ export function UserProfile({
       })),
     [commands, trackInteraction, user]
   );
+  const closeMenuAndRestoreFocus = () => {
+    setMenuVisible(false);
+    avatarRef.current?.focus();
+  };
 
   return (
     <div className={[styles.userProfileContainer, className].filter(Boolean).join(" ")}>
@@ -186,8 +202,10 @@ export function UserProfile({
         className={`${styles.userProfileAvatar} ${
           user?.avatarUrl ? styles.hasAvatar : styles.noAvatar
         }`}
-        aria-label={translate(sharedComponentTranslationKeys.userProfile.openMenu)}
+        aria-label={menuLabel}
+        aria-haspopup="menu"
         aria-expanded={menuVisible}
+        aria-controls={menuId}
       >
         {user?.avatarUrl ? (
           <img
@@ -204,8 +222,11 @@ export function UserProfile({
 
       {menuVisible && menuPosition ? (
         <ContextMenu
+          id={menuId}
+          label={menuLabel}
           position={menuPosition}
           onClose={() => setMenuVisible(false)}
+          onEscape={closeMenuAndRestoreFocus}
           commands={trackedCommands}
         />
       ) : null}

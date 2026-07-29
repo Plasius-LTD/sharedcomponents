@@ -1,3 +1,4 @@
+import axe from "axe-core";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { UserProfile } from "../src/components/user-profile/UserProfile.js";
@@ -39,6 +40,30 @@ describe("UserProfile", () => {
 
     expect(onOpenSettings).toHaveBeenCalledTimes(1);
     expect(onLogout).toHaveBeenCalledTimes(1);
+  });
+
+  it("names and relates the user menu and restores its opener on Escape", async () => {
+    const { container } = render(
+      <UserProfile onLogin={vi.fn()} providers={["google"]} />,
+    );
+
+    const opener = screen.getByRole("button", { name: "Open user menu" });
+    expect(opener.getAttribute("aria-haspopup")).toBe("menu");
+    const controlledMenuId = opener.getAttribute("aria-controls");
+    expect(controlledMenuId).toMatch(/^user-profile-menu-/);
+    opener.focus();
+    fireEvent.click(opener);
+
+    const menu = screen.getByRole("menu", { name: "Open user menu" });
+    expect(menu.id).toBe(controlledMenuId);
+    expect((await axe.run(container)).violations).toEqual([]);
+
+    fireEvent.keyDown(
+      screen.getByRole("menuitem", { name: "Sign in with Google" }),
+      { key: "Escape" },
+    );
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(document.activeElement).toBe(opener);
   });
 
   it("tracks avatar and menu command interactions when branding analytics is available", () => {

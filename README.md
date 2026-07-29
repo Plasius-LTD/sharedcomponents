@@ -177,8 +177,14 @@ focus for explicit close and Escape; an outside selection on a larger screen
 may receive focus without the component stealing it back.
 
 See [Touch-first action surfaces](./docs/touch-first-action-surfaces.md) for the
-complete API and host responsibilities. Existing `ContextMenu` behavior and
-coordinate-based API remain unchanged.
+complete API and host responsibilities. The coordinate-based `ContextMenu`
+accepts either `label` or `labelledBy` so callers can name the menu. Its Tab
+dismissal runs after the browser's native focus action, avoiding focus loss
+when the popup is removed. It preserves the active enabled command across
+structurally equivalent rerenders and moves to the next enabled command, then
+the preceding command, when the active command becomes unavailable. Header,
+Footer, and UserProfile menus expose their popup relationship and return focus
+to their opener on Escape.
 
 ## Privacy-safe feedback controls
 
@@ -258,9 +264,20 @@ represented. The AST and
 redact, validate, and encrypt before sending, and must never log, persist,
 cache, or attach them to analytics.
 
+Cancelable edits are admitted through a native `beforeinput` listener. Any
+unintercepted `input` outside an active validated composition is rolled back to
+the canonical model without emitting `onChange`. Mutation commands require a
+freshly mapped browser selection; cached ranges are never used as a fallback.
+Canonical recovery keeps the textbox element mounted, does not report an
+internal blur, and restores focus only when focus has not genuinely left.
+
+Caret-only empty paragraphs/list items remain private to the mounted editor.
+They count toward the limits but are never emitted; `onChange` receives only a
+canonical AST whose blocks and text leaves are non-empty.
+
 Runtime model helpers are intentionally isolated from the root entry so the
-editor model does not join the application shell. Import them only inside the
-lazy feedback flow:
+editor model, editing state, and full stylesheet do not join the application
+shell. Import model helpers only inside the lazy feedback flow:
 
 ```tsx
 import {
@@ -272,6 +289,11 @@ import {
 See [Privacy-safe feedback primitives](./docs/privacy-safe-feedback-primitives.md)
 and [ADR-0005](./docs/adrs/adr-0005-privacy-constrained-feedback-primitives.md)
 for the complete host boundary and schema-compatibility contract.
+
+Release gate: the feedback editor must consume the published
+`@plasius/schema ^1.4.0` Unicode-profile helper before this change is released.
+The staged runtime Unicode checks are not a substitute for the pinned profile
+and must not ship independently.
 
 ## Translations
 
