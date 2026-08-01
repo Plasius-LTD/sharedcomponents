@@ -9,6 +9,20 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [1.0.24] - 2026-08-01
+
+- **Added**
   - Added controlled, accessible `ActionMenu` and `ReviewSheet` primitives with touch-sized controls, responsive popover/sheet presentations, keyboard and focus management, safe-area support, and reduced-motion behavior (task #38).
 
 - **Changed**
@@ -297,7 +311,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ---
 
-[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.0.23...HEAD
+[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.0.24...HEAD
 
 ## [1.0.0] - 2026-02-11
 
@@ -329,3 +343,4 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 [1.0.21]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.21
 [1.0.22]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.22
 [1.0.23]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.23
+[1.0.24]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.24
