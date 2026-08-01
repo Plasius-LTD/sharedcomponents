@@ -4,3 +4,4 @@
 - [ADR-0002: Public Repository Governance Baseline](./adr-0002-public-repo-governance.md)
 - [ADR-0003: Base Package Boundary for Shared Components](./adr-0003-base-package-boundary.md)
 - [ADR-0004: Dual ESM and CJS Runtime Compatibility](./adr-0004-dual-esm-cjs-runtime-compatibility.md)
+- [ADR-0006: Exact-main OIDC package publishing](./adr-0006-exact-main-oidc-package-publishing.md)

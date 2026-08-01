@@ -18,6 +18,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - (placeholder)
 
 - **Security**
+  - Replaced token-based npm publication with a two-phase exact-main OIDC workflow, immutable tarball/SBOM hand-off, isolated pull-request validation, and fail-closed integrity checks.
   - (placeholder)
 
 ## [1.0.24] - 2026-08-01
