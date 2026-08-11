@@ -57,19 +57,14 @@ pending. `dismissOnEscape` and `dismissOnOutside` may disable individual
 dismissal paths. `initialFocusRef` and `returnFocusRef` allow explicit focus
 placement for programmatic workflows.
 
-Above `40rem`, the review surface is a non-modal right-side overlay. The
-backdrop is visually present but does not consume pointer input. A click on an
-exposed application target requests `outside` close and may continue to that
-target, allowing the host to implement cancel-and-switch behavior.
+Above `40rem`, the review surface retains its right-side presentation while
+remaining a semantic modal. At `40rem` and below, it becomes a full-width
+phone sheet. Both presentations use `aria-modal="true"`, intercept background
+pointer input, lock body scrolling, and contain Tab focus. The sheet must close
+before a background target can be selected.
 
-At `40rem` and below, the review surface is a full-width phone sheet with
-`aria-modal="true"`, background pointer interception, body-scroll locking, and
-Tab focus containment. It must close before a background target can be
-selected.
-
-Explicit close and Escape restore focus to `returnFocusRef`, or to the element
-focused when the sheet opened. Outside close does not force focus back, so a
-larger-screen target selection keeps its natural focus.
+Explicit close, Escape, and outside dismissal restore focus to
+`returnFocusRef`, or to the element focused when the sheet opened.
 
 ## Accessibility and styling
 

@@ -11,7 +11,10 @@ import { ContextMenu } from "../context-menu/index.js";
 import type { SharedComponentsMetadataInput } from "../../metadata/white-label.js";
 import { toFooterBranding } from "../../metadata/white-label.js";
 import { useSharedComponentsBrandingMetadata } from "../../metadata/provider.js";
-import { trackSharedComponentsInteraction } from "../../analytics/tracker.js";
+import {
+  trackSharedComponentsFooterFeedbackInteraction,
+  trackSharedComponentsInteraction,
+} from "../../analytics/tracker.js";
 import {
   createSharedComponentTranslationResolver,
   sharedComponentTranslationKeys,
@@ -35,7 +38,11 @@ export interface FooterLinkItem extends FooterNavItem {
 /** A footer command which invokes host-owned behavior and never navigates. */
 export interface FooterActionItem {
   kind: "action";
-  /** Stable caller-owned identity used for React and analytics context. */
+  /**
+   * Stable caller-owned identity. Only the exact `feedback` identifier emits
+   * a package-owned, context-isolated analytics event; other actions are not
+   * tracked by this component.
+   */
   id: string;
   /** Accessible action name, also shown in the mobile menu. */
   name: string;
@@ -238,11 +245,12 @@ export function Footer({
                 title={item.name}
                 disabled={item.disabled}
                 onClick={(event) => {
-                  trackInteraction("action_click", {
-                    label: item.name,
-                    variant: "desktop",
-                    context: { actionId: item.id },
-                  });
+                  if (item.id === "feedback") {
+                    trackSharedComponentsFooterFeedbackInteraction(
+                      resolvedMetadata,
+                      "desktop",
+                    );
+                  }
                   item.onSelect(event);
                 }}
               >
@@ -311,11 +319,12 @@ export function Footer({
               disabled: item.kind === "action" ? item.disabled : false,
               action: () => {
                 if (item.kind === "action") {
-                  trackInteraction("action_click", {
-                    label: item.name,
-                    variant: "mobile",
-                    context: { actionId: item.id },
-                  });
+                  if (item.id === "feedback") {
+                    trackSharedComponentsFooterFeedbackInteraction(
+                      resolvedMetadata,
+                      "mobile",
+                    );
+                  }
                   item.onSelect();
                   return;
                 }

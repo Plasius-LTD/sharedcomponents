@@ -35,6 +35,13 @@ const footerItems = [
 The desktop command is a native 44×44 button. The same item becomes a mobile
 menu command. `disabled` is honored in both presentations.
 
+Footer action telemetry is closed rather than caller-shaped. Only the exact
+`feedback` action ID emits the fixed `feedback_open` event with a bounded
+desktop/mobile variant. The event uses an isolated analytics client with no
+label, URL, host route/context, organization, website, or automatically
+injected channel context. Other action IDs emit no package telemetry. Hosts
+must keep feedback form state and content out of their `onSelect` telemetry.
+
 ## Star ratings
 
 `StarRating` is controlled and accepts exactly five caller-translated labels.
@@ -127,6 +134,27 @@ structure is allowlisted. The host must:
 
 `extractFeedbackRichText` exists only for the privacy/redaction pipeline. Its
 return value must not cross that boundary in readable form.
+
+## Schema 1.4 publication gate
+
+Do not publish these feedback primitives until `@plasius/schema` 1.4.0 is
+available from the approved public registry. Once it is available, the release
+preparation change must:
+
+1. add `@plasius/schema: ^1.4.0` as a direct runtime dependency and regenerate
+   `package-lock.json` from the registry (never from a file or Git source);
+2. import `containsFeedbackUnicodeProfileUnsupportedText` from
+   `@plasius/schema/feedback-unicode-profile` in the rich-text model and remove
+   the runtime `\p{Cn}` and hard-coded compatibility-code-point substitute;
+3. retain the 8,000 UTF-16-code-unit bound before invoking the schema helper;
+4. cover lone surrogates and code points assigned after Unicode 15.1 in the
+   model/editor tests; and
+5. repeat type, lint, coverage, build, dependency, packed-artifact, and lazy
+   bundle admission with the registry-resolved lockfile.
+
+The schema import belongs only to the feedback model/lazy editor path. The
+root entry must continue to type-export the AST without loading the Unicode
+profile into the initial application shell.
 
 ## Real-browser release gate
 

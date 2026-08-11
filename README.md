@@ -30,7 +30,7 @@ If a product needs auth/profile behavior, wire it via callbacks/props from the h
 - `ContactDetails`: reusable legal contact block with configurable details
 - `ContextMenu`: generic context menu surface
 - `ActionMenu`: controlled touch-first overflow menu with an anchored popover and phone-sheet presentation
-- `ReviewSheet`: controlled responsive review surface with non-modal side-sheet and modal phone behavior
+- `ReviewSheet`: controlled modal review surface with responsive side-sheet and phone presentations
 - `UserProfile`: optional generic avatar/menu shell driven by callbacks
 - `ConfirmationDialog`: reusable confirmation dialog with optional typed challenge flow for destructive actions
 - `StatusPanel`: reusable status/alert surface for loading, empty, warning, and retryable error states
@@ -117,9 +117,9 @@ Provide it once with `SharedComponentsBrandingProvider` (recommended), or per co
 `ActionMenu` and `ReviewSheet` are controlled presentation components. The host
 owns open state, authorization, draft state, validation, and persistence. At
 widths above `40rem`, `ActionMenu` is anchored to its trigger and `ReviewSheet`
-is a non-modal right-side overlay. At `40rem` and below, both adapt to
-full-width touch sheets; the review surface contains keyboard focus and marks
-itself modal.
+is a modal right-side overlay. At `40rem` and below, both adapt to full-width
+touch sheets. The review surface contains keyboard focus, blocks background
+interaction, and identifies itself as modal at every presentation width.
 
 ```tsx
 import {
@@ -173,8 +173,7 @@ outside-pointer dismissal, safe-area padding, reduced-motion handling,
 high-contrast focus indicators, and caller-translatable accessible labels.
 `ActionMenu` implements wrapping arrow, Home, and End navigation and returns
 focus to its trigger. `ReviewSheet` reports why close was requested and returns
-focus for explicit close and Escape; an outside selection on a larger screen
-may receive focus without the component stealing it back.
+focus for explicit close, Escape, and outside dismissal.
 
 See [Touch-first action surfaces](./docs/touch-first-action-surfaces.md) for the
 complete API and host responsibilities. The coordinate-based `ContextMenu`
@@ -210,6 +209,12 @@ const feedbackItems = [
 
 <Footer items={feedbackItems} />;
 ```
+
+Only the exact action ID `feedback` emits action telemetry. The package sends
+the fixed `feedback_open` event and desktop/mobile variant through a
+context-isolated client; it does not send the caller-owned label, URL, route,
+branding metadata, or arbitrary analytics context. Other footer actions are
+not tracked by the component.
 
 `StarRating` exposes exactly five caller-translated native radio options with
 Arrow/Home/End keyboard behavior and visible shape, border, and text state.
