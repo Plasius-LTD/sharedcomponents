@@ -1,4 +1,5 @@
 import * as React from "react";
+import axe from "axe-core";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ReviewSheet } from "../src/index.js";
@@ -77,7 +78,7 @@ describe("ReviewSheet", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
-  it("renders a labelled non-modal side sheet and focuses its close action", () => {
+  it("renders a labelled modal side sheet and focuses its close action", () => {
     installMatchMedia(false);
 
     render(
@@ -93,12 +94,38 @@ describe("ReviewSheet", () => {
     );
 
     const dialog = screen.getByRole("dialog", { name: "Review user change" });
-    expect(dialog.getAttribute("aria-modal")).toBeNull();
+    expect(dialog.getAttribute("aria-modal")).toBe("true");
     expect(dialog.getAttribute("data-presentation")).toBe("side");
+    expect(document.body.style.overflow).toBe("hidden");
     expect(screen.getByText("Confirm the new display name.")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Close review" })).toBe(
       document.activeElement,
     );
+  });
+
+  it("passes WCAG 2.2 AA axe rules in the desktop modal presentation", async () => {
+    installMatchMedia(false);
+
+    const { container } = render(
+      <ReviewSheet
+        open={true}
+        title="Review user change"
+        description="Confirm the proposed change."
+        closeLabel="Close review"
+        onClose={vi.fn()}
+        footer={<button type="button">Commit change</button>}
+      >
+        <p>Before and after</p>
+      </ReviewSheet>,
+    );
+
+    const result = await axe.run(container, {
+      runOnly: {
+        type: "tag",
+        values: ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"],
+      },
+    });
+    expect(result.violations).toEqual([]);
   });
 
   it("closes on Escape and restores focus after the controlled sheet closes", () => {
@@ -136,31 +163,70 @@ describe("ReviewSheet", () => {
     expect(trigger).toBe(document.activeElement);
   });
 
-  it("allows an outside pointer target to receive focus while requesting close", () => {
+  it("blocks the outside pointer default and restores opener focus after close", () => {
     installMatchMedia(false);
-    const onClose = vi.fn();
+    const outsideClick = vi.fn();
 
-    render(
-      <>
-        <button type="button">Next target</button>
-        <ReviewSheet
-          open={true}
-          title="Review user change"
-          closeLabel="Close review"
-          onClose={onClose}
-        >
-          <p>Change details</p>
-        </ReviewSheet>
-      </>,
-    );
+    function Example() {
+      const [open, setOpen] = React.useState(false);
+      return (
+        <>
+          <button type="button" onClick={() => setOpen(true)}>
+            Edit user
+          </button>
+          <button type="button" onClick={outsideClick}>
+            Next target
+          </button>
+          <ReviewSheet
+            open={open}
+            title="Review user change"
+            closeLabel="Close review"
+            onClose={() => setOpen(false)}
+          >
+            <p>Change details</p>
+          </ReviewSheet>
+        </>
+      );
+    }
+
+    render(<Example />);
+    const trigger = screen.getByRole("button", { name: "Edit user" });
+    trigger.focus();
+    fireEvent.click(trigger);
 
     const nextTarget = screen.getByRole("button", { name: "Next target" });
-    fireEvent.pointerDown(nextTarget);
-    nextTarget.focus();
-    fireEvent.click(nextTarget);
+    expect(fireEvent.pointerDown(nextTarget)).toBe(false);
 
-    expect(onClose).toHaveBeenCalledWith("outside");
-    expect(nextTarget).toBe(document.activeElement);
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(trigger).toBe(document.activeElement);
+    expect(outsideClick).not.toHaveBeenCalled();
+  });
+
+  it("contains Tab focus in the desktop side-sheet presentation", () => {
+    installMatchMedia(false);
+
+    render(
+      <ReviewSheet
+        open={true}
+        title="Review user change"
+        closeLabel="Close review"
+        onClose={vi.fn()}
+        footer={<button type="button">Commit change</button>}
+      >
+        <button type="button">Inspect consequence</button>
+      </ReviewSheet>,
+    );
+
+    const dialog = screen.getByRole("dialog", { name: "Review user change" });
+    const closeButton = screen.getByRole("button", { name: "Close review" });
+    const commitButton = screen.getByRole("button", { name: "Commit change" });
+
+    closeButton.focus();
+    fireEvent.keyDown(dialog, { key: "Tab", shiftKey: true });
+    expect(commitButton).toBe(document.activeElement);
+
+    fireEvent.keyDown(dialog, { key: "Tab" });
+    expect(closeButton).toBe(document.activeElement);
   });
 
   it("uses an aria-modal phone sheet, locks body scroll, and contains Tab focus", () => {
@@ -194,7 +260,7 @@ describe("ReviewSheet", () => {
     expect(closeButton).toBe(document.activeElement);
   });
 
-  it("updates modality when the phone media query changes", () => {
+  it("keeps modality while changing between side and phone presentations", () => {
     const media = installMatchMedia(false);
 
     render(
@@ -209,13 +275,15 @@ describe("ReviewSheet", () => {
     );
 
     const dialog = screen.getByRole("dialog");
-    expect(dialog.getAttribute("aria-modal")).toBeNull();
+    expect(dialog.getAttribute("aria-modal")).toBe("true");
+    expect(dialog.getAttribute("data-presentation")).toBe("side");
 
     act(() => {
       media.setMatches(true);
     });
 
     expect(dialog.getAttribute("aria-modal")).toBe("true");
+    expect(dialog.getAttribute("data-presentation")).toBe("phone");
     expect(document.body.style.overflow).toBe("hidden");
   });
 

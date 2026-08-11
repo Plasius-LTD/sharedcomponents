@@ -5,7 +5,7 @@
   display: flex;
   justify-content: flex-end;
   background: rgb(15 23 42 / 14%);
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 .sheet {

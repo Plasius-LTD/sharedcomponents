@@ -9,29 +9,15 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
-  - (placeholder)
-
-- **Changed**
-  - (placeholder)
-
-- **Fixed**
-  - (placeholder)
-
-- **Security**
-  - Replaced token-based npm publication with a two-phase exact-main OIDC workflow, immutable tarball/SBOM hand-off, isolated pull-request validation, and fail-closed integrity checks.
-  - (placeholder)
-
-## [1.0.24] - 2026-08-01
-
-- **Added**
-  - Added controlled, accessible `ActionMenu` and `ReviewSheet` primitives with touch-sized controls, responsive popover/sheet presentations, keyboard and focus management, safe-area support, and reduced-motion behavior (task #38).
   - Added discriminated desktop/mobile footer actions, an accessible one-to-five `StarRating`, and a lazy constrained rich-text editor with keyboard formatting, exact schema-compatible limits, and plain-text-only paste (task #39).
+  - (placeholder)
 
 - **Changed**
+  - Refreshed development-only transitive dependencies to versions that close
+    the current brace-expansion, nanoid, and undici advisories.
   - (placeholder)
 
 - **Fixed**
-  - (placeholder)
   - Preserve block-boundary Enter/caret behavior through an editor-private
     view state without emitting empty AST nodes, keep collapsed Cut
     non-destructive, and close mobile context menus when focus tabs away.
@@ -47,10 +33,13 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - Preserve the active ContextMenu command across equivalent rerenders, move
     focus predictably when commands become unavailable, and name/relate
     Header and UserProfile menus with Escape focus restoration.
+  - Keep `ReviewSheet` semantically modal in both side-sheet and phone
+    presentations, contain Tab focus, block background pointer/scroll input,
+    and restore opener focus for every dismissal path.
+  - (placeholder)
 
 - **Security**
-  - Added fail-closed source and npm-package admission for the administrative contributor registry and pinned the CI/CD runtime to Node.js 24.18.0 LTS.
-  - (placeholder)
+  - Replaced token-based npm publication with a two-phase exact-main OIDC workflow, immutable tarball/SBOM hand-off, isolated pull-request validation, and fail-closed integrity checks.
   - The constrained editor emits only an allowlisted transient AST, normalises Unicode, rejects unsupported browser edit/drop operations, and uses no raw HTML injection sink.
   - Disable browser and third-party writing-assistance hooks on the transient
     narrative editor so sensitive text is not intentionally shared with those
@@ -62,6 +51,25 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
     `@plasius/schema ^1.4.0` pinned Unicode-profile helper.
   - Fail closed for non-cancelable, empty, unknown, replacement, formatting,
     paste, and drop input escapes without retaining browser-mutated DOM.
+  - Isolate the exact footer `feedback_open` intent event from caller labels,
+    URLs, routes, branding, and arbitrary analytics context; non-feedback
+    footer actions emit no package action telemetry.
+  - (placeholder)
+
+## [1.0.24] - 2026-08-01
+
+- **Added**
+  - Added controlled, accessible `ActionMenu` and `ReviewSheet` primitives with touch-sized controls, responsive popover/sheet presentations, keyboard and focus management, safe-area support, and reduced-motion behavior (task #38).
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - Added fail-closed source and npm-package admission for the administrative contributor registry and pinned the CI/CD runtime to Node.js 24.18.0 LTS.
+  - (placeholder)
 
 ## [1.0.23] - 2026-07-13
 
