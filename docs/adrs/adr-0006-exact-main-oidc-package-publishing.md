@@ -39,7 +39,9 @@ Use a two-run release protocol:
 6. The hosted `production` job downloads the exact artifact IDs and verifies
    GitHub and SHA-256 digests, safe tar members, package identity, npm
    distribution tag, and SHA-512 registry integrity. It repeats the exact-main
-   check immediately before the first mutation.
+   check immediately before the first mutation. Archive-member predicates
+   consume the complete tar listing so `pipefail` cannot convert a successful
+   early match into a false verification failure through SIGPIPE.
 7. Only the verified tarball is published through npm OIDC with provenance.
    The privileged job installs no dependencies, runs no project scripts, and
    receives no npm write token.

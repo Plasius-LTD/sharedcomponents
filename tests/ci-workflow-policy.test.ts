@@ -123,4 +123,13 @@ describe("release workflow trust boundaries", () => {
     const source = releasePrepareWorkflow.slice(scriptStart, scriptEnd);
     expect(() => new Script(source)).not.toThrow();
   });
+
+  it("drains the package member stream before pipefail evaluates tar", () => {
+    expect(cdWorkflow).not.toContain(
+      'tar -tzf "${TARBALL}" | grep -Eq \'^package/dist(/|$)\'',
+    );
+    expect(cdWorkflow).toContain(
+      'tar -tzf "${TARBALL}" | grep -E \'^package/dist(/|$)\' >/dev/null',
+    );
+  });
 });

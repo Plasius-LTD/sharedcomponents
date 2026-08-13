@@ -17,6 +17,9 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 - **Fixed**
   - Correct the release-preparation pre-release identity parser and compile its
     embedded JavaScript in workflow policy tests before protected CD.
+  - Drain the complete immutable package member stream during protected
+    publication verification so `pipefail` cannot mistake tar's SIGPIPE for a
+    missing `dist` directory.
 
 - **Security**
   - (placeholder)

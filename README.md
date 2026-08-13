@@ -306,7 +306,8 @@ This package is released only through protected `cd.yml`; release-metadata
 checkout does not persist the workflow `GITHUB_TOKEN`, leaving the narrowly
 scoped release-preparation GitHub App token as the sole branch-mutation
 credential. Workflow policy tests also compile the embedded version/pre-release
-parser so a malformed release hand-off fails before a production run.
+parser and require archive-member checks to drain their input, so malformed
+release hand-offs fail closed without false negatives from shell `pipefail`.
 
 ## Translations
 
