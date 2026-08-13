@@ -15,6 +15,8 @@ capabilities before rendering any action or form. Removing an action from
 Use a discriminated item when the footer entry invokes behavior:
 
 ```tsx
+import { FOOTER_FEEDBACK_ACTION_ID } from "@plasius/sharedcomponents";
+
 const footerItems = [
   {
     kind: "link" as const,
@@ -24,7 +26,7 @@ const footerItems = [
   },
   {
     kind: "action" as const,
-    id: "feedback",
+    id: FOOTER_FEEDBACK_ACTION_ID,
     name: "Rate us or report a bug",
     icon: <FeedbackIcon />,
     onSelect: openFeedback,
@@ -33,10 +35,12 @@ const footerItems = [
 ```
 
 The desktop command is a native 44×44 button. The same item becomes a mobile
-menu command. `disabled` is honored in both presentations.
+menu command. `disabled` is honored in both presentations. Hosts import the
+stable `FOOTER_FEEDBACK_ACTION_ID` constant rather than constructing an
+analytics-bearing identifier from a label, route, or content.
 
 Footer action telemetry is closed rather than caller-shaped. Only the exact
-`feedback` action ID emits the fixed `feedback_open` event with a bounded
+`FOOTER_FEEDBACK_ACTION_ID` value emits the fixed `feedback_open` event with a bounded
 desktop/mobile variant. The event uses an isolated analytics client with no
 label, URL, host route/context, organization, website, or automatically
 injected channel context. Other action IDs emit no package telemetry. Hosts
@@ -137,19 +141,20 @@ return value must not cross that boundary in readable form.
 
 ## Schema 1.4 publication gate
 
-Do not publish these feedback primitives until `@plasius/schema` 1.4.0 is
-available from the approved public registry. Once it is available, the release
-preparation change must:
+The release candidate declares registry-only `@plasius/schema: ^1.4.0`, imports
+`containsFeedbackUnicodeProfileUnsupportedText`, retains the pre-scan 8,000
+UTF-16-code-unit bound, and covers lone surrogates plus post-15.1 assignments.
+It has been exercised against an exact local schema candidate without adding a
+file, workspace, source, or Git dependency.
 
-1. add `@plasius/schema: ^1.4.0` as a direct runtime dependency and regenerate
-   `package-lock.json` from the registry (never from a file or Git source);
-2. import `containsFeedbackUnicodeProfileUnsupportedText` from
-   `@plasius/schema/feedback-unicode-profile` in the rich-text model and remove
-   the runtime `\p{Cn}` and hard-coded compatibility-code-point substitute;
-3. retain the 8,000 UTF-16-code-unit bound before invoking the schema helper;
-4. cover lone surrogates and code points assigned after Unicode 15.1 in the
-   model/editor tests; and
-5. repeat type, lint, coverage, build, dependency, packed-artifact, and lazy
+Do not publish these feedback primitives until `@plasius/schema` 1.4.0 is
+available from the approved public registry. Once it is available, release
+preparation must:
+
+1. regenerate and verify `package-lock.json` from the registry, never from a
+   file or Git source, and confirm the published integrity matches the expected
+   candidate artifact;
+2. repeat type, lint, coverage, build, dependency, packed-artifact, and lazy
    bundle admission with the registry-resolved lockfile.
 
 The schema import belongs only to the feedback model/lazy editor path. The

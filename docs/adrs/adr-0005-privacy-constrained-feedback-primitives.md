@@ -12,9 +12,10 @@ and the feedback backend. Narrative is unusually sensitive: arbitrary HTML,
 browser metadata, attachments, links, and pixels must not enter the feedback
 contract, and the editor implementation must not enlarge the initial shell.
 
-The package is consumed before and after the feedback-domain packages are
-released. A runtime dependency on the schema package would couple rendering to
-validation and make the base UI boundary less reusable.
+The root shell must not load feedback validation code. Browser and private
+scanner Unicode admission must nevertheless share one pinned data profile;
+runtime `\p{Cn}` behavior changes with the JavaScript engine and cannot provide
+that consistency.
 
 ## Decision
 
@@ -32,6 +33,10 @@ validation and make the base UI boundary less reusable.
 - Type-export the AST from the root entry, but expose runtime model helpers
   through the `feedback-rich-text-model` subpath so neither the implementation
   nor the editing model joins the application shell.
+- Depend on `@plasius/schema ^1.4.0` and call only its pinned
+  `feedback-unicode-profile` helper after applying the 8,000-code-unit input
+  bound. Keep that import in the lazy model graph so it does not enlarge the
+  root shell.
 - Build editor output from a closed AST: `doc`, paragraph or bullet-list-item
   blocks, and text leaves with only bold, italic, or underline marks. Count
   one newline between blocks toward the exact 4,000 Unicode-code-point limit,
@@ -79,12 +84,12 @@ validation and make the base UI boundary less reusable.
   browser IME ordering. Release remains gated on packaged-artifact checks in
   Chromium, Firefox, and WebKit for composition ordering, post-composition
   input, and focus/blur behavior.
-- The package duplicates only the closed feedback AST constants and shape.
-  Compatibility tests in the consuming feedback feature must detect future
-  schema-version drift before either package is released.
-- Publication of this change is blocked until the released
-  `@plasius/schema ^1.4.0` Unicode-profile helper replaces the staged
-  runtime-dependent unassigned-code-point check. Browser admission must use
-  the same pinned profile as the private scanner.
+- The package duplicates only the closed feedback AST constants and shape;
+  the versioned Unicode corpus remains schema-owned. Compatibility tests in
+  the consuming feedback feature must detect future schema-version drift.
+- Publication remains blocked until `@plasius/schema 1.4.0` exists in the
+  approved registry and clean-install validation proves the registry artifact
+  matches the candidate used here. Source, file, workspace, and Git pins are
+  prohibited.
 - The host remains responsible for capability/flag evaluation and for loading
   the editor only after narrative is eligible for the active language.

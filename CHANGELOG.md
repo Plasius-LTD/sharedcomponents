@@ -10,9 +10,13 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 - **Added**
   - Added discriminated desktop/mobile footer actions, an accessible one-to-five `StarRating`, and a lazy constrained rich-text editor with keyboard formatting, exact schema-compatible limits, and plain-text-only paste (task #39).
+  - Export the stable `FOOTER_FEEDBACK_ACTION_ID` used to admit the single
+    package-owned feedback intent event.
   - (placeholder)
 
 - **Changed**
+  - Consume the schema-owned Unicode 15.1 feedback profile through the lazy
+    editor model using the registry-only `@plasius/schema ^1.4.0` contract.
   - Refreshed development-only transitive dependencies to versions that close
     the current brace-expansion, nanoid, and undici advisories.
   - (placeholder)
@@ -47,8 +51,11 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - Bound hostile rich-text arrays and text before profile or normalisation
     work, and keep the editor's full stylesheet in its lazy implementation
     chunk instead of the initial application shell.
-  - Kept publication blocked until the editor consumes the released
-    `@plasius/schema ^1.4.0` pinned Unicode-profile helper.
+  - Reject lone UTF-16 surrogates and code points assigned after the pinned
+    Unicode 15.1 corpus before browser-dependent normalization.
+  - Keep publication blocked until the locally validated
+    `@plasius/schema 1.4.0` candidate is published and reproduced by a clean
+    registry-only install.
   - Fail closed for non-cancelable, empty, unknown, replacement, formatting,
     paste, and drop input escapes without retaining browser-mutated DOM.
   - Isolate the exact footer `feedback_open` intent event from caller labels,

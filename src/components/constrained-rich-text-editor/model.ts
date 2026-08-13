@@ -1,3 +1,5 @@
+import { containsFeedbackUnicodeProfileUnsupportedText } from "@plasius/schema/feedback-unicode-profile";
+
 /** Exact contract version shared with `@plasius/schema` feedback AST v1. */
 export const FEEDBACK_RICH_TEXT_CONTRACT_VERSION = "1.0.0" as const;
 /** Exact Unicode-code-point ceiling, including block-separator newlines. */
@@ -91,25 +93,14 @@ export interface FeedbackRichTextMutation {
 
 const unicodeFormatPattern = /\p{Cf}/gu;
 const unicodeControlPattern = /\p{Cc}/u;
-const unicodeUnassignedPattern = /\p{Cn}/u;
 const disallowedNarrativeSyntaxPattern =
   /<|>|(?:https?|ftp|mailto|javascript|data|blob|file):|\/\/|www\.|\]\s*\(/i;
-/**
- * U+1C89 and U+A7F1 are unassigned in the scanner's pinned Unicode 15.1
- * profile but are assigned by newer runtimes; U+A7F1 also gains a
- * compatibility mapping. Reject both before runtime-dependent normalization
- * so browser and scanner decisions cannot diverge.
- */
-const postProfileCompatibilityCodePointPattern = /[\u1C89\uA7F1]/u;
 
 /** @internal Raw pre-NFKC gate shared by model and editing transactions. */
 export function containsFeedbackRichTextUnsupportedCodePoint(
   text: string,
 ): boolean {
-  return (
-    unicodeUnassignedPattern.test(text) ||
-    postProfileCompatibilityCodePointPattern.test(text)
-  );
+  return containsFeedbackUnicodeProfileUnsupportedText(text);
 }
 
 function stripControlCharacters(text: string, allowNewlines: boolean): string {

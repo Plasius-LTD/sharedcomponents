@@ -35,13 +35,22 @@ export interface FooterLinkItem extends FooterNavItem {
   id: string;
 }
 
+/** Exact stable action identity which enables privacy-isolated feedback intent telemetry. */
+export const FOOTER_FEEDBACK_ACTION_ID = "feedback" as const;
+
+function isFooterFeedbackActionId(
+  value: unknown,
+): value is typeof FOOTER_FEEDBACK_ACTION_ID {
+  return typeof value === "string" && value === FOOTER_FEEDBACK_ACTION_ID;
+}
+
 /** A footer command which invokes host-owned behavior and never navigates. */
 export interface FooterActionItem {
   kind: "action";
   /**
-   * Stable caller-owned identity. Only the exact `feedback` identifier emits
-   * a package-owned, context-isolated analytics event; other actions are not
-   * tracked by this component.
+   * Stable caller-owned identity. Only the exact
+   * `FOOTER_FEEDBACK_ACTION_ID` value emits a package-owned, context-isolated
+   * analytics event; other actions are not tracked by this component.
    */
   id: string;
   /** Accessible action name, also shown in the mobile menu. */
@@ -245,7 +254,7 @@ export function Footer({
                 title={item.name}
                 disabled={item.disabled}
                 onClick={(event) => {
-                  if (item.id === "feedback") {
+                  if (isFooterFeedbackActionId(item.id)) {
                     trackSharedComponentsFooterFeedbackInteraction(
                       resolvedMetadata,
                       "desktop",
@@ -319,7 +328,7 @@ export function Footer({
               disabled: item.kind === "action" ? item.disabled : false,
               action: () => {
                 if (item.kind === "action") {
-                  if (item.id === "feedback") {
+                  if (isFooterFeedbackActionId(item.id)) {
                     trackSharedComponentsFooterFeedbackInteraction(
                       resolvedMetadata,
                       "mobile",

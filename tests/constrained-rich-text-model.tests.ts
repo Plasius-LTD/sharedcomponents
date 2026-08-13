@@ -138,8 +138,27 @@ describe("constrained rich-text canonicalisation", () => {
     ).toBeNull();
   });
 
-  it("rejects Unicode data newer than the pinned scanner profile", () => {
-    for (const canary of ["\u0378", "\u1c89", "\ua7f1"]) {
+  it("rejects malformed UTF-16 and Unicode data newer than the pinned scanner profile", () => {
+    const profileCanaries = [
+      0x0378,
+      0x1c89,
+      0xa7f1,
+      0x10940,
+      0x11db0,
+      0x16ea0,
+      0x1e6c0,
+      0x323b0,
+    ].map((codePoint) => String.fromCodePoint(codePoint));
+    const malformedUtf16 = [
+      "\ud800",
+      "\udfff",
+      "\ud800A",
+      "A\udc00",
+      "\ud800\ud800",
+      "\udc00\udc00",
+    ];
+
+    for (const canary of [...profileCanaries, ...malformedUtf16]) {
       expect(createFeedbackRichTextDocument(`${canary}ynthetic`)).toBeNull();
       expect(
         normaliseFeedbackRichTextDocument(

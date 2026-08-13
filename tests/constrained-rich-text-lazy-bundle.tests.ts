@@ -9,6 +9,8 @@ const EDITOR_STATE =
   "/src/components/constrained-rich-text-editor/editing-state.ts";
 const EDITOR_STYLES =
   "/src/components/constrained-rich-text-editor/ConstrainedRichTextEditor.module.css";
+const SCHEMA_UNICODE_PROFILE_DIRECTORY =
+  "/node_modules/@plasius/schema/dist/";
 
 interface BundleChunk {
   type: "chunk";
@@ -95,7 +97,8 @@ describe("constrained rich-text lazy bundle boundary", () => {
         (moduleId) =>
           moduleId.endsWith(EDITOR_MODEL) ||
           moduleId.endsWith(EDITOR_STATE) ||
-          moduleId.endsWith(EDITOR_STYLES),
+          moduleId.endsWith(EDITOR_STYLES) ||
+          moduleId.includes(SCHEMA_UNICODE_PROFILE_DIRECTORY),
       ),
     ).toBe(false);
     expect(
@@ -111,6 +114,11 @@ describe("constrained rich-text lazy bundle boundary", () => {
     expect(
       Object.keys(implementationChunk?.modules ?? {}).some((moduleId) =>
         moduleId.endsWith(EDITOR_STYLES),
+      ),
+    ).toBe(true);
+    expect(
+      Object.keys(implementationChunk?.modules ?? {}).some((moduleId) =>
+        moduleId.includes(SCHEMA_UNICODE_PROFILE_DIRECTORY),
       ),
     ).toBe(true);
 

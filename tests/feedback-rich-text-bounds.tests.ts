@@ -1,4 +1,25 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const { profileScanSpy } = vi.hoisted(() => ({
+  profileScanSpy: vi.fn<(text: string) => boolean>(),
+}));
+
+vi.mock(
+  "@plasius/schema/feedback-unicode-profile",
+  async (importOriginal) => {
+    const actual =
+      await importOriginal<
+        typeof import("@plasius/schema/feedback-unicode-profile")
+      >();
+    profileScanSpy.mockImplementation((text: string) =>
+      actual.containsFeedbackUnicodeProfileUnsupportedText(text),
+    );
+    return {
+      ...actual,
+      containsFeedbackUnicodeProfileUnsupportedText: profileScanSpy,
+    };
+  },
+);
 import {
   extractFeedbackRichText,
   FEEDBACK_RICH_TEXT_MAX_BLOCKS,
@@ -10,12 +31,20 @@ import {
   type FeedbackRichTextDocument,
   type FeedbackRichTextNode,
 } from "../src/components/constrained-rich-text-editor/model.js";
+import {
+  createFeedbackRichTextEditingState,
+  replaceFeedbackRichTextEditingRange,
+} from "../src/components/constrained-rich-text-editor/editing-state.js";
 
 function isArrayIndex(property: string | symbol): boolean {
   return typeof property === "string" && /^(?:0|[1-9]\d*)$/.test(property);
 }
 
 describe("feedback rich-text defensive bounds", () => {
+  beforeEach(() => {
+    profileScanSpy.mockClear();
+  });
+
   it("visits no more than the closed node ceiling in a dense oversized array", () => {
     const node: FeedbackRichTextNode = { type: "text", text: "x" };
     let indexedReads = 0;
@@ -87,16 +116,8 @@ describe("feedback rich-text defensive bounds", () => {
   });
 
   it("bounds profile and normalisation inputs before inspecting a huge string", () => {
-    const profileInputLengths: number[] = [];
     const normalisationInputLengths: number[] = [];
-    const originalTest = RegExp.prototype.test;
     const originalNormalise = String.prototype.normalize;
-    const testSpy = vi
-      .spyOn(RegExp.prototype, "test")
-      .mockImplementation(function (this: RegExp, value: string) {
-        profileInputLengths.push(value.length);
-        return originalTest.call(this, value);
-      });
     const normaliseSpy = vi
       .spyOn(String.prototype, "normalize")
       .mockImplementation(function (
@@ -133,11 +154,19 @@ describe("feedback rich-text defensive bounds", () => {
         0,
         "\t".repeat(1_000_000),
       );
+      replaceFeedbackRichTextEditingRange(
+        createFeedbackRichTextEditingState(null),
+        0,
+        0,
+        "x".repeat(1_000_000),
+      );
     } finally {
       normaliseSpy.mockRestore();
-      testSpy.mockRestore();
     }
 
+    const profileInputLengths = profileScanSpy.mock.calls.map(
+      ([text]) => text.length,
+    );
     expect(extractFeedbackRichText(normalised)).toHaveLength(4_000);
     expect(profileInputLengths.length).toBeGreaterThan(0);
     expect(normalisationInputLengths.length).toBeGreaterThan(0);

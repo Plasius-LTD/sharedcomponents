@@ -140,7 +140,7 @@ function normaliseInsertedText(text: string): string | null {
   const boundedText = safeSlice(
     text,
     FEEDBACK_RICH_TEXT_MAX_CHARACTERS + 1,
-    FEEDBACK_RICH_TEXT_MAX_UTF16_CODE_UNITS + 1,
+    FEEDBACK_RICH_TEXT_MAX_UTF16_CODE_UNITS,
   );
   if (containsFeedbackRichTextUnsupportedCodePoint(boundedText)) {
     return null;

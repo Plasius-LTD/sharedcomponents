@@ -35,6 +35,7 @@
   "license": "MIT",
   "dependencies": {
     "@plasius/analytics": "^1.2.2",
+    "@plasius/schema": "^1.4.0",
     "@plasius/translations": "^1.0.23"
   },
   "peerDependencies": {

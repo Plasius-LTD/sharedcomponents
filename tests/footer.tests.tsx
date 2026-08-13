@@ -1,7 +1,10 @@
 import axe from "axe-core";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { Footer } from "../src/components/footer/Footer.js";
+import {
+  FOOTER_FEEDBACK_ACTION_ID,
+  Footer,
+} from "../src/components/footer/Footer.js";
 import { SharedComponentsBrandingProvider } from "../src/metadata/provider.js";
 import type { SharedComponentsMetadataInput } from "../src/metadata/white-label.js";
 import { __resetSharedComponentsAnalyticsClientsForTests } from "../src/analytics/tracker.js";
@@ -275,7 +278,7 @@ describe("Footer", () => {
         items={[
           {
             kind: "action",
-            id: "feedback",
+            id: FOOTER_FEEDBACK_ACTION_ID,
             name: "Sensitive caller-owned display label",
             icon: <span>!</span>,
             onSelect,
@@ -339,6 +342,71 @@ describe("Footer", () => {
       ),
     ).toBe(false);
     expect(onSelect).toHaveBeenCalledTimes(2);
+  });
+
+  it("admits feedback analytics only for the exported exact stable action ID", () => {
+    const onSelect = vi.fn();
+    const metadataWithAnalytics: SharedComponentsMetadataInput = {
+      ...fakeMetadata,
+      analytics: {
+        endpoint: "https://analytics.example.com/collect",
+      },
+    };
+
+    expect(FOOTER_FEEDBACK_ACTION_ID).toBe("feedback");
+    render(
+      <Footer
+        metadata={metadataWithAnalytics}
+        items={[
+          {
+            kind: "action",
+            id: FOOTER_FEEDBACK_ACTION_ID,
+            name: "Exact feedback action",
+            icon: <span>!</span>,
+            onSelect,
+          },
+          {
+            kind: "action",
+            id: "feedback ",
+            name: "Trailing-space lookalike",
+            icon: <span>!</span>,
+            onSelect,
+          },
+          {
+            kind: "action",
+            id: "feedback_open",
+            name: "Event-name lookalike",
+            icon: <span>!</span>,
+            onSelect,
+          },
+        ]}
+      />,
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Exact feedback action" }),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Trailing-space lookalike" }),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Event-name lookalike" }),
+    );
+
+    expect(
+      analyticsTrackSpy.mock.calls.filter(
+        ([event]) => event.action === "feedback_open",
+      ),
+    ).toEqual([
+      [
+        {
+          component: "Footer",
+          action: "feedback_open",
+          variant: "desktop",
+        },
+      ],
+    ]);
+    expect(onSelect).toHaveBeenCalledTimes(3);
   });
 
   it("keeps disabled footer actions unavailable in both presentations", () => {

@@ -191,6 +191,8 @@ to their opener on Escape.
 44×44 native buttons on desktop and as disabled-aware mobile menu commands:
 
 ```tsx
+import { FOOTER_FEEDBACK_ACTION_ID } from "@plasius/sharedcomponents";
+
 const feedbackItems = [
   {
     kind: "link" as const,
@@ -200,7 +202,7 @@ const feedbackItems = [
   },
   {
     kind: "action" as const,
-    id: "feedback",
+    id: FOOTER_FEEDBACK_ACTION_ID,
     name: "Rate us or report a bug",
     icon: <span aria-hidden="true">★</span>,
     onSelect: () => setFeedbackOpen(true),
@@ -210,7 +212,9 @@ const feedbackItems = [
 <Footer items={feedbackItems} />;
 ```
 
-Only the exact action ID `feedback` emits action telemetry. The package sends
+Import `FOOTER_FEEDBACK_ACTION_ID` from `@plasius/sharedcomponents` rather than
+repeating the identifier in host code. Only that exact string value emits
+action telemetry. The package sends
 the fixed `feedback_open` event and desktop/mobile variant through a
 context-isolated client; it does not send the caller-owned label, URL, route,
 branding metadata, or arbitrary analytics context. Other footer actions are
@@ -295,10 +299,11 @@ See [Privacy-safe feedback primitives](./docs/privacy-safe-feedback-primitives.m
 and [ADR-0005](./docs/adrs/adr-0005-privacy-constrained-feedback-primitives.md)
 for the complete host boundary and schema-compatibility contract.
 
-Release gate: the feedback editor must consume the published
-`@plasius/schema ^1.4.0` Unicode-profile helper before this change is released.
-The staged runtime Unicode checks are not a substitute for the pinned profile
-and must not ship independently.
+Release gate: the feedback editor now consumes the
+`@plasius/schema ^1.4.0` Unicode-profile helper through its lazy model path.
+This package must not be released until schema 1.4.0 is published by its
+protected workflow and a clean registry install reproduces the candidate lock
+and package gates. A local schema candidate is validation evidence only.
 
 ## Translations
 
