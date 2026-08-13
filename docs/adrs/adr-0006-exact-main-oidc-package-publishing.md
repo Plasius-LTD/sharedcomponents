@@ -31,7 +31,8 @@ Use a two-run release protocol:
    commit.
 4. If remote `main` still equals that commit, it dispatches
    `phase: publish` from `main`, carrying the exact expected SHA, release tag,
-   and version-derived prerelease identity.
+   and version-derived prerelease identity. Workflow policy tests compile the
+   embedded parser that derives that identity before the workflow can land.
 5. A read-only hosted job repeats exact-main and exact-CI checks, validates and
    packs the package with lifecycle scripts disabled, creates the SBOM, and
    uploads both as digest-bound direct artifacts.
@@ -63,6 +64,9 @@ policies are independent admission controls. The inherited product flag is `feed
 - Checkout-provided credentials cannot shadow the release-preparation App
   token, so an unexpected authentication path fails before release metadata is
   written to the protected branch.
+- The embedded JavaScript used to derive the publication distribution tag is
+  syntax-checked by the repository test suite rather than first executing in a
+  protected release run.
 - A moved `main`, mismatched existing package, stale dispatch, or absent
   trusted-publisher binding fails closed.
 - Releases use two runs and may require fresh preparation after concurrent

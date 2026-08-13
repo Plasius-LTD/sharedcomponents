@@ -305,7 +305,8 @@ lock and package gates have been reproduced from a clean registry-only install.
 This package is released only through protected `cd.yml`; release-metadata
 checkout does not persist the workflow `GITHUB_TOKEN`, leaving the narrowly
 scoped release-preparation GitHub App token as the sole branch-mutation
-credential.
+credential. Workflow policy tests also compile the embedded version/pre-release
+parser so a malformed release hand-off fails before a production run.
 
 ## Translations
 
