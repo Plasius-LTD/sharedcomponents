@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { Script } from "node:vm";
 import { describe, expect, it } from "vitest";
 
 const read = (path: string): string =>
@@ -108,5 +109,18 @@ describe("release workflow trust boundaries", () => {
     expect(releasePrepareWorkflow).toContain(
       'git remote set-url origin "https://x-access-token:${AUTH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"',
     );
+  });
+
+  it("keeps the embedded pre-release identity parser syntactically valid", () => {
+    const marker = 'EFFECTIVE_PREID=$(TARGET_VER="${MAIN_VERSION}" node -e \'';
+    const start = releasePrepareWorkflow.indexOf(marker);
+    const scriptStart = start + marker.length;
+    const scriptEnd = releasePrepareWorkflow.indexOf("\n          ')", scriptStart);
+
+    expect(start).toBeGreaterThanOrEqual(0);
+    expect(scriptEnd).toBeGreaterThan(scriptStart);
+
+    const source = releasePrepareWorkflow.slice(scriptStart, scriptEnd);
+    expect(() => new Script(source)).not.toThrow();
   });
 });

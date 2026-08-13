@@ -15,7 +15,8 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - (placeholder)
 
 - **Fixed**
-  - (placeholder)
+  - Correct the release-preparation pre-release identity parser and compile its
+    embedded JavaScript in workflow policy tests before protected CD.
 
 - **Security**
   - (placeholder)
