@@ -9,6 +9,20 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [1.1.0] - 2026-08-13
+
+- **Added**
   - Added discriminated desktop/mobile footer actions, an accessible one-to-five `StarRating`, and a lazy constrained rich-text editor with keyboard formatting, exact schema-compatible limits, and plain-text-only paste (task #39).
   - Export the stable `FOOTER_FEEDBACK_ACTION_ID` used by hosts to identify the
     feedback command without deriving it from labels or routes.
@@ -357,7 +371,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ---
 
-[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.0.24...HEAD
+[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.1.0...HEAD
 
 ## [1.0.0] - 2026-02-11
 
@@ -390,3 +404,4 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 [1.0.22]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.22
 [1.0.23]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.23
 [1.0.24]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.24
+[1.1.0]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.1.0
