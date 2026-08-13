@@ -43,6 +43,9 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - (placeholder)
 
 - **Security**
+  - Prevent checkout-persisted `GITHUB_TOKEN` credentials from overriding the
+    narrowly scoped release-preparation GitHub App token used to land release
+    metadata through a protected pull request.
   - Replaced token-based npm publication with a two-phase exact-main OIDC workflow, immutable tarball/SBOM hand-off, isolated pull-request validation, and fail-closed integrity checks.
   - The constrained editor emits only an allowlisted transient AST, normalises Unicode, rejects unsupported browser edit/drop operations, and uses no raw HTML injection sink.
   - Disable browser and third-party writing-assistance hooks on the transient

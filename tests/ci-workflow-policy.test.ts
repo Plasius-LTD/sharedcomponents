@@ -94,4 +94,19 @@ describe("release workflow trust boundaries", () => {
     expect(releasePrepareWorkflow).not.toContain("--force-with-lease");
     expect(releasePrepareWorkflow).not.toContain("secrets: inherit");
   });
+
+  it("keeps checkout credentials from overriding the release-prep App token", () => {
+    const checkoutBlock = releasePrepareWorkflow.slice(
+      releasePrepareWorkflow.indexOf("- name: Checkout main"),
+      releasePrepareWorkflow.indexOf(
+        "- name: Create release-prep GitHub App token",
+      ),
+    );
+
+    expect(checkoutBlock).toContain("persist-credentials: false");
+    expect(checkoutBlock).not.toContain("persist-credentials: true");
+    expect(releasePrepareWorkflow).toContain(
+      'git remote set-url origin "https://x-access-token:${AUTH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"',
+    );
+  });
 });

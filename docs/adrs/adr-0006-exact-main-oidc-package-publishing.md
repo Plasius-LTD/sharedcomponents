@@ -2,6 +2,7 @@
 
 - Status: Accepted
 - Date: 2026-08-01
+- Amended: 2026-08-13
 
 ## Context
 
@@ -22,7 +23,9 @@ Use a two-run release protocol:
    `phase: prepare`.
 2. The reusable preparation workflow versions the package with lifecycle
    scripts disabled and lands metadata through a unique, non-force-pushed pull
-   request.
+   request. Its initial checkout never persists the workflow `GITHUB_TOKEN`;
+   the narrowly scoped release-preparation GitHub App token is the sole
+   credential admitted for the branch push and pull-request mutation.
 3. The prepare run waits for successful push-triggered `ci.yml` evidence whose
    branch, event, head SHA, status, and conclusion match the resulting `main`
    commit.
@@ -57,6 +60,9 @@ policies are independent admission controls. The inherited product flag is `feed
   one immutable `main` commit.
 - Dependency and third-party code cannot use the production OIDC or repository
   mutation permissions.
+- Checkout-provided credentials cannot shadow the release-preparation App
+  token, so an unexpected authentication path fails before release metadata is
+  written to the protected branch.
 - A moved `main`, mismatched existing package, stale dispatch, or absent
   trusted-publisher binding fails closed.
 - Releases use two runs and may require fresh preparation after concurrent
