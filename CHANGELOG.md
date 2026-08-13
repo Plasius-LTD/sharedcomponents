@@ -12,6 +12,20 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - (placeholder)
 
 - **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [1.1.1] - 2026-08-13
+
+- **Added**
+  - (placeholder)
+
+- **Changed**
   - Preserve partially tagged, registry-unpublished release attempts as
     immutable evidence; only a fresh successor version may reach npm.
 
@@ -379,7 +393,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ---
 
-[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.1.1...HEAD
 
 ## [1.0.0] - 2026-02-11
 
@@ -413,3 +427,4 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 [1.0.23]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.23
 [1.0.24]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.24
 [1.1.0]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.1.0
+[1.1.1]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.1.1
