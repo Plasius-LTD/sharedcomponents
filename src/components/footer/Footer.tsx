@@ -11,10 +11,7 @@ import { ContextMenu } from "../context-menu/index.js";
 import type { SharedComponentsMetadataInput } from "../../metadata/white-label.js";
 import { toFooterBranding } from "../../metadata/white-label.js";
 import { useSharedComponentsBrandingMetadata } from "../../metadata/provider.js";
-import {
-  trackSharedComponentsFooterFeedbackInteraction,
-  trackSharedComponentsInteraction,
-} from "../../analytics/tracker.js";
+import { trackSharedComponentsInteraction } from "../../analytics/tracker.js";
 import {
   createSharedComponentTranslationResolver,
   sharedComponentTranslationKeys,
@@ -35,23 +32,13 @@ export interface FooterLinkItem extends FooterNavItem {
   id: string;
 }
 
-/** Exact stable action identity which enables privacy-isolated feedback intent telemetry. */
+/** Stable host-owned identity for the feedback action. */
 export const FOOTER_FEEDBACK_ACTION_ID = "feedback" as const;
-
-function isFooterFeedbackActionId(
-  value: unknown,
-): value is typeof FOOTER_FEEDBACK_ACTION_ID {
-  return typeof value === "string" && value === FOOTER_FEEDBACK_ACTION_ID;
-}
 
 /** A footer command which invokes host-owned behavior and never navigates. */
 export interface FooterActionItem {
   kind: "action";
-  /**
-   * Stable caller-owned identity. Only the exact
-   * `FOOTER_FEEDBACK_ACTION_ID` value emits a package-owned, context-isolated
-   * analytics event; other actions are not tracked by this component.
-   */
+  /** Stable caller-owned identity. Footer actions emit no package telemetry. */
   id: string;
   /** Accessible action name, also shown in the mobile menu. */
   name: string;
@@ -254,12 +241,6 @@ export function Footer({
                 title={item.name}
                 disabled={item.disabled}
                 onClick={(event) => {
-                  if (isFooterFeedbackActionId(item.id)) {
-                    trackSharedComponentsFooterFeedbackInteraction(
-                      resolvedMetadata,
-                      "desktop",
-                    );
-                  }
                   item.onSelect(event);
                 }}
               >
@@ -328,12 +309,6 @@ export function Footer({
               disabled: item.kind === "action" ? item.disabled : false,
               action: () => {
                 if (item.kind === "action") {
-                  if (isFooterFeedbackActionId(item.id)) {
-                    trackSharedComponentsFooterFeedbackInteraction(
-                      resolvedMetadata,
-                      "mobile",
-                    );
-                  }
                   item.onSelect();
                   return;
                 }

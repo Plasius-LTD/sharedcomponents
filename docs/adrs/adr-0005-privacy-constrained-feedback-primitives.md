@@ -22,6 +22,9 @@ that consistency.
 - Model footer links and commands as a discriminated union. Continue accepting
   legacy link objects while hosts migrate. Render commands as native buttons
   on desktop and disabled-aware commands in the mobile menu.
+- Keep feedback commands outside package analytics. Export a stable host-owned
+  action identity, but create no analytics event, session, transport, or
+  browser queue when the feedback surface opens.
 - Implement ratings with native radio inputs inside an explicitly labelled
   radiogroup. Use caller-owned labels, roving focus, and explicit
   Arrow/Home/End behavior.
@@ -72,6 +75,9 @@ that consistency.
 
 - Hosts receive reusable, touch-sized WCAG 2.2 AA-oriented primitives without
   pulling service or domain state into the base UI package.
+- Feedback opening cannot be correlated through the package's general
+  session-bearing analytics client. A host that adds surrounding telemetry is
+  responsible for preserving the same no-content, no-identifier boundary.
 - Narrative remains live browser state controlled by the host. The exported
   extraction helper is explicitly transient and must never be logged, cached,
   persisted, or sent before the host's privacy pipeline.

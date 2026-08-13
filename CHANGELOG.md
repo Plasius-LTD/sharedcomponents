@@ -10,8 +10,8 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 - **Added**
   - Added discriminated desktop/mobile footer actions, an accessible one-to-five `StarRating`, and a lazy constrained rich-text editor with keyboard formatting, exact schema-compatible limits, and plain-text-only paste (task #39).
-  - Export the stable `FOOTER_FEEDBACK_ACTION_ID` used to admit the single
-    package-owned feedback intent event.
+  - Export the stable `FOOTER_FEEDBACK_ACTION_ID` used by hosts to identify the
+    feedback command without deriving it from labels or routes.
   - (placeholder)
 
 - **Changed**
@@ -58,9 +58,9 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
     registry-only install.
   - Fail closed for non-cancelable, empty, unknown, replacement, formatting,
     paste, and drop input escapes without retaining browser-mutated DOM.
-  - Isolate the exact footer `feedback_open` intent event from caller labels,
-    URLs, routes, branding, and arbitrary analytics context; non-feedback
-    footer actions emit no package action telemetry.
+  - Keep footer feedback actions entirely outside package analytics so opening
+    feedback creates no event, session identifier, transport, or browser
+    queue; non-feedback footer actions also emit no package action telemetry.
   - (placeholder)
 
 ## [1.0.24] - 2026-08-01

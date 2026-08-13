@@ -213,12 +213,11 @@ const feedbackItems = [
 ```
 
 Import `FOOTER_FEEDBACK_ACTION_ID` from `@plasius/sharedcomponents` rather than
-repeating the identifier in host code. Only that exact string value emits
-action telemetry. The package sends
-the fixed `feedback_open` event and desktop/mobile variant through a
-context-isolated client; it does not send the caller-owned label, URL, route,
-branding metadata, or arbitrary analytics context. Other footer actions are
-not tracked by the component.
+repeating the identifier in host code. The identifier is only a stable
+host/component contract: feedback actions emit no package-owned analytics,
+create no analytics session, and use no browser analytics queue. Hosts must
+also keep feedback form state and content out of any telemetry they add around
+`onSelect`.
 
 `StarRating` exposes exactly five caller-translated native radio options with
 Arrow/Home/End keyboard behavior and visible shape, border, and text state.

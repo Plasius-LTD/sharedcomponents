@@ -6,26 +6,9 @@ import {
 import type { SharedComponentsMetadata } from "../metadata/white-label.js";
 
 const clientCache = new Map<string, LocalSpaceAnalyticsClient>();
-const isolatedFooterFeedbackStorageKey =
-  "@plasius/sharedcomponents:footer-feedback-actions:v1";
 
-type AnalyticsContextPolicy = "default" | "isolated-footer-feedback";
-
-function getCacheKey(
-  metadata: SharedComponentsMetadata,
-  contextPolicy: AnalyticsContextPolicy,
-): string {
-  if (contextPolicy === "isolated-footer-feedback") {
-    return JSON.stringify({
-      contextPolicy,
-      endpoint: metadata.analytics.endpoint ?? "",
-      source: metadata.analytics.source ?? "@plasius/sharedcomponents",
-      headers: metadata.analytics.headers ?? {},
-    });
-  }
-
+function getCacheKey(metadata: SharedComponentsMetadata): string {
   return JSON.stringify({
-    contextPolicy,
     endpoint: metadata.analytics.endpoint ?? "",
     source: metadata.analytics.source ?? "@plasius/sharedcomponents",
     headers: metadata.analytics.headers ?? {},
@@ -35,10 +18,7 @@ function getCacheKey(
   });
 }
 
-function getClient(
-  metadata: SharedComponentsMetadata,
-  contextPolicy: AnalyticsContextPolicy = "default",
-): LocalSpaceAnalyticsClient | null {
+function getClient(metadata: SharedComponentsMetadata): LocalSpaceAnalyticsClient | null {
   const analyticsMetadata = metadata.analytics;
 
   if (analyticsMetadata.enabled === false) {
@@ -50,58 +30,27 @@ function getClient(
     return null;
   }
 
-  const cacheKey = getCacheKey(metadata, contextPolicy);
+  const cacheKey = getCacheKey(metadata);
   const cachedClient = clientCache.get(cacheKey);
 
   if (cachedClient) {
     return cachedClient;
   }
 
-  const isolatedFooterFeedback =
-    contextPolicy === "isolated-footer-feedback";
   const client = createLocalSpaceAnalyticsClient({
     source: analyticsMetadata.source?.trim() || "@plasius/sharedcomponents",
     endpoint,
     enabled: true,
     headers: analyticsMetadata.headers,
-    defaultContext: isolatedFooterFeedback
-      ? {}
-      : {
-          organizationName: metadata.organizationName,
-          website: metadata.website,
-          ...(analyticsMetadata.context ?? {}),
-        },
-    ...(isolatedFooterFeedback
-      ? {
-          injectChannelContext: false,
-          storageKey: isolatedFooterFeedbackStorageKey,
-        }
-      : {}),
+    defaultContext: {
+      organizationName: metadata.organizationName,
+      website: metadata.website,
+      ...(analyticsMetadata.context ?? {}),
+    },
   });
 
   clientCache.set(cacheKey, client);
   return client;
-}
-
-/**
- * Sends the fixed footer-feedback intent event without host, route, label, or
- * automatically injected channel context. This boundary is intentionally not
- * a general-purpose arbitrary-context API.
- */
-export function trackSharedComponentsFooterFeedbackInteraction(
-  metadata: SharedComponentsMetadata,
-  variant: "desktop" | "mobile",
-): void {
-  const client = getClient(metadata, "isolated-footer-feedback");
-  if (!client) {
-    return;
-  }
-
-  client.track({
-    component: "Footer",
-    action: "feedback_open",
-    variant,
-  });
 }
 
 export function trackSharedComponentsInteraction(

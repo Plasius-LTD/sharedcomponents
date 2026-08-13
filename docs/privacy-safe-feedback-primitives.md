@@ -37,14 +37,12 @@ const footerItems = [
 The desktop command is a native 44×44 button. The same item becomes a mobile
 menu command. `disabled` is honored in both presentations. Hosts import the
 stable `FOOTER_FEEDBACK_ACTION_ID` constant rather than constructing an
-analytics-bearing identifier from a label, route, or content.
+identifier from a label, route, or content.
 
-Footer action telemetry is closed rather than caller-shaped. Only the exact
-`FOOTER_FEEDBACK_ACTION_ID` value emits the fixed `feedback_open` event with a bounded
-desktop/mobile variant. The event uses an isolated analytics client with no
-label, URL, host route/context, organization, website, or automatically
-injected channel context. Other action IDs emit no package telemetry. Hosts
-must keep feedback form state and content out of their `onSelect` telemetry.
+Footer feedback actions deliberately emit no package telemetry. Opening the
+feedback surface creates no analytics client, session identifier, event, or
+browser analytics queue. Hosts must keep feedback form state and content out
+of telemetry they add around `onSelect`.
 
 ## Star ratings
 

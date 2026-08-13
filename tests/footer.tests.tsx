@@ -259,7 +259,7 @@ describe("Footer", () => {
     expect(onSelect).toHaveBeenCalledTimes(2);
   });
 
-  it("emits only the fixed context-isolated feedback action event", () => {
+  it("keeps feedback actions outside analytics and persistent queues", () => {
     const onSelect = vi.fn();
     const metadataWithRouteContext: SharedComponentsMetadataInput = {
       ...fakeMetadata,
@@ -292,59 +292,30 @@ describe("Footer", () => {
         name: "Sensitive caller-owned display label",
       }),
     );
+
+    expect(createAnalyticsClientSpy).not.toHaveBeenCalled();
+    expect(analyticsTrackSpy).not.toHaveBeenCalled();
+
     fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
+    __resetSharedComponentsAnalyticsClientsForTests();
+    resetAnalyticsMocks();
     fireEvent.click(
       screen.getByRole("menuitem", {
         name: "Sensitive caller-owned display label",
       }),
     );
 
-    const feedbackEvents = analyticsTrackSpy.mock.calls
-      .map(([event]) => event)
-      .filter((event) => event.action === "feedback_open");
-    expect(feedbackEvents).toEqual([
-      {
-        component: "Footer",
-        action: "feedback_open",
-        variant: "desktop",
-      },
-      {
-        component: "Footer",
-        action: "feedback_open",
-        variant: "mobile",
-      },
-    ]);
-
-    const isolatedClientConfigs = createAnalyticsClientSpy.mock.calls
-      .map(([config]) => config)
-      .filter(
-        (config) =>
-          config.storageKey ===
-          "@plasius/sharedcomponents:footer-feedback-actions:v1",
-      );
-    expect(isolatedClientConfigs).toEqual([
-      expect.objectContaining({
-        defaultContext: {},
-        injectChannelContext: false,
-      }),
-    ]);
-    expect(JSON.stringify(feedbackEvents)).not.toContain("Sensitive caller");
-    expect(JSON.stringify(feedbackEvents)).not.toContain("private/account");
-    expect(JSON.stringify(isolatedClientConfigs)).not.toContain(
-      "private/account",
-    );
-    expect(JSON.stringify(isolatedClientConfigs)).not.toContain(
-      "must-not-join-feedback-action",
-    );
+    expect(createAnalyticsClientSpy).not.toHaveBeenCalled();
+    expect(analyticsTrackSpy).not.toHaveBeenCalled();
     expect(
-      analyticsTrackSpy.mock.calls.some(
-        ([event]) => event.action === "action_click",
+      window.localStorage.getItem(
+        "@plasius/sharedcomponents:footer-feedback-actions:v1",
       ),
-    ).toBe(false);
+    ).toBeNull();
     expect(onSelect).toHaveBeenCalledTimes(2);
   });
 
-  it("admits feedback analytics only for the exported exact stable action ID", () => {
+  it("uses the exported feedback ID only as a host action identity", () => {
     const onSelect = vi.fn();
     const metadataWithAnalytics: SharedComponentsMetadataInput = {
       ...fakeMetadata,
@@ -393,19 +364,8 @@ describe("Footer", () => {
       screen.getByRole("button", { name: "Event-name lookalike" }),
     );
 
-    expect(
-      analyticsTrackSpy.mock.calls.filter(
-        ([event]) => event.action === "feedback_open",
-      ),
-    ).toEqual([
-      [
-        {
-          component: "Footer",
-          action: "feedback_open",
-          variant: "desktop",
-        },
-      ],
-    ]);
+    expect(createAnalyticsClientSpy).not.toHaveBeenCalled();
+    expect(analyticsTrackSpy).not.toHaveBeenCalled();
     expect(onSelect).toHaveBeenCalledTimes(3);
   });
 
