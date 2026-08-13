@@ -12,7 +12,8 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - (placeholder)
 
 - **Changed**
-  - (placeholder)
+  - Preserve partially tagged, registry-unpublished release attempts as
+    immutable evidence; only a fresh successor version may reach npm.
 
 - **Fixed**
   - Correct the release-preparation pre-release identity parser and compile its
