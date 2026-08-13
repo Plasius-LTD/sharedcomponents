@@ -308,6 +308,9 @@ scoped release-preparation GitHub App token as the sole branch-mutation
 credential. Workflow policy tests also compile the embedded version/pre-release
 parser and require archive-member checks to drain their input, so malformed
 release hand-offs fail closed without false negatives from shell `pipefail`.
+Downloaded tarballs are published as explicit local package specs; if a failed
+attempt has already sealed an immutable tag to an older commit, preparation
+advances to a fresh version rather than moving that tag.
 
 ## Translations
 

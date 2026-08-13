@@ -20,6 +20,9 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - Drain the complete immutable package member stream during protected
     publication verification so `pipefail` cannot mistake tar's SIGPIPE for a
     missing `dist` directory.
+  - Pass the downloaded package to npm as an explicit local tarball and recover
+    an unpublished release whose immutable tag belongs to an older commit by
+    preparing a fresh version instead of rewriting the tag.
 
 - **Security**
   - (placeholder)

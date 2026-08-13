@@ -222,6 +222,12 @@ jobs:
           fi
 
           CURRENT_TAG="${TAG_PREFIX}${CURRENT_VER}"
+          CURRENT_HEAD_SHA="$(git rev-parse HEAD)"
+          CURRENT_TAG_SHA="$(git rev-list -n 1 "${CURRENT_TAG}" 2>/dev/null || true)"
+          if [ -n "${CURRENT_TAG_SHA}" ] && ! printf '%s' "${CURRENT_TAG_SHA}" | grep -Eq '^[0-9a-f]{40}$'; then
+            echo "Could not resolve immutable tag ${CURRENT_TAG} to a full commit SHA." >&2
+            exit 1
+          fi
           if npm view "${NAME}@${CURRENT_VER}" version >/dev/null 2>&1; then
             CURRENT_PUBLISHED="true"
           else
@@ -237,12 +243,20 @@ jobs:
             fi
           fi
 
+          if [ "${BUMP}" = "none" ] && [ -n "${CURRENT_TAG_SHA}" ] && [ "${CURRENT_TAG_SHA}" != "${CURRENT_HEAD_SHA}" ]; then
+            echo "Tag ${CURRENT_TAG} belongs to ${CURRENT_TAG_SHA}, not current main ${CURRENT_HEAD_SHA}; choose a new version instead of rewriting the immutable tag." >&2
+            exit 1
+          fi
+
           if [ "${BUMP}" = "none" ]; then
             TARGET_VER="${CURRENT_VER}"
-          elif grep -Eq "^## (\[${CURRENT_VER}\]|${CURRENT_VER})( |$)" "${FILE}" && { [ "${CURRENT_PUBLISHED}" != "true" ] || [ "${CURRENT_RELEASE_STATE}" != "published" ]; }; then
+          elif grep -Eq "^## (\[${CURRENT_VER}\]|${CURRENT_VER})( |$)" "${FILE}" && [ "${CURRENT_PUBLISHED}" != "true" ] && [ "${CURRENT_RELEASE_STATE}" != "published" ] && { [ -z "${CURRENT_TAG_SHA}" ] || [ "${CURRENT_TAG_SHA}" = "${CURRENT_HEAD_SHA}" ]; }; then
             echo "Reusing already-prepared incomplete release version ${CURRENT_VER}."
             TARGET_VER="${CURRENT_VER}"
           else
+            if [ -n "${CURRENT_TAG_SHA}" ] && [ "${CURRENT_TAG_SHA}" != "${CURRENT_HEAD_SHA}" ]; then
+              echo "Preserving immutable ${CURRENT_TAG} at ${CURRENT_TAG_SHA} and preparing a fresh ${BUMP} version from ${CURRENT_HEAD_SHA}."
+            fi
             TARGET_VER=$(node -e '
           const [localVersion, registryVersion, tagVersion, bump, preid] = process.argv.slice(1);
           const clean = (value) => String(value || "").replace(/^v/, "").trim();
