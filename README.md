@@ -300,9 +300,12 @@ for the complete host boundary and schema-compatibility contract.
 
 Release gate: the feedback editor now consumes the
 `@plasius/schema ^1.4.0` Unicode-profile helper through its lazy model path.
-This package must not be released until schema 1.4.0 is published by its
-protected workflow and a clean registry install reproduces the candidate lock
-and package gates. A local schema candidate is validation evidence only.
+Schema 1.4.0 is published through its protected workflow, and the candidate
+lock and package gates have been reproduced from a clean registry-only install.
+This package is released only through protected `cd.yml`; release-metadata
+checkout does not persist the workflow `GITHUB_TOKEN`, leaving the narrowly
+scoped release-preparation GitHub App token as the sole branch-mutation
+credential.
 
 ## Translations
 
