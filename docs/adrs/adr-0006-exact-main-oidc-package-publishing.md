@@ -44,12 +44,16 @@ Use a two-run release protocol:
    early match into a false verification failure through SIGPIPE.
 7. Only the verified tarball is published through npm OIDC with provenance.
    The privileged job installs no dependencies, runs no project scripts, and
-   receives no npm write token.
+   receives no npm write token. The downloaded tarball is passed as an
+   explicit `./`-prefixed local package spec so npm cannot interpret its path
+   as a hosted Git repository shorthand.
 
 Preparation runs are serialized. Publication concurrency includes the prepared
 SHA so the self-dispatched run is not blocked by its own preparation while
 duplicate attempts for the same SHA remain non-cancelling. Conflicting tags are
-never rewritten.
+never rewritten. An incomplete version is reusable only while its tag is absent
+or points at current `main`; if a failed attempt already sealed the tag before a
+workflow repair lands, preparation preserves it and cuts a fresh version.
 
 The npm trusted publisher must be externally bound to organization
 `Plasius-LTD`, repository `sharedcomponents`, workflow `cd.yml`, environment
@@ -71,6 +75,9 @@ policies are independent admission controls. The inherited product flag is `feed
   protected release run.
 - A moved `main`, mismatched existing package, stale dispatch, or absent
   trusted-publisher binding fails closed.
+- A package-path parsing failure after tag creation is recoverable without tag
+  deletion or mutation: the next protected preparation advances the version
+  and keeps the failed attempt's tag and draft release immutable.
 - Releases use two runs and may require fresh preparation after concurrent
   protected-branch movement.
 - CD remains disabled until the trusted publisher and protected environment are

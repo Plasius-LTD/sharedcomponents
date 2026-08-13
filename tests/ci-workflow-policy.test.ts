@@ -132,4 +132,24 @@ describe("release workflow trust boundaries", () => {
       'tar -tzf "${TARBALL}" | grep -E \'^package/dist(/|$)\' >/dev/null',
     );
   });
+
+  it("publishes the downloaded tarball as an explicit local package spec", () => {
+    expect(cdWorkflow).not.toContain('npm publish "${TARBALL}"');
+    expect(cdWorkflow).toContain('npm publish "./${TARBALL#./}"');
+  });
+
+  it("never reuses a prepared version whose immutable tag is on an older commit", () => {
+    expect(releasePrepareWorkflow).toContain(
+      'CURRENT_HEAD_SHA="$(git rev-parse HEAD)"',
+    );
+    expect(releasePrepareWorkflow).toContain(
+      'CURRENT_TAG_SHA="$(git rev-list -n 1 "${CURRENT_TAG}" 2>/dev/null || true)"',
+    );
+    expect(releasePrepareWorkflow).toContain(
+      '[ -z "${CURRENT_TAG_SHA}" ] || [ "${CURRENT_TAG_SHA}" = "${CURRENT_HEAD_SHA}" ]',
+    );
+    expect(releasePrepareWorkflow).toContain(
+      "choose a new version instead of rewriting the immutable tag",
+    );
+  });
 });
