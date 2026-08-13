@@ -25,10 +25,12 @@ If a product needs auth/profile behavior, wire it via callbacks/props from the h
 
 - `Header`: configurable nav with optional profile slot and mobile context menu
 - `Footer`: configurable legal/footer links with mobile context menu
+- `StarRating`: controlled, touch-sized one-to-five native radiogroup
+- `ConstrainedRichTextEditor`: lazy, allowlisted transient rich-text editor
 - `ContactDetails`: reusable legal contact block with configurable details
 - `ContextMenu`: generic context menu surface
 - `ActionMenu`: controlled touch-first overflow menu with an anchored popover and phone-sheet presentation
-- `ReviewSheet`: controlled responsive review surface with non-modal side-sheet and modal phone behavior
+- `ReviewSheet`: controlled modal review surface with responsive side-sheet and phone presentations
 - `UserProfile`: optional generic avatar/menu shell driven by callbacks
 - `ConfirmationDialog`: reusable confirmation dialog with optional typed challenge flow for destructive actions
 - `StatusPanel`: reusable status/alert surface for loading, empty, warning, and retryable error states
@@ -115,9 +117,9 @@ Provide it once with `SharedComponentsBrandingProvider` (recommended), or per co
 `ActionMenu` and `ReviewSheet` are controlled presentation components. The host
 owns open state, authorization, draft state, validation, and persistence. At
 widths above `40rem`, `ActionMenu` is anchored to its trigger and `ReviewSheet`
-is a non-modal right-side overlay. At `40rem` and below, both adapt to
-full-width touch sheets; the review surface contains keyboard focus and marks
-itself modal.
+is a modal right-side overlay. At `40rem` and below, both adapt to full-width
+touch sheets. The review surface contains keyboard focus, blocks background
+interaction, and identifies itself as modal at every presentation width.
 
 ```tsx
 import {
@@ -171,12 +173,136 @@ outside-pointer dismissal, safe-area padding, reduced-motion handling,
 high-contrast focus indicators, and caller-translatable accessible labels.
 `ActionMenu` implements wrapping arrow, Home, and End navigation and returns
 focus to its trigger. `ReviewSheet` reports why close was requested and returns
-focus for explicit close and Escape; an outside selection on a larger screen
-may receive focus without the component stealing it back.
+focus for explicit close, Escape, and outside dismissal.
 
 See [Touch-first action surfaces](./docs/touch-first-action-surfaces.md) for the
-complete API and host responsibilities. Existing `ContextMenu` behavior and
-coordinate-based API remain unchanged.
+complete API and host responsibilities. The coordinate-based `ContextMenu`
+accepts either `label` or `labelledBy` so callers can name the menu. Its Tab
+dismissal runs after the browser's native focus action, avoiding focus loss
+when the popup is removed. It preserves the active enabled command across
+structurally equivalent rerenders and moves to the next enabled command, then
+the preceding command, when the active command becomes unavailable. Header,
+Footer, and UserProfile menus expose their popup relationship and return focus
+to their opener on Escape.
+
+## Privacy-safe feedback controls
+
+`Footer` accepts explicit links and host-owned actions. Actions render as
+44×44 native buttons on desktop and as disabled-aware mobile menu commands:
+
+```tsx
+import { FOOTER_FEEDBACK_ACTION_ID } from "@plasius/sharedcomponents";
+
+const feedbackItems = [
+  {
+    kind: "link" as const,
+    id: "privacy",
+    name: "Privacy",
+    url: "/privacy",
+  },
+  {
+    kind: "action" as const,
+    id: FOOTER_FEEDBACK_ACTION_ID,
+    name: "Rate us or report a bug",
+    icon: <span aria-hidden="true">★</span>,
+    onSelect: () => setFeedbackOpen(true),
+  },
+];
+
+<Footer items={feedbackItems} />;
+```
+
+Import `FOOTER_FEEDBACK_ACTION_ID` from `@plasius/sharedcomponents` rather than
+repeating the identifier in host code. The identifier is only a stable
+host/component contract: feedback actions emit no package-owned analytics,
+create no analytics session, and use no browser analytics queue. Hosts must
+also keep feedback form state and content out of any telemetry they add around
+`onSelect`.
+
+`StarRating` exposes exactly five caller-translated native radio options with
+Arrow/Home/End keyboard behavior and visible shape, border, and text state.
+`ConstrainedRichTextEditor` is dynamically loaded and emits only the transient
+feedback AST: paragraphs or bullet items, depths 0–4, and bold/italic/underline
+text leaves. Its exact 4,000-Unicode-code-point budget includes inter-block
+newlines and is bounded again at 8,000 UTF-16 code units.
+
+```tsx
+import {
+  ConstrainedRichTextEditor,
+  StarRating,
+  type FeedbackRichTextDocument,
+  type StarRatingValue,
+} from "@plasius/sharedcomponents";
+
+const [rating, setRating] = useState<StarRatingValue | null>(null);
+const [narrative, setNarrative] =
+  useState<FeedbackRichTextDocument | null>(null);
+
+<StarRating
+  label="Overall satisfaction"
+  labels={["Very poor", "Poor", "Fair", "Good", "Excellent"]}
+  value={rating}
+  onChange={setRating}
+  required
+/>;
+
+<ConstrainedRichTextEditor
+  labels={{
+    editor: "Tell us more",
+    toolbar: "Text formatting",
+    bold: "Bold",
+    italic: "Italic",
+    underline: "Underline",
+    bullets: "Bulleted list",
+    indent: "Increase indent",
+    outdent: "Decrease indent",
+    loading: "Loading editor",
+  }}
+  placeholder="Optional details"
+  value={narrative}
+  onChange={setNarrative}
+/>;
+```
+
+The editor uses no `innerHTML`, `dangerouslySetInnerHTML`, or `execCommand`.
+Paste is plain text only; links, images, attachments, code, mentions, embedded
+metadata, HTML/link syntax, arbitrary formatting, and drops are not
+represented. The AST and
+`extractFeedbackRichText` output remain sensitive live-browser data: hosts must
+redact, validate, and encrypt before sending, and must never log, persist,
+cache, or attach them to analytics.
+
+Cancelable edits are admitted through a native `beforeinput` listener. Any
+unintercepted `input` outside an active validated composition is rolled back to
+the canonical model without emitting `onChange`. Mutation commands require a
+freshly mapped browser selection; cached ranges are never used as a fallback.
+Canonical recovery keeps the textbox element mounted, does not report an
+internal blur, and restores focus only when focus has not genuinely left.
+
+Caret-only empty paragraphs/list items remain private to the mounted editor.
+They count toward the limits but are never emitted; `onChange` receives only a
+canonical AST whose blocks and text leaves are non-empty.
+
+Runtime model helpers are intentionally isolated from the root entry so the
+editor model, editing state, and full stylesheet do not join the application
+shell. Import model helpers only inside the lazy feedback flow:
+
+```tsx
+import {
+  extractFeedbackRichText,
+  normaliseFeedbackRichTextDocument,
+} from "@plasius/sharedcomponents/feedback-rich-text-model";
+```
+
+See [Privacy-safe feedback primitives](./docs/privacy-safe-feedback-primitives.md)
+and [ADR-0005](./docs/adrs/adr-0005-privacy-constrained-feedback-primitives.md)
+for the complete host boundary and schema-compatibility contract.
+
+Release gate: the feedback editor now consumes the
+`@plasius/schema ^1.4.0` Unicode-profile helper through its lazy model path.
+This package must not be released until schema 1.4.0 is published by its
+protected workflow and a clean registry install reproduces the candidate lock
+and package gates. A local schema candidate is validation evidence only.
 
 ## Translations
 

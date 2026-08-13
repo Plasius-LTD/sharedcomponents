@@ -158,7 +158,7 @@ export function ReviewSheet({
   }, [initialFocusRef, open, returnFocusRef]);
 
   useEffect(() => {
-    if (!open || !isPhoneSheet) {
+    if (!open) {
       return;
     }
 
@@ -167,7 +167,7 @@ export function ReviewSheet({
     return () => {
       document.body.style.overflow = previousOverflow;
     };
-  }, [isPhoneSheet, open]);
+  }, [open]);
 
   useEffect(() => {
     if (!open) {
@@ -204,10 +204,8 @@ export function ReviewSheet({
         return;
       }
 
-      if (isPhoneSheet) {
-        event.preventDefault();
-      }
-      requestClose("outside", false);
+      event.preventDefault();
+      requestClose("outside", true);
     };
 
     document.addEventListener("pointerdown", handlePointerDown, true);
@@ -219,7 +217,7 @@ export function ReviewSheet({
   const handleDialogKeyDown = (
     event: ReactKeyboardEvent<HTMLElement>,
   ) => {
-    if (!isPhoneSheet || event.key !== "Tab") {
+    if (event.key !== "Tab") {
       return;
     }
 
@@ -267,7 +265,7 @@ export function ReviewSheet({
         id={dialogId}
         className={`${styles.sheet} ${className ?? ""}`}
         role="dialog"
-        aria-modal={isPhoneSheet ? true : undefined}
+        aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={description ? descriptionId : undefined}
         tabIndex={-1}

@@ -9,16 +9,58 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
+  - Added discriminated desktop/mobile footer actions, an accessible one-to-five `StarRating`, and a lazy constrained rich-text editor with keyboard formatting, exact schema-compatible limits, and plain-text-only paste (task #39).
+  - Export the stable `FOOTER_FEEDBACK_ACTION_ID` used by hosts to identify the
+    feedback command without deriving it from labels or routes.
   - (placeholder)
 
 - **Changed**
+  - Consume the schema-owned Unicode 15.1 feedback profile through the lazy
+    editor model using the registry-only `@plasius/schema ^1.4.0` contract.
+  - Refreshed development-only transitive dependencies to versions that close
+    the current brace-expansion, nanoid, and undici advisories.
   - (placeholder)
 
 - **Fixed**
+  - Preserve block-boundary Enter/caret behavior through an editor-private
+    view state without emitting empty AST nodes, keep collapsed Cut
+    non-destructive, and close mobile context menus when focus tabs away.
+  - Map constrained-editor selections at exact text, span, block, and root
+    boundaries; fail clipboard operations closed for invalid or cross-editor
+    selections; and keep native Tab focus when removing context menus.
+  - Name footer mobile menus, expose their popup relationship, and focus the
+    menu surface when every command is disabled.
+  - Intercept constrained-editor edits through native `beforeinput`, roll
+    escaped post-mutation input back to the canonical model, require a fresh
+    mapped selection for every mutation, and keep canonical recovery from
+    creating false focus-loss saves or stealing focus.
+  - Preserve the active ContextMenu command across equivalent rerenders, move
+    focus predictably when commands become unavailable, and name/relate
+    Header and UserProfile menus with Escape focus restoration.
+  - Keep `ReviewSheet` semantically modal in both side-sheet and phone
+    presentations, contain Tab focus, block background pointer/scroll input,
+    and restore opener focus for every dismissal path.
   - (placeholder)
 
 - **Security**
   - Replaced token-based npm publication with a two-phase exact-main OIDC workflow, immutable tarball/SBOM hand-off, isolated pull-request validation, and fail-closed integrity checks.
+  - The constrained editor emits only an allowlisted transient AST, normalises Unicode, rejects unsupported browser edit/drop operations, and uses no raw HTML injection sink.
+  - Disable browser and third-party writing-assistance hooks on the transient
+    narrative editor so sensitive text is not intentionally shared with those
+    services.
+  - Bound hostile rich-text arrays and text before profile or normalisation
+    work, and keep the editor's full stylesheet in its lazy implementation
+    chunk instead of the initial application shell.
+  - Reject lone UTF-16 surrogates and code points assigned after the pinned
+    Unicode 15.1 corpus before browser-dependent normalization.
+  - Keep publication blocked until the locally validated
+    `@plasius/schema 1.4.0` candidate is published and reproduced by a clean
+    registry-only install.
+  - Fail closed for non-cancelable, empty, unknown, replacement, formatting,
+    paste, and drop input escapes without retaining browser-mutated DOM.
+  - Keep footer feedback actions entirely outside package analytics so opening
+    feedback creates no event, session identifier, transport, or browser
+    queue; non-feedback footer actions also emit no package action telemetry.
   - (placeholder)
 
 ## [1.0.24] - 2026-08-01

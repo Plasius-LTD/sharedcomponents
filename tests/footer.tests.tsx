@@ -1,10 +1,18 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import axe from "axe-core";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { Footer } from "../src/components/footer/Footer.js";
+import {
+  FOOTER_FEEDBACK_ACTION_ID,
+  Footer,
+} from "../src/components/footer/Footer.js";
 import { SharedComponentsBrandingProvider } from "../src/metadata/provider.js";
 import type { SharedComponentsMetadataInput } from "../src/metadata/white-label.js";
 import { __resetSharedComponentsAnalyticsClientsForTests } from "../src/analytics/tracker.js";
-import { analyticsTrackSpy, resetAnalyticsMocks } from "./analytics-mocks.js";
+import {
+  analyticsTrackSpy,
+  createAnalyticsClientSpy,
+  resetAnalyticsMocks,
+} from "./analytics-mocks.js";
 
 const fakeFooterItems = [
   { name: "Privacy", url: "/privacy" },
@@ -18,6 +26,7 @@ const fakeMetadata: SharedComponentsMetadataInput = {
 
 describe("Footer", () => {
   afterEach(() => {
+    vi.useRealTimers();
     resetAnalyticsMocks();
     __resetSharedComponentsAnalyticsClientsForTests();
     vi.restoreAllMocks();
@@ -108,14 +117,56 @@ describe("Footer", () => {
     );
   });
 
-  it("closes the mobile context menu on Escape", () => {
+  it("closes the mobile context menu on Escape and restores toggle focus", () => {
+    render(<Footer metadata={fakeMetadata} items={fakeFooterItems} />);
+
+    const toggle = screen.getByRole("button", { name: "Toggle footer menu" });
+    fireEvent.click(toggle);
+    expect(screen.getByRole("menu")).toBeTruthy();
+    expect(document.activeElement).toBe(
+      screen.getByRole("menuitem", { name: "Privacy" }),
+    );
+
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: "Escape" });
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(document.activeElement).toBe(toggle);
+  });
+
+  it("closes the mobile context menu when focus tabs away", () => {
+    vi.useFakeTimers();
     render(<Footer metadata={fakeMetadata} items={fakeFooterItems} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
+    const firstItem = screen.getByRole("menuitem", { name: "Privacy" });
+    expect(fireEvent.keyDown(firstItem, { key: "Tab" })).toBe(true);
     expect(screen.getByRole("menu")).toBeTruthy();
-
-    fireEvent.keyDown(window, { key: "Escape" });
+    act(() => {
+      vi.runOnlyPendingTimers();
+    });
     expect(screen.queryByRole("menu")).toBeNull();
+  });
+
+  it("names the popup menu, exposes its relationship, and passes axe", async () => {
+    const { container } = render(
+      <Footer metadata={fakeMetadata} items={fakeFooterItems} />,
+    );
+
+    const toggle = screen.getByRole("button", {
+      name: "Toggle footer menu",
+    });
+    expect(toggle.getAttribute("aria-haspopup")).toBe("menu");
+    fireEvent.click(toggle);
+    expect(
+      screen.getByRole("menu", { name: "Toggle footer menu" }),
+    ).toBeTruthy();
+
+    const result = await axe.run(container, {
+      runOnly: {
+        type: "tag",
+        values: ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"],
+      },
+    });
+    expect(result.violations).toEqual([]);
   });
 
   it("runs internal mobile navigation commands", () => {
@@ -177,5 +228,180 @@ describe("Footer", () => {
         variant: "mobile",
       })
     );
+  });
+
+  it("renders and invokes discriminated icon actions on desktop and mobile", () => {
+    const onSelect = vi.fn();
+    const items = [
+      { kind: "link" as const, id: "privacy", name: "Privacy", url: "/privacy" },
+      {
+        kind: "action" as const,
+        id: "feedback",
+        name: "Rate us or report a bug",
+        icon: <span>!</span>,
+        onSelect,
+      },
+    ];
+
+    render(<Footer metadata={fakeMetadata} items={items} />);
+
+    const action = screen.getByRole("button", {
+      name: "Rate us or report a bug",
+    });
+    expect(action.getAttribute("data-footer-item-kind")).toBe("action");
+    fireEvent.click(action);
+    expect(onSelect).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
+    fireEvent.click(
+      screen.getByRole("menuitem", { name: "Rate us or report a bug" }),
+    );
+    expect(onSelect).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps feedback actions outside analytics and persistent queues", () => {
+    const onSelect = vi.fn();
+    const metadataWithRouteContext: SharedComponentsMetadataInput = {
+      ...fakeMetadata,
+      analytics: {
+        endpoint: "https://analytics.example.com/collect",
+        context: {
+          pathname: "/private/account-area",
+          arbitraryHostContext: "must-not-join-feedback-action",
+        },
+      },
+    };
+
+    render(
+      <Footer
+        metadata={metadataWithRouteContext}
+        items={[
+          {
+            kind: "action",
+            id: FOOTER_FEEDBACK_ACTION_ID,
+            name: "Sensitive caller-owned display label",
+            icon: <span>!</span>,
+            onSelect,
+          },
+        ]}
+      />,
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Sensitive caller-owned display label",
+      }),
+    );
+
+    expect(createAnalyticsClientSpy).not.toHaveBeenCalled();
+    expect(analyticsTrackSpy).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
+    __resetSharedComponentsAnalyticsClientsForTests();
+    resetAnalyticsMocks();
+    fireEvent.click(
+      screen.getByRole("menuitem", {
+        name: "Sensitive caller-owned display label",
+      }),
+    );
+
+    expect(createAnalyticsClientSpy).not.toHaveBeenCalled();
+    expect(analyticsTrackSpy).not.toHaveBeenCalled();
+    expect(
+      window.localStorage.getItem(
+        "@plasius/sharedcomponents:footer-feedback-actions:v1",
+      ),
+    ).toBeNull();
+    expect(onSelect).toHaveBeenCalledTimes(2);
+  });
+
+  it("uses the exported feedback ID only as a host action identity", () => {
+    const onSelect = vi.fn();
+    const metadataWithAnalytics: SharedComponentsMetadataInput = {
+      ...fakeMetadata,
+      analytics: {
+        endpoint: "https://analytics.example.com/collect",
+      },
+    };
+
+    expect(FOOTER_FEEDBACK_ACTION_ID).toBe("feedback");
+    render(
+      <Footer
+        metadata={metadataWithAnalytics}
+        items={[
+          {
+            kind: "action",
+            id: FOOTER_FEEDBACK_ACTION_ID,
+            name: "Exact feedback action",
+            icon: <span>!</span>,
+            onSelect,
+          },
+          {
+            kind: "action",
+            id: "feedback ",
+            name: "Trailing-space lookalike",
+            icon: <span>!</span>,
+            onSelect,
+          },
+          {
+            kind: "action",
+            id: "feedback_open",
+            name: "Event-name lookalike",
+            icon: <span>!</span>,
+            onSelect,
+          },
+        ]}
+      />,
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Exact feedback action" }),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Trailing-space lookalike" }),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "Event-name lookalike" }),
+    );
+
+    expect(createAnalyticsClientSpy).not.toHaveBeenCalled();
+    expect(analyticsTrackSpy).not.toHaveBeenCalled();
+    expect(onSelect).toHaveBeenCalledTimes(3);
+  });
+
+  it("keeps disabled footer actions unavailable in both presentations", () => {
+    const onSelect = vi.fn();
+    render(
+      <Footer
+        metadata={fakeMetadata}
+        items={[
+          {
+            kind: "action",
+            id: "feedback",
+            name: "Feedback unavailable",
+            icon: <span>!</span>,
+            disabled: true,
+            onSelect,
+          },
+        ]}
+      />,
+    );
+
+    expect(
+      (screen.getByRole("button", {
+        name: "Feedback unavailable",
+      }) as HTMLButtonElement).disabled,
+    ).toBe(true);
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
+    expect(document.activeElement).toBe(
+      screen.getByRole("menu", { name: "Toggle footer menu" }),
+    );
+    expect(
+      (screen.getByRole("menuitem", {
+        name: "Feedback unavailable",
+      }) as HTMLButtonElement).disabled,
+    ).toBe(true);
+    expect(onSelect).not.toHaveBeenCalled();
   });
 });
