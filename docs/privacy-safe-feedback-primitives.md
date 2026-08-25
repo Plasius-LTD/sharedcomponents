@@ -41,8 +41,15 @@ identifier from a label, route, or content.
 
 Footer feedback actions deliberately emit no package telemetry. Opening the
 feedback surface creates no analytics client, session identifier, event, or
-browser analytics queue. Hosts must keep feedback form state and content out
-of telemetry they add around `onSelect`.
+browser analytics queue. On mobile this boundary begins at the prerequisite
+footer-menu toggle, so the menu opener and closer are also telemetry-free
+whenever an enabled item carries the exact reserved feedback identity. A
+disabled feedback action cannot open the surface and therefore does not change
+ordinary menu telemetry. The same identity remains telemetry-free if it is
+accidentally represented as a link; lookalike IDs and unrelated links retain
+their ordinary behavior. Hosts must keep feedback form state and content out
+of telemetry they add around `onSelect` and must not reuse the reserved
+identity for another purpose.
 
 ## Star ratings
 

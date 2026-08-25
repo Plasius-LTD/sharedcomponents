@@ -1,4 +1,5 @@
 import axe from "axe-core";
+import type { MouseEvent as ReactMouseEvent } from "react";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
@@ -259,7 +260,7 @@ describe("Footer", () => {
     expect(onSelect).toHaveBeenCalledTimes(2);
   });
 
-  it("keeps feedback actions outside analytics and persistent queues", () => {
+  it("keeps the complete feedback action path outside analytics and queues", () => {
     const onSelect = vi.fn();
     const metadataWithRouteContext: SharedComponentsMetadataInput = {
       ...fakeMetadata,
@@ -297,8 +298,6 @@ describe("Footer", () => {
     expect(analyticsTrackSpy).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
-    __resetSharedComponentsAnalyticsClientsForTests();
-    resetAnalyticsMocks();
     fireEvent.click(
       screen.getByRole("menuitem", {
         name: "Sensitive caller-owned display label",
@@ -312,7 +311,51 @@ describe("Footer", () => {
         "@plasius/sharedcomponents:footer-feedback-actions:v1",
       ),
     ).toBeNull();
+    expect(
+      Array.from(
+        { length: window.localStorage.length },
+        (_, index) => window.localStorage.key(index),
+      ).some((key) =>
+        key?.startsWith("plasius.analytics."),
+      ),
+    ).toBe(false);
     expect(onSelect).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps the reserved feedback identity private across item representations", () => {
+    const onNavigate = vi.fn(
+      (_item, _href, event: ReactMouseEvent<HTMLAnchorElement>) => {
+        event.preventDefault();
+      },
+    );
+    const metadataWithAnalytics: SharedComponentsMetadataInput = {
+      ...fakeMetadata,
+      analytics: {
+        endpoint: "https://analytics.example.com/collect",
+      },
+    };
+
+    render(
+      <Footer
+        metadata={metadataWithAnalytics}
+        items={[
+          {
+            kind: "link",
+            id: FOOTER_FEEDBACK_ACTION_ID,
+            name: "Feedback route",
+            url: "/feedback",
+          },
+        ]}
+        onNavigate={onNavigate}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("link", { name: "Feedback route" }));
+    fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
+
+    expect(onNavigate).toHaveBeenCalledTimes(1);
+    expect(createAnalyticsClientSpy).not.toHaveBeenCalled();
+    expect(analyticsTrackSpy).not.toHaveBeenCalled();
   });
 
   it("uses the exported feedback ID only as a host action identity", () => {
@@ -403,5 +446,55 @@ describe("Footer", () => {
       }) as HTMLButtonElement).disabled,
     ).toBe(true);
     expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("retains ordinary mobile analytics when feedback cannot be invoked", () => {
+    const metadataWithAnalytics: SharedComponentsMetadataInput = {
+      ...fakeMetadata,
+      analytics: {
+        endpoint: "https://analytics.example.com/collect",
+      },
+    };
+
+    render(
+      <Footer
+        metadata={metadataWithAnalytics}
+        items={[
+          {
+            kind: "link",
+            id: "privacy",
+            name: "Privacy",
+            url: "/privacy",
+          },
+          {
+            kind: "action",
+            id: FOOTER_FEEDBACK_ACTION_ID,
+            name: "Feedback unavailable",
+            icon: <span>!</span>,
+            disabled: true,
+            onSelect: vi.fn(),
+          },
+        ]}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Privacy" }));
+
+    expect(analyticsTrackSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        component: "Footer",
+        action: "mobile_menu_toggle",
+        variant: "open",
+      }),
+    );
+    expect(analyticsTrackSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        component: "Footer",
+        action: "nav_click",
+        label: "Privacy",
+        variant: "mobile",
+      }),
+    );
   });
 });

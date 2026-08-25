@@ -217,7 +217,12 @@ repeating the identifier in host code. The identifier is only a stable
 host/component contract: feedback actions emit no package-owned analytics,
 create no analytics session, and use no browser analytics queue. Hosts must
 also keep feedback form state and content out of any telemetry they add around
-`onSelect`.
+`onSelect`. This exclusion covers the complete mobile path: when an enabled
+item has the reserved feedback identity, opening or closing the shared footer
+menu also emits no package telemetry. The exact reserved identity remains
+private if a host accidentally supplies it on a link, while unrelated footer
+links and menus—including menus where feedback is disabled—retain their
+existing analytics behavior.
 
 `StarRating` exposes exactly five caller-translated native radio options with
 Arrow/Home/End keyboard behavior and visible shape, border, and text state.

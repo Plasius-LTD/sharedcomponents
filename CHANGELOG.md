@@ -18,7 +18,11 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - (placeholder)
 
 - **Security**
-  - (placeholder)
+  - Keep the complete mobile feedback path outside package analytics by
+    suppressing the prerequisite footer-menu toggle when an enabled item has
+    the reserved feedback identity, and keep that identity private across item
+    representations without changing unrelated or disabled-item footer
+    analytics (task #39).
 
 ## [1.1.1] - 2026-08-13
 

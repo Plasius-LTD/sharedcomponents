@@ -28,7 +28,7 @@ export interface FooterNavItem {
 /** A new, explicitly discriminated footer navigation link. */
 export interface FooterLinkItem extends FooterNavItem {
   kind: "link";
-  /** Stable caller-owned identity used for React and analytics context. */
+  /** Stable caller-owned identity; the reserved feedback ID is never tracked. */
   id: string;
 }
 
@@ -85,6 +85,10 @@ function isFooterAction(
   item: FooterItem | FooterNavItem,
 ): item is FooterActionItem {
   return "kind" in item && item.kind === "action";
+}
+
+function isFooterFeedbackItem(item: { id: string }): boolean {
+  return item.id === FOOTER_FEEDBACK_ACTION_ID;
 }
 
 export function Footer({
@@ -158,6 +162,11 @@ export function Footer({
       ),
     [items]
   );
+  const hasEnabledFeedbackItem = resolvedItems.some(
+    (item) =>
+      isFooterFeedbackItem(item) &&
+      (item.kind !== "action" || !item.disabled),
+  );
   const footerClasses = [
     styles.footer,
     appearance === "polishedMetal" ? styles.polishedMetal : undefined,
@@ -179,9 +188,11 @@ export function Footer({
     const rect = menuToggleRef.current.getBoundingClientRect();
     setMenuPosition((previous: { x: number; y: number } | null) => {
       const next = previous ? null : { x: rect.left, y: rect.top - 4 };
-      trackInteraction("mobile_menu_toggle", {
-        variant: next ? "open" : "close",
-      });
+      if (!hasEnabledFeedbackItem) {
+        trackInteraction("mobile_menu_toggle", {
+          variant: next ? "open" : "close",
+        });
+      }
       return next;
     });
   };
@@ -265,12 +276,14 @@ export function Footer({
                 rel={item.external ? "noopener noreferrer" : undefined}
                 data-footer-item-kind="link"
                 onClick={(event: MouseEvent<HTMLAnchorElement>) => {
-                  trackInteraction("nav_click", {
-                    label: item.name,
-                    href: item.href,
-                    variant: "desktop",
-                    context: { external: !!item.external },
-                  });
+                  if (!isFooterFeedbackItem(item)) {
+                    trackInteraction("nav_click", {
+                      label: item.name,
+                      href: item.href,
+                      variant: "desktop",
+                      context: { external: !!item.external },
+                    });
+                  }
                   onNavigate?.(item.source, item.href, event);
                 }}
               >
@@ -312,12 +325,14 @@ export function Footer({
                   item.onSelect();
                   return;
                 }
-                trackInteraction("nav_click", {
-                  label: item.name,
-                  href: item.href,
-                  variant: "mobile",
-                  context: { external: !!item.external },
-                });
+                if (!isFooterFeedbackItem(item)) {
+                  trackInteraction("nav_click", {
+                    label: item.name,
+                    href: item.href,
+                    variant: "mobile",
+                    context: { external: !!item.external },
+                  });
+                }
                 if (item.external) {
                   window.open(item.href, "_blank", "noopener,noreferrer");
                   return;
