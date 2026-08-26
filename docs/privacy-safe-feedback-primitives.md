@@ -49,7 +49,12 @@ ordinary menu telemetry. The same identity remains telemetry-free if it is
 accidentally represented as a link; lookalike IDs and unrelated links retain
 their ordinary behavior. Hosts must keep feedback form state and content out
 of telemetry they add around `onSelect` and must not reuse the reserved
-identity for another purpose.
+identity for another purpose. Eligibility is captured when each mobile menu
+opens. If feedback becomes enabled during an already-open ordinary menu, its
+command remains non-invokable while the menu closes and restores trigger
+focus; the user must open the menu again through the telemetry-free path.
+Conversely, a menu opened while feedback is enabled keeps its opener/closer
+telemetry-free even if feedback is revoked before dismissal.
 
 ## Star ratings
 

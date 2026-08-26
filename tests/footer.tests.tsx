@@ -497,4 +497,138 @@ describe("Footer", () => {
       }),
     );
   });
+
+  it("requires a fresh telemetry-free menu open when feedback becomes enabled", () => {
+    const onSelect = vi.fn();
+    const metadataWithRouteContext: SharedComponentsMetadataInput = {
+      ...fakeMetadata,
+      analytics: {
+        endpoint: "https://analytics.example.com/collect",
+        context: { pathname: "/private/account-area" },
+      },
+    };
+    const disabledFeedbackItem = {
+      kind: "action" as const,
+      id: FOOTER_FEEDBACK_ACTION_ID,
+      name: "Rate us or report a bug",
+      icon: <span>!</span>,
+      disabled: true,
+      onSelect,
+    };
+    const { rerender } = render(
+      <Footer
+        metadata={metadataWithRouteContext}
+        items={[
+          { kind: "link", id: "privacy", name: "Privacy", url: "/privacy" },
+          disabledFeedbackItem,
+        ]}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
+    expect(analyticsTrackSpy).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <Footer
+        metadata={metadataWithRouteContext}
+        items={[
+          { kind: "link", id: "privacy", name: "Privacy", url: "/privacy" },
+          { ...disabledFeedbackItem, disabled: false },
+        ]}
+      />,
+    );
+
+    expect(screen.queryByRole("menu", { name: "Toggle footer menu" })).toBeNull();
+    expect(document.activeElement).toBe(
+      screen.getByRole("button", { name: "Toggle footer menu" }),
+    );
+    expect(onSelect).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
+    fireEvent.click(
+      screen.getByRole("menuitem", { name: "Rate us or report a bug" }),
+    );
+
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(analyticsTrackSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("requires a fresh menu open when a feedback link is added", () => {
+    const metadataWithAnalytics: SharedComponentsMetadataInput = {
+      ...fakeMetadata,
+      analytics: {
+        endpoint: "https://analytics.example.com/collect",
+      },
+    };
+    const privacyItem = {
+      kind: "link" as const,
+      id: "privacy",
+      name: "Privacy",
+      url: "/privacy",
+    };
+    const { rerender } = render(
+      <Footer metadata={metadataWithAnalytics} items={[privacyItem]} />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
+    expect(analyticsTrackSpy).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <Footer
+        metadata={metadataWithAnalytics}
+        items={[
+          privacyItem,
+          {
+            kind: "link",
+            id: FOOTER_FEEDBACK_ACTION_ID,
+            name: "Feedback route",
+            url: "/feedback",
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.queryByRole("menu", { name: "Toggle footer menu" })).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
+    expect(screen.getByRole("menuitem", { name: "Feedback route" })).toBeTruthy();
+    expect(analyticsTrackSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps a private menu close private after feedback is revoked", () => {
+    const metadataWithAnalytics: SharedComponentsMetadataInput = {
+      ...fakeMetadata,
+      analytics: {
+        endpoint: "https://analytics.example.com/collect",
+      },
+    };
+    const feedbackItem = {
+      kind: "action" as const,
+      id: FOOTER_FEEDBACK_ACTION_ID,
+      name: "Rate us or report a bug",
+      icon: <span>!</span>,
+      onSelect: vi.fn(),
+    };
+    const { rerender } = render(
+      <Footer metadata={metadataWithAnalytics} items={[feedbackItem]} />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle footer menu" }));
+    expect(analyticsTrackSpy).not.toHaveBeenCalled();
+
+    rerender(
+      <Footer
+        metadata={metadataWithAnalytics}
+        items={[{ ...feedbackItem, disabled: true }]}
+      />,
+    );
+    const toggle = screen.getByRole("button", { name: "Toggle footer menu" });
+    fireEvent.mouseDown(toggle);
+    fireEvent.mouseUp(toggle);
+    fireEvent.click(toggle);
+
+    expect(screen.queryByRole("menu", { name: "Toggle footer menu" })).toBeNull();
+    expect(createAnalyticsClientSpy).not.toHaveBeenCalled();
+    expect(analyticsTrackSpy).not.toHaveBeenCalled();
+  });
 });

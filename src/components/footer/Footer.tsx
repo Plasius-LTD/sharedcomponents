@@ -120,10 +120,12 @@ export function Footer({
     }
   );
   const menuToggleRef = useRef<HTMLButtonElement | null>(null);
-  const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(
-    null
-  );
-  const menuOpen = menuPosition !== null;
+  const [menuState, setMenuState] = useState<{
+    position: { x: number; y: number };
+    feedbackEnabledAtOpen: boolean;
+  } | null>(null);
+  const menuPosition = menuState?.position ?? null;
+  const menuOpen = menuState !== null;
 
   const trackInteraction = (
     action: string,
@@ -167,6 +169,10 @@ export function Footer({
       isFooterFeedbackItem(item) &&
       (item.kind !== "action" || !item.disabled),
   );
+  const feedbackBecameEnabledWhileOpen =
+    menuState !== null &&
+    !menuState.feedbackEnabledAtOpen &&
+    hasEnabledFeedbackItem;
   const footerClasses = [
     styles.footer,
     appearance === "polishedMetal" ? styles.polishedMetal : undefined,
@@ -175,9 +181,9 @@ export function Footer({
     .filter(Boolean)
     .join(" ");
 
-  const closeMenu = () => setMenuPosition(null);
+  const closeMenu = () => setMenuState(null);
   const closeMenuAndRestoreFocus = () => {
-    setMenuPosition(null);
+    setMenuState(null);
     menuToggleRef.current?.focus();
   };
 
@@ -186,9 +192,16 @@ export function Footer({
       return;
     }
     const rect = menuToggleRef.current.getBoundingClientRect();
-    setMenuPosition((previous: { x: number; y: number } | null) => {
-      const next = previous ? null : { x: rect.left, y: rect.top - 4 };
-      if (!hasEnabledFeedbackItem) {
+    setMenuState((previous) => {
+      const feedbackEnabledForTransition =
+        previous?.feedbackEnabledAtOpen ?? hasEnabledFeedbackItem;
+      const next = previous
+        ? null
+        : {
+            position: { x: rect.left, y: rect.top - 4 },
+            feedbackEnabledAtOpen: hasEnabledFeedbackItem,
+          };
+      if (!feedbackEnabledForTransition) {
         trackInteraction("mobile_menu_toggle", {
           variant: next ? "open" : "close",
         });
@@ -196,6 +209,15 @@ export function Footer({
       return next;
     });
   };
+
+  useEffect(() => {
+    if (!feedbackBecameEnabledWhileOpen) {
+      return;
+    }
+
+    setMenuState(null);
+    menuToggleRef.current?.focus();
+  }, [feedbackBecameEnabledWhileOpen]);
 
   useEffect(() => {
     if (!menuOpen) {
@@ -299,6 +321,11 @@ export function Footer({
           ref={menuToggleRef}
           type="button"
           className={styles.menuToggle}
+          onMouseDown={(event) => {
+            if (menuOpen) {
+              event.stopPropagation();
+            }
+          }}
           onClick={toggleMobileMenu}
           aria-label={toggleFooterMenuLabel}
           aria-haspopup="menu"
@@ -319,8 +346,17 @@ export function Footer({
             onEscape={closeMenuAndRestoreFocus}
             commands={resolvedItems.map((item) => ({
               name: item.name,
-              disabled: item.kind === "action" ? item.disabled : false,
+              disabled:
+                (isFooterFeedbackItem(item) &&
+                  feedbackBecameEnabledWhileOpen) ||
+                (item.kind === "action" ? item.disabled : false),
               action: () => {
+                if (
+                  isFooterFeedbackItem(item) &&
+                  feedbackBecameEnabledWhileOpen
+                ) {
+                  return;
+                }
                 if (item.kind === "action") {
                   item.onSelect();
                   return;
