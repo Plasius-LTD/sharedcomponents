@@ -15,6 +15,20 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - (placeholder)
 
 - **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [1.1.2] - 2026-08-26
+
+- **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
   - Keep a real pointer activation of the open footer trigger from being
     consumed first as a context-menu outside click, so one activation closes
     the menu instead of closing and immediately reopening it (task #39).
@@ -401,7 +415,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ---
 
-[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.1.2...HEAD
 
 ## [1.0.0] - 2026-02-11
 
@@ -436,3 +450,4 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 [1.0.24]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.0.24
 [1.1.0]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.1.0
 [1.1.1]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.1.1
+[1.1.2]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.1.2
