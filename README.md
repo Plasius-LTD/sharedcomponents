@@ -183,7 +183,9 @@ when the popup is removed. It preserves the active enabled command across
 structurally equivalent rerenders and moves to the next enabled command, then
 the preceding command, when the active command becomes unavailable. Header,
 Footer, and UserProfile menus expose their popup relationship and return focus
-to their opener on Escape.
+to their opener on Escape. The Footer trigger also treats one real pointer
+activation as one close operation instead of an outside dismissal followed by
+an immediate reopen.
 
 ## Privacy-safe feedback controls
 
@@ -217,7 +219,17 @@ repeating the identifier in host code. The identifier is only a stable
 host/component contract: feedback actions emit no package-owned analytics,
 create no analytics session, and use no browser analytics queue. Hosts must
 also keep feedback form state and content out of any telemetry they add around
-`onSelect`.
+`onSelect`. This exclusion covers the complete mobile path: when an enabled
+item has the reserved feedback identity, opening or closing the shared footer
+menu also emits no package telemetry. The exact reserved identity remains
+private if a host accidentally supplies it on a link, while unrelated footer
+links and menus—including menus where feedback is disabled—retain their
+existing analytics behavior. Feedback eligibility is captured for each mobile
+menu open. If an enabled feedback item appears while an ordinary tracked menu
+is already open, the package keeps that command non-invokable, closes the menu,
+restores trigger focus, and requires a fresh telemetry-free open.
+A menu opened with feedback available remains telemetry-free through dismissal
+even if the host revokes feedback before it closes.
 
 `StarRating` exposes exactly five caller-translated native radio options with
 Arrow/Home/End keyboard behavior and visible shape, border, and text state.

@@ -28,7 +28,7 @@ export interface FooterNavItem {
 /** A new, explicitly discriminated footer navigation link. */
 export interface FooterLinkItem extends FooterNavItem {
   kind: "link";
-  /** Stable caller-owned identity used for React and analytics context. */
+  /** Stable caller-owned identity; the reserved feedback ID is never tracked. */
   id: string;
 }
 
@@ -87,6 +87,10 @@ function isFooterAction(
   return "kind" in item && item.kind === "action";
 }
 
+function isFooterFeedbackItem(item: { id: string }): boolean {
+  return item.id === FOOTER_FEEDBACK_ACTION_ID;
+}
+
 export function Footer({
   items,
   metadata,
@@ -116,10 +120,12 @@ export function Footer({
     }
   );
   const menuToggleRef = useRef<HTMLButtonElement | null>(null);
-  const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(
-    null
-  );
-  const menuOpen = menuPosition !== null;
+  const [menuState, setMenuState] = useState<{
+    position: { x: number; y: number };
+    feedbackEnabledAtOpen: boolean;
+  } | null>(null);
+  const menuPosition = menuState?.position ?? null;
+  const menuOpen = menuState !== null;
 
   const trackInteraction = (
     action: string,
@@ -158,6 +164,15 @@ export function Footer({
       ),
     [items]
   );
+  const hasEnabledFeedbackItem = resolvedItems.some(
+    (item) =>
+      isFooterFeedbackItem(item) &&
+      (item.kind !== "action" || !item.disabled),
+  );
+  const feedbackBecameEnabledWhileOpen =
+    menuState !== null &&
+    !menuState.feedbackEnabledAtOpen &&
+    hasEnabledFeedbackItem;
   const footerClasses = [
     styles.footer,
     appearance === "polishedMetal" ? styles.polishedMetal : undefined,
@@ -166,9 +181,9 @@ export function Footer({
     .filter(Boolean)
     .join(" ");
 
-  const closeMenu = () => setMenuPosition(null);
+  const closeMenu = () => setMenuState(null);
   const closeMenuAndRestoreFocus = () => {
-    setMenuPosition(null);
+    setMenuState(null);
     menuToggleRef.current?.focus();
   };
 
@@ -177,14 +192,32 @@ export function Footer({
       return;
     }
     const rect = menuToggleRef.current.getBoundingClientRect();
-    setMenuPosition((previous: { x: number; y: number } | null) => {
-      const next = previous ? null : { x: rect.left, y: rect.top - 4 };
-      trackInteraction("mobile_menu_toggle", {
-        variant: next ? "open" : "close",
-      });
+    setMenuState((previous) => {
+      const feedbackEnabledForTransition =
+        previous?.feedbackEnabledAtOpen ?? hasEnabledFeedbackItem;
+      const next = previous
+        ? null
+        : {
+            position: { x: rect.left, y: rect.top - 4 },
+            feedbackEnabledAtOpen: hasEnabledFeedbackItem,
+          };
+      if (!feedbackEnabledForTransition) {
+        trackInteraction("mobile_menu_toggle", {
+          variant: next ? "open" : "close",
+        });
+      }
       return next;
     });
   };
+
+  useEffect(() => {
+    if (!feedbackBecameEnabledWhileOpen) {
+      return;
+    }
+
+    setMenuState(null);
+    menuToggleRef.current?.focus();
+  }, [feedbackBecameEnabledWhileOpen]);
 
   useEffect(() => {
     if (!menuOpen) {
@@ -265,12 +298,14 @@ export function Footer({
                 rel={item.external ? "noopener noreferrer" : undefined}
                 data-footer-item-kind="link"
                 onClick={(event: MouseEvent<HTMLAnchorElement>) => {
-                  trackInteraction("nav_click", {
-                    label: item.name,
-                    href: item.href,
-                    variant: "desktop",
-                    context: { external: !!item.external },
-                  });
+                  if (!isFooterFeedbackItem(item)) {
+                    trackInteraction("nav_click", {
+                      label: item.name,
+                      href: item.href,
+                      variant: "desktop",
+                      context: { external: !!item.external },
+                    });
+                  }
                   onNavigate?.(item.source, item.href, event);
                 }}
               >
@@ -286,6 +321,11 @@ export function Footer({
           ref={menuToggleRef}
           type="button"
           className={styles.menuToggle}
+          onMouseDown={(event) => {
+            if (menuOpen) {
+              event.stopPropagation();
+            }
+          }}
           onClick={toggleMobileMenu}
           aria-label={toggleFooterMenuLabel}
           aria-haspopup="menu"
@@ -306,18 +346,29 @@ export function Footer({
             onEscape={closeMenuAndRestoreFocus}
             commands={resolvedItems.map((item) => ({
               name: item.name,
-              disabled: item.kind === "action" ? item.disabled : false,
+              disabled:
+                (isFooterFeedbackItem(item) &&
+                  feedbackBecameEnabledWhileOpen) ||
+                (item.kind === "action" ? item.disabled : false),
               action: () => {
+                if (
+                  isFooterFeedbackItem(item) &&
+                  feedbackBecameEnabledWhileOpen
+                ) {
+                  return;
+                }
                 if (item.kind === "action") {
                   item.onSelect();
                   return;
                 }
-                trackInteraction("nav_click", {
-                  label: item.name,
-                  href: item.href,
-                  variant: "mobile",
-                  context: { external: !!item.external },
-                });
+                if (!isFooterFeedbackItem(item)) {
+                  trackInteraction("nav_click", {
+                    label: item.name,
+                    href: item.href,
+                    variant: "mobile",
+                    context: { external: !!item.external },
+                  });
+                }
                 if (item.external) {
                   window.open(item.href, "_blank", "noopener,noreferrer");
                   return;

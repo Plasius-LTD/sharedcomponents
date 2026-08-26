@@ -24,7 +24,16 @@ that consistency.
   on desktop and disabled-aware commands in the mobile menu.
 - Keep feedback commands outside package analytics. Export a stable host-owned
   action identity, but create no analytics event, session, transport, or
-  browser queue when the feedback surface opens.
+  browser queue when the feedback surface opens. Treat the prerequisite mobile
+  footer-menu toggle as part of that boundary whenever an enabled item has the
+  reserved identity, and suppress feedback-identity link telemetry as a
+  fail-safe for an incorrectly represented host item. Preserve ordinary menu
+  telemetry when a feedback action is disabled and cannot open the surface.
+  Capture feedback eligibility at menu-open time; if it becomes enabled during
+  an ordinary tracked open, keep the command non-invokable, close the menu,
+  restore trigger focus, and require a fresh telemetry-free open.
+  Use the captured state for explicit dismissal too, so revocation during an
+  open feedback-capable menu cannot introduce a close event.
 - Implement ratings with native radio inputs inside an explicitly labelled
   radiogroup. Use caller-owned labels, roving focus, and explicit
   Arrow/Home/End behavior.
@@ -76,8 +85,11 @@ that consistency.
 - Hosts receive reusable, touch-sized WCAG 2.2 AA-oriented primitives without
   pulling service or domain state into the base UI package.
 - Feedback opening cannot be correlated through the package's general
-  session-bearing analytics client. A host that adds surrounding telemetry is
-  responsible for preserving the same no-content, no-identifier boundary.
+  session-bearing analytics client, including through the shared mobile-menu
+  opener or an asynchronous eligibility transition during an already-open
+  ordinary menu. Unrelated footer links and menus retain their analytics
+  behavior. A host that adds surrounding telemetry is responsible for
+  preserving the same no-content, no-identifier boundary.
 - Narrative remains live browser state controlled by the host. The exported
   extraction helper is explicitly transient and must never be logged, cached,
   persisted, or sent before the host's privacy pipeline.

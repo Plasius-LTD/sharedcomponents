@@ -15,10 +15,18 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - (placeholder)
 
 - **Fixed**
-  - (placeholder)
+  - Keep a real pointer activation of the open footer trigger from being
+    consumed first as a context-menu outside click, so one activation closes
+    the menu instead of closing and immediately reopening it (task #39).
 
 - **Security**
-  - (placeholder)
+  - Keep the complete mobile feedback path outside package analytics by
+    suppressing the prerequisite footer-menu toggle when an enabled item has
+    the reserved feedback identity, and keep that identity private across item
+    representations. Capture feedback eligibility for each open menu and
+    require a fresh telemetry-free open if feedback becomes enabled; keep an
+    already-private close private after revocation without changing unrelated
+    or disabled-item footer analytics (task #39).
 
 ## [1.1.1] - 2026-08-13
 
