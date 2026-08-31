@@ -34,8 +34,8 @@
   "author": "Plasius LTD <development@plasius.co.uk>",
   "license": "MIT",
   "dependencies": {
-    "@plasius/analytics": "^1.2.2",
-    "@plasius/schema": "^1.4.0",
+    "@plasius/analytics": "^1.2.3",
+    "@plasius/schema": "^1.4.3",
     "@plasius/translations": "^1.0.23"
   },
   "peerDependencies": {
@@ -44,22 +44,22 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@testing-library/dom": "^10.4.1",
-    "@testing-library/react": "^16.3.2",
-    "@types/react": "^19.2.17",
-    "@typescript-eslint/eslint-plugin": "^8.63.0",
-    "@typescript-eslint/parser": "^8.63.0",
-    "@vitest/coverage-v8": "^4.1.10",
-    "axe-core": "^4.12.1",
-    "eslint": "^10.7.0",
-    "globals": "^17.7.0",
+    "@testing-library/react": "^16.3.3",
+    "@types/react": "^19.2.18",
+    "@typescript-eslint/eslint-plugin": "^8.69.0",
+    "@typescript-eslint/parser": "^8.69.0",
+    "@vitest/coverage-v8": "^4.1.11",
+    "axe-core": "^4.13.0",
+    "eslint": "^10.9.1",
+    "globals": "^17.11.0",
     "jsdom": "^29.1.1",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "tsx": "^4.23.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tsx": "^4.23.13",
     "typescript": "^6.0.3",
-    "vite": "^8.1.4",
-    "vitest": "^4.1.10",
-    "zod": "^4.4.3"
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11",
+    "zod": "^4.5.4"
   },
   "sideEffects": [
     "*.css"
