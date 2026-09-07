@@ -34,6 +34,8 @@ If a product needs auth/profile behavior, wire it via callbacks/props from the h
 - `UserProfile`: optional generic avatar/menu shell driven by callbacks
 - `ConfirmationDialog`: reusable confirmation dialog with optional typed challenge flow for destructive actions
 - `StatusPanel`: reusable status/alert surface for loading, empty, warning, and retryable error states
+- `CollectionViewport`: native scroll region with continuous append, pull-down refresh and accessible button alternatives
+- `useProgressiveItems`: reveal an already sorted/filtered collection in batches while keeping a selected row mounted
 - Built-in interaction analytics forwarding through `@plasius/analytics`
 - Package-owned default display text resolved through `@plasius/translations`
 
@@ -47,6 +49,32 @@ npm install @plasius/sharedcomponents
 
 This package publishes dual ESM and CJS artifacts.
 When CJS output is emitted under `dist-cjs/*.js` with `type: module`, `dist-cjs/package.json` is generated with `{ "type": "commonjs" }` to ensure Node `require(...)` compatibility.
+
+## Continuous collections
+
+Wrap a stable table/list in `CollectionViewport`, provide a region `label`, and
+pass localized `labels` for refresh/load-more/loading/refreshing/pull/release/end/
+failed/refreshBlocked. `onLoadMore(signal)` appends the next available page when
+the user reaches or scrolls further at the bottom; `hasMore=false` ends loading.
+`onRefresh(signal)` handles pull-and-release at the top and the Refresh button.
+Both callbacks may return promises. The component serializes gestures and
+buttons, reports rejected operations without exposing their error contents,
+and aborts its signal on unmount or `resetKey` changes. Hosts must honour the
+signal or use query-generation checks, and own request timeouts and data state.
+
+Use `disabled` during commits, and `refreshDisabled` while a refresh could discard
+an unsaved draft. Refresh should retain the old rows on failure. The component
+does not mutate data, fetch endpoints, or evaluate authority/rollout policy.
+Its native scrollbar measures the actual loaded content, including expanding
+editors. Scrollbar visibility follows browser/OS preferences. Viewport height is
+bounded to 65% of the dynamic viewport (maximum 48rem); a host class can override
+layout styles. No synthetic unknown-total scroll range or automatic background
+page-draining loop is used.
+
+For complete-array endpoints, call `useProgressiveItems(sortedFilteredItems,
+{ resetKey, batchSize: 50, keepVisibleIndex })` and render its `items`. Pass its
+`hasMore` and `loadMore` to the viewport. Query changes reset the visible batch;
+`keepVisibleIndex` ensures an existing selected editor remains mounted.
 
 
 ## Usage

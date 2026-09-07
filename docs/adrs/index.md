@@ -6,3 +6,4 @@
 - [ADR-0004: Dual ESM and CJS Runtime Compatibility](./adr-0004-dual-esm-cjs-runtime-compatibility.md)
 - [ADR-0005: Privacy-Constrained Feedback UI Primitives](./adr-0005-privacy-constrained-feedback-primitives.md)
 - [ADR-0006: Exact-main OIDC package publishing](./adr-0006-exact-main-oidc-package-publishing.md)
+- [ADR-0007: Native continuous collection interactions](./adr-0007-native-continuous-collections.md)
