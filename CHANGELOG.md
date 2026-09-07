@@ -9,6 +9,20 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [1.2.0] - 2026-09-07
+
+- **Added**
   - Native `CollectionViewport` with user-driven append, top-edge pull refresh,
     accessible button alternatives, draft/commit guards and abortable callbacks;
     `useProgressiveItems` reveals complete collections in batches (#62).
@@ -435,7 +449,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ---
 
-[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.1.3...HEAD
+[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.2.0...HEAD
 
 ## [1.0.0] - 2026-02-11
 
@@ -472,3 +486,4 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 [1.1.1]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.1.1
 [1.1.2]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.1.2
 [1.1.3]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.1.3
+[1.2.0]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.0
