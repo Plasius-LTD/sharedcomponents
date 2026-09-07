@@ -9,3 +9,4 @@ export * from "./action-menu/index.js";
 export * from "./review-sheet/index.js";
 export * from "./star-rating/index.js";
 export * from "./constrained-rich-text-editor/index.js";
+export * from "./collection-viewport/index.js";

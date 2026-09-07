@@ -9,6 +9,9 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
+  - Native `CollectionViewport` with user-driven append, top-edge pull refresh,
+    accessible button alternatives, draft/commit guards and abortable callbacks;
+    `useProgressiveItems` reveals complete collections in batches (#62).
   - (placeholder)
 
 - **Changed**
