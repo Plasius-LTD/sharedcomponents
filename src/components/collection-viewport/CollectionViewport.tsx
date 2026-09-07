@@ -59,6 +59,7 @@ export function CollectionViewport({
   const activeRef = useRef<AbortController | null>(null);
   const gestureRef = useRef<Gesture | null>(null);
   const previousTop = useRef(0);
+  const appendedHeight = useRef<number | null>(null);
   const [operation, setOperation] = useState<Operation | null>(null);
   const [failed, setFailed] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
@@ -71,6 +72,7 @@ export function CollectionViewport({
     const action = kind === "more" ? onLoadMore! : onRefresh!;
     const controller = new AbortController();
     activeRef.current = controller;
+    if (kind === "more") appendedHeight.current = rootRef.current?.scrollHeight ?? null;
     setOperation(kind);
     setFailed(false);
     try {
@@ -90,6 +92,7 @@ export function CollectionViewport({
     activeRef.current = null;
     gestureRef.current = null;
     previousTop.current = 0;
+    appendedHeight.current = null;
     setOperation(null);
     setFailed(false);
     setPullDistance(0);
@@ -176,7 +179,11 @@ export function CollectionViewport({
         const root = event.currentTarget;
         const movingDown = root.scrollTop > previousTop.current;
         previousTop.current = root.scrollTop;
-        if (movingDown && root.scrollHeight - root.scrollTop - root.clientHeight <= endThreshold) void run("more");
+        const atEnd = root.scrollHeight - root.scrollTop - root.clientHeight <= endThreshold;
+        if (!atEnd) appendedHeight.current = null;
+        // A completed wheel/touch append may be followed by its native scroll
+        // event before React commits new rows. Do not load the same extent twice.
+        if (movingDown && atEnd && appendedHeight.current !== root.scrollHeight) void run("more");
       }}>
       <div className={styles.content}>{children}</div>
       {hasMore && onLoadMore ? <div className={styles.more}>

@@ -19,6 +19,15 @@ authorization, rollout, translations and draft policy. The component guards one
 operation at a time and aborts callbacks on query reset/unmount. A separate
 `useProgressiveItems` hook supports sorted/filtered complete-array endpoints.
 
+Task #66 adds an append-extent guard: a delayed native scroll event cannot repeat
+the wheel/touch operation that already loaded that extent, even when its callback
+resolved synchronously before the host committed new rows. Explicit fresh input
+still works, and leaving the bottom or resetting the query rearms native scroll.
+The viewport uses `overflow-anchor: none` so browser layout adjustments cannot
+move the view to newly appended content and trigger another load. This uses the
+[standard scroll-anchoring opt-out](https://www.w3.org/TR/css-scroll-anchoring/#exclusion-api),
+not a timer, fake scrollbar or disabled native scrolling.
+
 ## Consequences
 
 Native keyboard scrolling, focus and browser zoom remain available. Explicit

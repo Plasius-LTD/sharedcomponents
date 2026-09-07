@@ -2,6 +2,8 @@ import * as React from "react";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import axe from "axe-core";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { CollectionViewport, useProgressiveItems } from "../src/index.js";
 
 const labels = {
@@ -26,6 +28,56 @@ function pull(element: HTMLElement, distance = 100) {
 afterEach(cleanup);
 
 describe("CollectionViewport", () => {
+  it("does not append twice for the scroll event following a completed wheel append", async () => {
+    const more = vi.fn();
+    render(<CollectionViewport label="Flags" labels={labels} hasMore onLoadMore={more}>Rows</CollectionViewport>);
+    const region = screen.getByRole("region");
+    geometry(region);
+    await act(async () => fireEvent.wheel(region, { deltaY: 100 }));
+    expect(more).toHaveBeenCalledTimes(1);
+    await act(async () => fireEvent.scroll(region));
+    expect(more).toHaveBeenCalledTimes(1);
+    await act(async () => fireEvent.wheel(region, { deltaY: 100 }));
+    expect(more).toHaveBeenCalledTimes(2);
+    region.scrollTop = 100;
+    fireEvent.scroll(region);
+    region.scrollTop = 400;
+    await act(async () => fireEvent.scroll(region));
+    expect(more).toHaveBeenCalledTimes(3);
+  });
+
+  it("disables layout-driven scroll anchoring inside the append viewport", () => {
+    const css = readFileSync(resolve(process.cwd(), "src/components/collection-viewport/CollectionViewport.module.css"), "utf8");
+    expect(css).toMatch(/\.viewport\s*\{[^}]*overflow-anchor:\s*none\s*;/);
+  });
+
+  it("deduplicates a released touch append but rearms native scrolling for a new query", async () => {
+    const more = vi.fn();
+    const { rerender } = render(<CollectionViewport label="Flags" labels={labels} hasMore onLoadMore={more} resetKey="a">Rows</CollectionViewport>);
+    const region = screen.getByRole("region");
+    geometry(region);
+    await act(async () => pull(region, -100));
+    await act(async () => fireEvent.scroll(region));
+    expect(more).toHaveBeenCalledTimes(1);
+    rerender(<CollectionViewport label="Flags" labels={labels} hasMore onLoadMore={more} resetKey="b">New rows</CollectionViewport>);
+    region.scrollTop = 400;
+    await act(async () => fireEvent.scroll(region));
+    expect(more).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not retry a rejected append from its trailing scroll event", async () => {
+    const more = vi.fn().mockRejectedValueOnce(new Error("unavailable")).mockResolvedValue(undefined);
+    render(<CollectionViewport label="Flags" labels={labels} hasMore onLoadMore={more}>Rows</CollectionViewport>);
+    const region = screen.getByRole("region");
+    geometry(region);
+    await act(async () => fireEvent.wheel(region, { deltaY: 100 }));
+    expect(screen.getByRole("alert").textContent).toBe(labels.failed);
+    await act(async () => fireEvent.scroll(region));
+    expect(more).toHaveBeenCalledTimes(1);
+    await act(async () => fireEvent.wheel(region, { deltaY: 100 }));
+    expect(more).toHaveBeenCalledTimes(2);
+  });
+
   it("appends only after user scrolls to the end and preserves focused rows", async () => {
     let resolve!: () => void;
     const onLoadMore = vi.fn(() => new Promise<void>((done) => { resolve = done; }));

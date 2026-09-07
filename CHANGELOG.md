@@ -15,6 +15,9 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - (placeholder)
 
 - **Fixed**
+  - Prevented a completed wheel/touch append and its following scroll event from
+    loading the same content range twice. Native collection layout changes no
+    longer anchor the viewport onto appended content (#66).
   - (placeholder)
 
 - **Security**

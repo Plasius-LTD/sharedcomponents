@@ -66,7 +66,11 @@ Use `disabled` during commits, and `refreshDisabled` while a refresh could disca
 an unsaved draft. Refresh should retain the old rows on failure. The component
 does not mutate data, fetch endpoints, or evaluate authority/rollout policy.
 Its native scrollbar measures the actual loaded content, including expanding
-editors. Scrollbar visibility follows browser/OS preferences. Viewport height is
+editors. The viewport opts out of layout-driven scroll anchoring; a native scroll
+event following a completed wheel/touch append cannot load the same extent twice.
+Further deliberate wheel/touch input, button activation or returning to the bottom
+can still request another page. Native scrolling, keyboard controls and inline
+editors remain available. Scrollbar visibility follows browser/OS preferences. Viewport height is
 bounded to 65% of the dynamic viewport (maximum 48rem); a host class can override
 layout styles. No synthetic unknown-total scroll range or automatic background
 page-draining loop is used.

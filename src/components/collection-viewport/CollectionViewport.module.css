@@ -33,6 +33,7 @@
   max-height: min(65vh, 48rem);
   max-height: min(65dvh, 48rem);
   overflow: auto;
+  overflow-anchor: none;
   overscroll-behavior-y: contain;
   scrollbar-gutter: stable;
   scrollbar-width: auto;
