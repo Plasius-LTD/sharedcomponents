@@ -1,6 +1,6 @@
 {
   "name": "@plasius/sharedcomponents",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Base React UI components for shared navigation, menus, profile shells, and legal/contact surfaces.",
   "keywords": [
     "Components",
