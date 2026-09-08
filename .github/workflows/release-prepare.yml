@@ -421,30 +421,43 @@ jobs:
             PR_NUMBER="$(gh pr view "${PR_URL}" --json number --jq '.number')"
 
             if gh pr merge "${PR_NUMBER}" --squash --delete-branch; then
-              echo "Release metadata PR #${PR_NUMBER} merged."
+              echo "Merge request accepted for release metadata PR #${PR_NUMBER}; verifying observed state."
             else
-              echo "Immediate merge was not available for release metadata PR #${PR_NUMBER}; enabling auto-merge and waiting."
+              echo "Immediate merge was not available for release metadata PR #${PR_NUMBER}; waiting for required checks and retrying the protected merge."
               gh pr merge "${PR_NUMBER}" --auto --squash --delete-branch || true
+            fi
 
-              DEADLINE=$((SECONDS + MERGE_TIMEOUT_SECONDS))
-              while [ "${SECONDS}" -lt "${DEADLINE}" ]; do
-                STATE="$(gh pr view "${PR_NUMBER}" --json state --jq '.state')"
-                if [ "${STATE}" = "MERGED" ]; then
-                  echo "Release metadata PR #${PR_NUMBER} merged."
-                  break
-                fi
-                if [ "${STATE}" = "CLOSED" ]; then
-                  echo "Release metadata PR #${PR_NUMBER} closed without merging." >&2
-                  exit 1
-                fi
-                sleep 10
-              done
-
-              STATE="$(gh pr view "${PR_NUMBER}" --json state --jq '.state')"
-              if [ "${STATE}" != "MERGED" ]; then
-                echo "Release metadata PR #${PR_NUMBER} did not merge within ${MERGE_TIMEOUT_SECONDS}s; release will not continue until ${BASE_BRANCH} contains ${TAG}." >&2
+            DEADLINE=$((SECONDS + MERGE_TIMEOUT_SECONDS))
+            STATE=""
+            while [ "${SECONDS}" -lt "${DEADLINE}" ]; do
+              if ! STATE="$(gh pr view "${PR_NUMBER}" --json state --jq '.state')"; then
+                echo "Unable to read release metadata PR #${PR_NUMBER} state; release will not continue." >&2
                 exit 1
               fi
+              case "${STATE}" in
+                MERGED)
+                  echo "Release metadata PR #${PR_NUMBER} confirmed merged."
+                  break
+                  ;;
+                CLOSED)
+                  echo "Release metadata PR #${PR_NUMBER} closed without merging." >&2
+                  exit 1
+                  ;;
+                OPEN) ;;
+                *)
+                  echo "Unexpected release metadata PR state; release will not continue." >&2
+                  exit 1
+                  ;;
+              esac
+              if gh pr merge "${PR_NUMBER}" --squash --delete-branch >/dev/null 2>&1; then
+                echo "Merge request accepted; waiting for confirmed MERGED state."
+              fi
+              sleep 10
+            done
+
+            if [ "${STATE}" != "MERGED" ]; then
+              echo "Release metadata PR #${PR_NUMBER} did not merge within ${MERGE_TIMEOUT_SECONDS}s; release will not continue until ${BASE_BRANCH} contains ${TAG}." >&2
+              exit 1
             fi
           fi
 

@@ -8,6 +8,14 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ## [Unreleased]
 
+### Fixed
+
+- Confined CI and scheduled audit validation to explicit quarantined self-hosted
+  capacity, with trusted push-only CI and a main-only audit guard.
+- Required confirmed GitHub `MERGED` state before release preparation continues,
+  including successful queued merge requests and bounded retry/failure paths.
+
+
 - **Added**
   - (placeholder)
 

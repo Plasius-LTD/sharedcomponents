@@ -349,7 +349,9 @@ lock and package gates have been reproduced from a clean registry-only install.
 This package is released only through protected `cd.yml`; release-metadata
 checkout does not persist the workflow `GITHUB_TOKEN`, leaving the narrowly
 scoped release-preparation GitHub App token as the sole branch-mutation
-credential. Workflow policy tests also compile the embedded version/pre-release
+credential. A successful merge command is only an accepted request: preparation
+continues only after GitHub reports `MERGED`, and fails on closed, unreadable,
+invalid, or timed-out PR state. Workflow policy tests also compile the embedded version/pre-release
 parser and require archive-member checks to drain their input, so malformed
 release hand-offs fail closed without false negatives from shell `pipefail`.
 Downloaded tarballs are published as explicit local package specs; if a failed
@@ -421,12 +423,22 @@ MIT
 
 CI keeps the administrative contributor registry outside Git and npm package
 artifacts using exact, case-normalised path checks. External fork heads are
-rejected; same-repository pull requests validate on GitHub-hosted runners and
-main pushes validate on approved self-hosted runners. Release preparation and
+excluded from CI triggers. Every CI job runs only for repository-owned pushes
+on explicit `[self-hosted, Linux, X64]` labels in `Public CI - Quarantined`;
+there is no hosted CI fallback or configurable runner selector. The monthly
+audit uses the same group and is restricted to `main`. Release preparation and
 publication use a two-run exact-main protocol on GitHub-hosted Node.js 24.18.0
 LTS. A read-only job seals the package tarball and SBOM before a dependency-free
 production job publishes that exact artifact through npm OIDC with provenance;
-there is no npm write-token fallback. CD remains disabled until the npm trusted
-publisher binding and protected-branch-only production environment are
-independently verified.
+there is no npm write-token fallback. Before enabling CD, independently verify
+the npm trusted publisher binding and protected-branch-only production
+environment. Disable `cd.yml` to stop release promotion; never restore the
+administrative path or token publication.
+
+Protect and freeze each reviewed implementation or release-metadata branch
+before temporarily admitting its exact workflow/ref to the quarantined group.
+Required push checks remain mandatory on the PR. Remove temporary admissions
+after merge; retain only approved main CI and main-only audit refs. See
+[ADR-0008](docs/adrs/adr-0008-trusted-push-ci-and-confirmed-release-merges.md)
+for trust boundaries and verification.
 <!-- END PLASIUS RELEASE INTEGRITY -->
