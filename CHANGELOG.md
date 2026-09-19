@@ -9,7 +9,9 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
-  - (placeholder)
+  - Opt-in `theme.css` export with scoped neutral and chronicle light/dark
+    palettes, host identity overrides, typography, controls, focus styles and
+    Header/Footer adapters. Fonts and brand assets remain host-owned.
 
 - **Changed**
   - (placeholder)
