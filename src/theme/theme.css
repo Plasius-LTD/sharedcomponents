@@ -1,0 +1,253 @@
+/* Opt in on a container. Hosts own fonts, identity assets and rollout policy. */
+.plasius-theme {
+  --plasius-font-body: "Roboto", system-ui, sans-serif;
+  --plasius-font-heading: "Roboto", system-ui, sans-serif;
+  --plasius-space-1: 0.25rem;
+  --plasius-space-2: 0.5rem;
+  --plasius-space-3: 0.75rem;
+  --plasius-space-4: 1rem;
+  --plasius-space-6: 1.5rem;
+  --plasius-space-8: 2rem;
+  --plasius-space-12: 3rem;
+  --plasius-radius: 0.375rem;
+  --plasius-line-height: 1.65;
+  font-family: var(--plasius-font-body);
+  font-size: 1rem;
+  line-height: var(--plasius-line-height);
+  color: var(--plasius-text);
+  background: var(--plasius-surface);
+  overflow-wrap: anywhere;
+  color-scheme: light;
+
+  /* Adapters for existing Header and Footer APIs. */
+  --headerBg: var(--plasius-surface);
+  --headerText: var(--plasius-text);
+  --headerButtonBg: var(--plasius-panel);
+  --headerButtonText: var(--plasius-text);
+  --headerButtonHover: var(--plasius-raised);
+  --headerShadow: none;
+  --headerButtonShadow: none;
+  --footerBg: var(--plasius-panel);
+  --footerTextPrimary: var(--plasius-text);
+  --footerTextSecondary: var(--plasius-muted);
+  --footerLink: var(--plasius-accent);
+  --footerLinkHover: var(--plasius-accent);
+  --footerBorder: var(--plasius-border);
+}
+
+.plasius-theme,
+.plasius-theme[data-theme="light"] {
+  --plasius-surface: #f5f8f9;
+  --plasius-panel: #ffffff;
+  --plasius-raised: #e5eff0;
+  --plasius-text: #21323b;
+  --plasius-muted: #4b616c;
+  --plasius-accent: #116674;
+  --plasius-on-accent: #ffffff;
+  --plasius-border: #697e87;
+}
+
+[data-theme="dark"] .plasius-theme:not([data-theme="light"]),
+.plasius-theme[data-theme="dark"] {
+  --plasius-surface: #14252c;
+  --plasius-panel: #1d333b;
+  --plasius-raised: #28434c;
+  --plasius-text: #eef5f5;
+  --plasius-muted: #bcced0;
+  --plasius-accent: #8bd9df;
+  --plasius-on-accent: #122b33;
+  --plasius-border: #8aa5ab;
+  color-scheme: dark;
+}
+
+.plasius-theme.plasius-theme--chronicle {
+  --plasius-font-heading: "Merriweather", Georgia, serif;
+  --plasius-radius: 0.1875rem;
+  --plasius-line-height: 1.75;
+}
+
+.plasius-theme.plasius-theme--chronicle,
+.plasius-theme.plasius-theme--chronicle[data-theme="light"] {
+  --plasius-surface: #f3eddf;
+  --plasius-panel: #e8e1cf;
+  --plasius-raised: #e3dbc8;
+  --plasius-text: #26352f;
+  --plasius-muted: #4e5a52;
+  --plasius-accent: #705020;
+  --plasius-on-accent: #ffffff;
+  --plasius-border: #81755b;
+}
+
+[data-theme="dark"] .plasius-theme.plasius-theme--chronicle:not([data-theme="light"]),
+.plasius-theme.plasius-theme--chronicle[data-theme="dark"] {
+  --plasius-surface: #182621;
+  --plasius-panel: #23352c;
+  --plasius-raised: #304438;
+  --plasius-text: #eee9db;
+  --plasius-muted: #c3ccbf;
+  --plasius-accent: #e2bd77;
+  --plasius-on-accent: #182621;
+  --plasius-border: #9caa96;
+}
+
+.plasius-theme .plasius-heading {
+  color: var(--plasius-text);
+  font-family: var(--plasius-font-heading);
+  font-weight: 400;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.plasius-theme .plasius-display {
+  font-size: clamp(2.25rem, 5.5vw, 5.5rem);
+  margin-block: var(--plasius-space-4) var(--plasius-space-6);
+}
+
+.plasius-theme .plasius-title {
+  font-size: clamp(1.75rem, 3vw, 3rem);
+  margin-block: var(--plasius-space-4) var(--plasius-space-6);
+}
+
+.plasius-theme .plasius-wordmark {
+  font-family: var(--plasius-font-heading);
+  font-size: 1.05rem;
+  letter-spacing: 0.22em;
+  line-height: 1.25;
+}
+
+.plasius-theme .plasius-eyebrow {
+  color: var(--plasius-accent);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.plasius-theme .plasius-muted {
+  color: var(--plasius-muted);
+}
+
+.plasius-theme .plasius-link {
+  color: var(--plasius-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.plasius-theme .plasius-link:hover {
+  color: var(--plasius-accent);
+  text-decoration-thickness: 0.15em;
+}
+
+.plasius-theme .plasius-button {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--plasius-space-3);
+  min-height: 3rem;
+  max-width: 100%;
+  padding: var(--plasius-space-3) var(--plasius-space-6);
+  border: 1px solid var(--plasius-accent);
+  border-radius: var(--plasius-radius);
+  color: var(--plasius-text);
+  background: var(--plasius-surface);
+  font-family: var(--plasius-font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+  text-decoration: none;
+  white-space: normal;
+  cursor: pointer;
+}
+
+.plasius-theme .plasius-button:hover {
+  color: var(--plasius-text);
+  background: var(--plasius-raised);
+}
+
+.plasius-theme .plasius-button--primary,
+.plasius-theme .plasius-button--primary:hover {
+  color: var(--plasius-on-accent);
+  background: var(--plasius-accent);
+}
+
+.plasius-theme .plasius-button--primary:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.plasius-theme .plasius-button:disabled,
+.plasius-theme .plasius-input:disabled {
+  color: var(--plasius-muted);
+  background: var(--plasius-panel);
+  border-color: var(--plasius-border);
+  cursor: not-allowed;
+}
+
+.plasius-theme .plasius-panel {
+  padding: var(--plasius-space-6);
+  border: 1px solid var(--plasius-border);
+  border-radius: var(--plasius-radius);
+  color: var(--plasius-text);
+  background: var(--plasius-panel);
+}
+
+.plasius-theme .plasius-label {
+  display: block;
+  margin-block-end: var(--plasius-space-2);
+  font-weight: 600;
+}
+
+.plasius-theme .plasius-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 3rem;
+  padding: var(--plasius-space-3);
+  border: 1px solid var(--plasius-border);
+  border-radius: var(--plasius-radius);
+  color: var(--plasius-text);
+  background: var(--plasius-surface);
+  font-family: var(--plasius-font-body);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.plasius-theme .plasius-input::placeholder {
+  color: var(--plasius-muted);
+  opacity: 1;
+}
+
+.plasius-theme .plasius-input[aria-invalid="true"] {
+  border-width: 2px;
+}
+
+.plasius-theme:focus-visible,
+.plasius-theme :focus-visible {
+  outline: 3px solid var(--plasius-accent);
+  outline-offset: 4px;
+}
+
+@media (max-width: 380px) {
+  .plasius-theme .plasius-wordmark {
+    font-size: 0.875rem;
+    letter-spacing: 0.12em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plasius-theme *,
+  .plasius-theme *::before,
+  .plasius-theme *::after {
+    scroll-behavior: auto;
+    animation: none;
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .plasius-theme:focus-visible,
+  .plasius-theme :focus-visible {
+    outline-color: Highlight;
+  }
+}
