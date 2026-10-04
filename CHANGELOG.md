@@ -8,6 +8,8 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ## [Unreleased]
 
+- Refresh supported npm dependencies and published Plasius baselines; pin patched brace-expansion (weekly maintenance, 2026-10-04).
+
 - **Added**
   - (placeholder)
 
