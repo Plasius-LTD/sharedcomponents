@@ -75,6 +75,7 @@
       "import": "./dist/components/constrained-rich-text-editor/model.js",
       "require": "./dist-cjs/components/constrained-rich-text-editor/model.js"
     },
+    "./theme.css": "./src/theme/theme.css",
     "./package.json": "./package.json"
   },
   "module": "./dist/index.js",

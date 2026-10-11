@@ -45,6 +45,15 @@ If a product needs auth/profile behavior, wire it via callbacks/props from the h
 npm install @plasius/sharedcomponents
 ```
 
+## Optional themes
+
+Import `@plasius/sharedcomponents/theme.css` and add `plasius-theme` to a host
+container for shared typography, light/dark palettes, controls and focus styles.
+The default is neutral; `plasius-theme--chronicle` adds an editorial variant.
+Hosts own identity assets, font loading and semantic token overrides. JavaScript
+imports do not load the theme or fonts. See the [theme reference](docs/theme.md)
+for classes, properties, accessibility requirements and migration examples.
+
 ## Module formats
 
 This package publishes dual ESM and CJS artifacts.
