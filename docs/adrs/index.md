@@ -8,3 +8,4 @@
 - [ADR-0006: Exact-main OIDC package publishing](./adr-0006-exact-main-oidc-package-publishing.md)
 - [ADR-0007: Native continuous collection interactions](./adr-0007-native-continuous-collections.md)
 - [ADR-0008: Trusted push CI and confirmed release merges](./adr-0008-trusted-push-ci-and-confirmed-release-merges.md)
+- [ADR-0009: Required CSS build assets](./adr-0009-required-css-build-assets.md)

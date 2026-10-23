@@ -12,6 +12,13 @@ const releasePrepareWorkflow = read(".github/workflows/release-prepare.yml");
 const npmConfig = read(".npmrc");
 
 describe("release workflow trust boundaries", () => {
+  it("validates packed CSS after build in CI and before CD publication", () => {
+    const pack = ciWorkflow.indexOf("run: npm run pack:check");
+    expect(pack).toBeGreaterThan(ciWorkflow.indexOf("run: npm run build"));
+    const validation = cdWorkflow.slice(cdWorkflow.indexOf("\n  validate_and_pack:"), cdWorkflow.indexOf("\n  publish:"));
+    expect(validation.indexOf("npm run pack:check")).toBeGreaterThan(validation.indexOf("npm run build"));
+  });
+
   it("runs every CI job only on trusted repository pushes and explicit self-hosted labels", () => {
     expect(ciWorkflow).toMatch(/push:\s*\n\s+branches: \["\*\*"\]/u);
     expect(ciWorkflow).not.toMatch(/\n\s+pull_request(?:_target)?:/u);
