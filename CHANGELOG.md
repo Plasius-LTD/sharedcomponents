@@ -15,7 +15,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - (placeholder)
 
 - **Fixed**
-  - (placeholder)
+  - Fail build and package validation when required component CSS modules are missing from either ESM or CommonJS output; copy with Node.js and verify packed assets before publication.
 
 - **Security**
   - (placeholder)

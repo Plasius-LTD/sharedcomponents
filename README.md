@@ -406,6 +406,23 @@ npm test
 npm run test:coverage
 ```
 
+`npm run typecheck` checks component source and the build/release tooling tests;
+the latter use dev-only Node.js typings.
+
+`npm run build` compiles ESM and CommonJS and copies every source CSS module
+into both output trees using Node.js. Missing required component stylesheets,
+nonregular source files, source symlinks, and copy errors fail the build;
+`rsync` is no longer required. The helper's required asset list preserves the
+eleven current component stylesheets even when stale output exists. Update that
+list and the regression fixtures when adding or deliberately removing a component.
+
+Run `npm run pack:check` after building. It checks the actual npm dry-run file
+manifest for every source CSS module under both `dist/` and `dist-cjs/`, as well
+as CommonJS metadata and the existing private-path/reference rules. Files merely
+existing on disk do not satisfy this check. CI runs it after build, and CD runs
+it in read-only validation before sealing the publication tarball. See
+[ADR-0009](docs/adrs/adr-0009-required-css-build-assets.md).
+
 ## Governance & ADRs
 
 - Security policy: [SECURITY.md](./SECURITY.md)
