@@ -15,6 +15,20 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - (placeholder)
 
 - **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [1.2.7] - 2026-10-23
+
+- **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
   - Fail build and package validation when required component CSS modules are missing from either ESM or CommonJS output; copy with Node.js and verify packed assets before publication.
 
 - **Security**
@@ -552,7 +566,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ---
 
-[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.2.6...HEAD
+[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.2.7...HEAD
 
 ## [1.0.0] - 2026-02-11
 
@@ -596,3 +610,4 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 [1.2.4]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.4
 [1.2.5]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.5
 [1.2.6]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.6
+[1.2.7]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.7
