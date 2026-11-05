@@ -9,7 +9,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
-  - (placeholder)
+  - Documented the Header and Footer appearance and current-page navigation props, including host-controlled opt-in and default behavior.
 
 - **Changed**
   - (placeholder)
