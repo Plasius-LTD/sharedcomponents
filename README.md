@@ -144,6 +144,30 @@ const sharedMetadata: SharedComponentsMetadataInput = {
 `Header`, `Footer`, and `ContactDetails` require a branding metadata reference.
 Provide it once with `SharedComponentsBrandingProvider` (recommended), or per component using the `metadata` prop.
 
+## Header and Footer appearance
+
+Both components use the default appearance when `appearance` is omitted.
+Set `appearance="polishedMetal"` to opt into the metal finish. The host app
+decides when to enable it and can pass `"default"` when its rollout is disabled
+or unavailable.
+
+Pass the current navigation href as `activeHref` to mark matching links with
+`aria-current="page"`. This works with either appearance. The components
+compare the string to each resolved link href exactly (including a configured
+folder prefix). Normalize the value in the host if its router includes a query,
+hash, or trailing slash that the link does not have. Omitting `activeHref`
+leaves all links unmarked. Mobile menus continue to provide navigation
+commands.
+
+```tsx
+const appearance = chromeMetalEnabled ? "polishedMetal" : "default";
+
+<>
+  <Header items={navHeaderItems} appearance={appearance} activeHref={currentHref} />
+  <Footer items={navFooterItems} appearance={appearance} activeHref={currentHref} />
+</>;
+```
+
 ## Touch-first action and review surfaces
 
 `ActionMenu` and `ReviewSheet` are controlled presentation components. The host
