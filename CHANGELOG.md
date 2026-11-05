@@ -9,6 +9,20 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [1.2.8] - 2026-11-05
+
+- **Added**
   - Documented the Header and Footer appearance and current-page navigation props, including host-controlled opt-in and default behavior.
 
 - **Changed**
@@ -566,7 +580,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ---
 
-[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.2.7...HEAD
+[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.2.8...HEAD
 
 ## [1.0.0] - 2026-02-11
 
@@ -611,3 +625,4 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 [1.2.5]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.5
 [1.2.6]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.6
 [1.2.7]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.7
+[1.2.8]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.8
