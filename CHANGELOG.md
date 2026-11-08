@@ -9,7 +9,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
-  - (placeholder)
+  - PersistentWorkspace with independent collapsible panels, compact disclosures, preserved viewport/form state, and localized accessible context controls.
 
 - **Changed**
   - (placeholder)
@@ -18,7 +18,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - (placeholder)
 
 - **Security**
-  - (placeholder)
+  - Pin the development minimatch override to patched 11.0.1 for GHSA-g3hv-75wg-m249.
 
 ## [1.2.8] - 2026-11-05
 
