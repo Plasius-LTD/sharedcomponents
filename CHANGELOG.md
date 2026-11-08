@@ -9,6 +9,20 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [1.3.0] - 2026-11-08
+
+- **Added**
   - PersistentWorkspace with independent collapsible panels, compact disclosures, preserved viewport/form state, and localized accessible context controls.
 
 - **Changed**
@@ -580,7 +594,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ---
 
-[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.2.8...HEAD
+[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.3.0...HEAD
 
 ## [1.0.0] - 2026-02-11
 
@@ -626,3 +640,4 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 [1.2.6]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.6
 [1.2.7]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.7
 [1.2.8]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.8
+[1.3.0]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.3.0
