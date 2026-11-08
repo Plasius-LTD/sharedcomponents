@@ -21,6 +21,7 @@ const stylesheets: string[] = [
   "components/footer/Footer.module.css",
   "components/header/Header.module.css",
   "components/review-sheet/ReviewSheet.module.css",
+  "components/persistent-workspace/PersistentWorkspace.module.css",
   "components/star-rating/StarRating.module.css",
   "components/status-panel/StatusPanel.module.css",
   "components/user-profile/UserProfile.module.css"

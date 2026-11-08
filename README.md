@@ -29,6 +29,7 @@ If a product needs auth/profile behavior, wire it via callbacks/props from the h
 - `ConstrainedRichTextEditor`: lazy, allowlisted transient rich-text editor
 - `ContactDetails`: reusable legal contact block with configurable details
 - `ContextMenu`: generic context menu surface
+- `PersistentWorkspace`: persistent central content with independently collapsible navigation and option panels
 - `ActionMenu`: controlled touch-first overflow menu with an anchored popover and phone-sheet presentation
 - `ReviewSheet`: controlled modal review surface with responsive side-sheet and phone presentations
 - `UserProfile`: optional generic avatar/menu shell driven by callbacks
@@ -49,6 +50,32 @@ npm install @plasius/sharedcomponents
 
 This package publishes dual ESM and CJS artifacts.
 When CJS output is emitted under `dist-cjs/*.js` with `type: module`, `dist-cjs/package.json` is generated with `{ "type": "commonjs" }` to ensure Node `require(...)` compatibility.
+
+## Persistent workspaces
+
+`PersistentWorkspace` reuses the model viewer's three-pane interaction model.
+Provide `items` (`id`, `label`, optional `icon`/`href`, `onSelect`), `active`,
+`title`, `options` (`id`, `label`, optional `icon`, `content`) and the central
+content as children. Optional `description`, `actions`, `navigation` and
+`className` slots keep application concerns in the host. Import the component
+and `WorkspaceLabels` type from `@plasius/sharedcomponents`.
+
+Supply translated `labels`: `navigation`, `selection`, `options`, `viewport`,
+`expandNavigation`, `collapseNavigation`, `expandOptions`, `collapseOptions`,
+`closeContext` and `openItem(label)`. The package embeds no application routes,
+game names, feature flags or account decisions.
+
+Desktop panels collapse independently to icon rails. Navigation icons open a
+context menu before selection; option icons open a nonmodal form with Escape
+and close focus restoration. At widths up to 1100 CSS pixels, independent
+disclosures replace the rails. Central children and hidden forms stay mounted
+across these interactions. Keep child keys stable and give the host container
+a bounded height for independent desktop scrolling. The host owns game pause,
+navigation confirmation and rendering lifecycle. Empty `options` omits the
+right panel. CSS is included in both package module formats.
+
+See the [workspace design](docs/design/persistent-workspace.md) and
+[architecture decision](docs/adrs/adr-0010-persistent-workspace.md).
 
 ## Continuous collections
 
