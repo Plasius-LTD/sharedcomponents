@@ -1,3 +1,4 @@
+import { useInteractionMarkers } from "../../analytics/interaction-markers.js";
 import { useI18n } from "@plasius/translations";
 import type { SharedComponentsMetadataInput } from "../../metadata/white-label.js";
 import { toContactDetailsBranding } from "../../metadata/white-label.js";
@@ -50,6 +51,7 @@ function resolveDetails({
 }
 
 export function ContactDetails(props: ContactDetailsProps) {
+  const markers = useInteractionMarkers();
   const { className } = props;
   const { t } = useI18n();
   const translate = createSharedComponentTranslationResolver(t);
@@ -68,6 +70,7 @@ export function ContactDetails(props: ContactDetailsProps) {
     action: string,
     details: { label: string; href: string; variant?: string }
   ) => {
+    if (markers) return;
     trackSharedComponentsInteraction(metadata, {
       component: "ContactDetails",
       action,
@@ -98,6 +101,7 @@ export function ContactDetails(props: ContactDetailsProps) {
         {translate(sharedComponentTranslationKeys.contactDetails.emailLabel)}{" "}
         <a
           href={`mailto:${resolvedDetails.email}`}
+          {...markers?.navigation}
           onClick={() =>
             trackInteraction("email_click", {
               label: resolvedDetails.email,
@@ -111,6 +115,7 @@ export function ContactDetails(props: ContactDetailsProps) {
         {translate(sharedComponentTranslationKeys.contactDetails.websiteLabel)}{" "}
         <a
           href={resolvedDetails.website}
+          {...markers?.navigation}
           target="_blank"
           rel="noopener noreferrer"
           onClick={() =>

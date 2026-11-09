@@ -1,3 +1,4 @@
+import { useInteractionMarkers } from "../../analytics/interaction-markers.js";
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { useI18n } from "@plasius/translations";
 import {
@@ -47,6 +48,7 @@ export function ConfirmationDialog({
   onCancel,
   onConfirm,
 }: ConfirmationDialogProps) {
+  const markers = useInteractionMarkers();
   const { t } = useI18n();
   const translate = createSharedComponentTranslationResolver(t);
   const [step, setStep] = useState<ConfirmationStep>("review");
@@ -210,6 +212,7 @@ export function ConfirmationDialog({
             ref={cancelButtonRef}
             type="button"
             className={styles.button}
+            {...(submitting || busy ? undefined : markers?.cancel)}
             onClick={onCancel}
             disabled={submitting || busy}
           >
@@ -220,6 +223,7 @@ export function ConfirmationDialog({
             <button
               type="button"
               className={`${styles.button} ${styles.primaryButton}`}
+              {...(submitting || busy ? undefined : markers?.activate)}
               onClick={() => setStep("challenge")}
               disabled={submitting || busy}
             >
@@ -233,6 +237,7 @@ export function ConfirmationDialog({
                 void handleConfirm();
               }}
               disabled={confirmDisabled}
+              {...(confirmDisabled ? undefined : markers?.activate)}
             >
               {submitting || busy ? confirmBusyLabelText : confirmLabel}
             </button>

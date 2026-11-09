@@ -1,3 +1,4 @@
+import { useInteractionMarkers } from "../../analytics/interaction-markers.js";
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode, type RefObject } from "react";
 import { ContextMenu } from "../context-menu/contextMenu.js";
 import styles from "./PersistentWorkspace.module.css";
@@ -23,6 +24,7 @@ function Surface({ floating, visible, label, id, trigger, onDismiss, closeLabel,
   trigger: RefObject<HTMLButtonElement | null>; onDismiss: (restoreFocus?: boolean) => void;
   children: ReactNode; className?: string; scrollArea: string;
 }) {
+  const markers = useInteractionMarkers();
   const surface = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!floating || !visible) return;
@@ -38,13 +40,14 @@ function Surface({ floating, visible, label, id, trigger, onDismiss, closeLabel,
   return <div ref={surface} id={id} data-workspace-scroll={scrollArea} className={`${className ?? ""} ${floating ? styles.flyout : ""}`}
     hidden={!visible} role={floating ? "dialog" : "group"} aria-label={label} tabIndex={floating ? -1 : 0}
     onKeyDown={event => { if (floating && event.key === "Escape") { event.preventDefault(); event.stopPropagation(); onDismiss(true); } }}>
-    {floating && <button type="button" className={styles.close} aria-label={closeLabel} onClick={() => onDismiss(true)}><span aria-hidden="true">×</span></button>}
+    {floating && <button type="button" className={styles.close} aria-label={closeLabel} {...markers?.closeDialog} onClick={() => onDismiss(true)}><span aria-hidden="true">×</span></button>}
     {children}
   </div>;
 }
 
 /** Independently collapsible panels preserve the centre and hidden form identity. */
 export function PersistentWorkspace({ active, title, description, actions, navigation, items, options, labels, children, className }: PersistentWorkspaceProps) {
+  const markers = useInteractionMarkers();
   const id = useId();
   const [panel, setPanel] = useState(options[0]?.id);
   const [compact, setCompact] = useState(() => globalThis.matchMedia?.("(max-width: 1100px)").matches ?? false);
@@ -83,35 +86,35 @@ export function PersistentWorkspace({ active, title, description, actions, navig
       if (compact && navigationOpen && event.key === "Escape") { event.preventDefault(); setNavigationOpen(false); navigationDisclosure.current?.focus(); }
     }}>
       <button ref={navigationDisclosure} hidden={!compact} className={styles.disclosure} type="button" aria-label={labels.navigation} aria-expanded={navigationOpen}
-        aria-controls={`${id}-navigation`} onClick={() => setNavigationOpen(value => !value)}>{labels.navigation}</button>
+        aria-controls={`${id}-navigation`} {...markers?.activate} onClick={() => setNavigationOpen(value => !value)}>{labels.navigation}</button>
       <button ref={navigationToggle} hidden={compact} className={styles.collapse} type="button" aria-label={navCollapsed ? labels.expandNavigation : labels.collapseNavigation}
-        title={navCollapsed ? labels.expandNavigation : labels.collapseNavigation} aria-expanded={!navCollapsed} aria-controls={`${id}-navigation`}
+        title={navCollapsed ? labels.expandNavigation : labels.collapseNavigation} aria-expanded={!navCollapsed} aria-controls={`${id}-navigation`} {...markers?.activate}
         onClick={() => { dismiss(); setMenu(null); setNavigationCollapsed(value => !value); }}>
         {icon(null, navCollapsed ? "›" : "‹")}{!navCollapsed && <span>{labels.navigation}</span>}
       </button>
       {navCollapsed && <div className={styles.iconRail}>
         {items.map(item => <button key={item.id} type="button" aria-label={item.label} title={item.label} aria-haspopup="menu"
-          aria-expanded={menu?.key === item.id} aria-controls={menu?.key === item.id ? `${id}-menu` : undefined} data-current={active === item.id}
+          aria-expanded={menu?.key === item.id} aria-controls={menu?.key === item.id ? `${id}-menu` : undefined} data-current={active === item.id} {...markers?.openMenu}
           onClick={event => { dismiss(); menuTrigger.current = event.currentTarget; const bounds = event.currentTarget.getBoundingClientRect(); setMenu({ key: item.id, x: bounds.right + 8, y: bounds.top }); }}>
           {icon(item.icon, item.label.slice(0, 1))}
         </button>)}
         {navigation && <button type="button" aria-label={labels.selection} title={labels.selection} aria-haspopup="dialog" aria-expanded={context === "navigation"}
-          aria-controls={`${id}-navigation`} onClick={event => { contextTrigger.current = event.currentTarget; setMenu(null); setContext(value => value === "navigation" ? null : "navigation"); }}>{icon(null, "≡")}</button>}
+          aria-controls={`${id}-navigation`} {...markers?.activate} onClick={event => { contextTrigger.current = event.currentTarget; setMenu(null); setContext(value => value === "navigation" ? null : "navigation"); }}>{icon(null, "≡")}</button>}
       </div>}
       <Surface scrollArea="navigation" id={`${id}-navigation`} className={styles.navigationContent} floating={navCollapsed}
         visible={compact ? navigationOpen : !navCollapsed || context === "navigation"} label={navCollapsed ? labels.selection : labels.navigation}
         closeLabel={labels.closeContext} trigger={contextTrigger} onDismiss={dismiss}>
         <ul hidden={navCollapsed}>{items.map(item => <li key={item.id}>
-          {item.href ? <a href={item.href} aria-current={active === item.id ? "page" : undefined} onClick={event => {
+          {item.href ? <a href={item.href} {...markers?.navigation} aria-current={active === item.id ? "page" : undefined} onClick={event => {
             if (event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) { event.preventDefault(); item.onSelect(); }
           }}>{icon(item.icon, "•")}<span>{item.label}</span></a>
-            : <button type="button" aria-current={active === item.id ? "page" : undefined} onClick={item.onSelect}>{icon(item.icon, "•")}<span>{item.label}</span></button>}
+            : <button type="button" {...markers?.navigation} aria-current={active === item.id ? "page" : undefined} onClick={item.onSelect}>{icon(item.icon, "•")}<span>{item.label}</span></button>}
         </li>)}</ul>
         {navigation && <div className={styles.selection}>{navigation}</div>}
       </Surface>
       {menu && menuItem && <ContextMenu id={`${id}-menu`} label={menuItem.label} position={menu} onClose={() => setMenu(null)}
         onEscape={() => { setMenu(null); menuTrigger.current?.focus(); }} commands={[
-          { id: "open", name: labels.openItem(menuItem.label), action: menuItem.onSelect },
+          { id: "open", name: labels.openItem(menuItem.label), semanticActivation: "navigation", action: menuItem.onSelect },
           { id: "expand", name: labels.expandNavigation, action: () => { setNavigationCollapsed(false); navigationToggle.current?.focus(); } },
         ]}/>}
     </nav>
@@ -123,9 +126,9 @@ export function PersistentWorkspace({ active, title, description, actions, navig
       if (compact && optionsOpen && event.key === "Escape") { event.preventDefault(); setOptionsOpen(false); optionsDisclosure.current?.focus(); }
     }}>
       <button ref={optionsDisclosure} hidden={!compact} className={styles.disclosure} type="button" aria-label={labels.options} aria-expanded={optionsOpen}
-        aria-controls={`${id}-options`} onClick={() => setOptionsOpen(value => !value)}>{labels.options}</button>
+        aria-controls={`${id}-options`} {...markers?.activate} onClick={() => setOptionsOpen(value => !value)}>{labels.options}</button>
       <button hidden={compact} className={styles.collapse} type="button" aria-label={optsCollapsed ? labels.expandOptions : labels.collapseOptions}
-        title={optsCollapsed ? labels.expandOptions : labels.collapseOptions} aria-expanded={!optsCollapsed} aria-controls={`${id}-options`}
+        title={optsCollapsed ? labels.expandOptions : labels.collapseOptions} aria-expanded={!optsCollapsed} aria-controls={`${id}-options`} {...markers?.activate}
         onClick={() => { dismiss(); setMenu(null); setOptionsCollapsed(value => !value); }}>
         {!optsCollapsed && <span>{labels.options}</span>}{icon(null, optsCollapsed ? "‹" : "›")}
       </button>
@@ -138,7 +141,7 @@ export function PersistentWorkspace({ active, title, description, actions, navig
         </Surface>
         <div className={styles.rail} role="group" aria-label={labels.options}>{options.map(option => <button key={option.id} type="button"
           id={`${id}-${option.id}-button`} aria-label={option.label} title={option.label} aria-controls={`${id}-${option.id}`}
-          aria-haspopup={optsCollapsed ? "dialog" : undefined} aria-expanded={selected === option.id && (!optsCollapsed || context === "options")}
+          {...markers?.activate} aria-haspopup={optsCollapsed ? "dialog" : undefined} aria-expanded={selected === option.id && (!optsCollapsed || context === "options")}
           onClick={event => { contextTrigger.current = event.currentTarget; setPanel(option.id); setMenu(null); setContext(value => optsCollapsed && !(value === "options" && selected === option.id) ? "options" : null); }}>
           {icon(option.icon, option.label.slice(0, 1))}{!optsCollapsed && <span>{option.label}</span>}
         </button>)}</div>

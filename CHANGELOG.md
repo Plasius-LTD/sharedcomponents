@@ -9,7 +9,9 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
-  - (placeholder)
+  - Opt-in semantic interaction markers on shared navigation, profile,
+    contact, menu, dialog and workspace controls. The host owns catalogue
+    capture; the package does not start legacy tracking in this mode.
 
 - **Changed**
   - (placeholder)

@@ -1,3 +1,4 @@
+import { useInteractionMarkers } from "../../analytics/interaction-markers.js";
 import {
   useEffect,
   useMemo,
@@ -60,6 +61,7 @@ export function Header({
   className,
   onNavigate,
 }: HeaderProps) {
+  const markers = useInteractionMarkers();
   const { t } = useI18n();
   const translate = createSharedComponentTranslationResolver(t);
   const resolvedMetadata = useSharedComponentsBrandingMetadata("Header", metadata);
@@ -106,6 +108,7 @@ export function Header({
       context?: Record<string, unknown>;
     }
   ) => {
+    if (markers) return;
     trackSharedComponentsInteraction(resolvedMetadata, {
       component: "Header",
       action,
@@ -155,6 +158,7 @@ export function Header({
       <nav className={styles.headerBar} aria-label={primaryNavigationLabel}>
         <a
           href={homeHref}
+          {...markers?.navigation}
           className={styles.brandLink}
           aria-label={homeLabel}
           onClick={() =>
@@ -175,6 +179,7 @@ export function Header({
             <a
               key={`${item.name}-${index}`}
               href={item.href}
+              {...markers?.navigation}
               className={[
                 styles.headerButton,
                 activeHref === item.href ? styles.activeHeaderButton : undefined,
@@ -205,6 +210,7 @@ export function Header({
             ref={mobileMenuToggleRef}
             type="button"
             className={styles.mobileMenuToggle}
+            {...(menuOpen ? markers?.closeMenu : markers?.openMenu)}
             onClick={toggleMobileMenu}
             aria-label={toggleMenuLabel}
             aria-haspopup="menu"
@@ -221,6 +227,7 @@ export function Header({
           <ContextMenu
             commands={links.map((item: HeaderNavItem & { href: string }) => ({
               name: item.name,
+              semanticActivation: "navigation",
               action: () => {
                 trackInteraction("nav_click", {
                   label: item.name,

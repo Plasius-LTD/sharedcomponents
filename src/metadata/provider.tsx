@@ -1,4 +1,5 @@
 import { createContext, useContext, type ReactNode } from "react";
+import { SemanticInteractionMarkersContext } from "../analytics/interaction-markers.js";
 import {
   resolveSharedComponentsMetadata,
   type SharedComponentsMetadata,
@@ -10,17 +11,25 @@ const BrandingMetadataContext = createContext<SharedComponentsMetadata | null>(n
 export interface SharedComponentsBrandingProviderProps {
   metadata: SharedComponentsMetadataInput;
   children: ReactNode;
+  /** Opt in to passive catalogue markers using the host rollout and consent decision. */
+  semanticInteractionMarkers?: boolean;
 }
 
 export function SharedComponentsBrandingProvider({
   metadata,
   children,
+  semanticInteractionMarkers,
 }: SharedComponentsBrandingProviderProps) {
+  const inheritedMarkers = useContext(SemanticInteractionMarkersContext);
   const resolvedMetadata = resolveSharedComponentsMetadata(metadata);
 
   return (
     <BrandingMetadataContext.Provider value={resolvedMetadata}>
-      {children}
+      <SemanticInteractionMarkersContext.Provider
+        value={semanticInteractionMarkers === undefined ? inheritedMarkers : semanticInteractionMarkers === true}
+      >
+        {children}
+      </SemanticInteractionMarkersContext.Provider>
     </BrandingMetadataContext.Provider>
   );
 }

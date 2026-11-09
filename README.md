@@ -436,6 +436,40 @@ for (const [language, dictionary] of Object.entries(sharedComponentsTranslations
 
 ## Interaction Analytics
 
+For hosts using the delegated semantic journey observer in `@plasius/analytics`,
+opt in at the branding provider after the host resolves rollout and consent:
+
+```tsx
+<SharedComponentsBrandingProvider
+  metadata={{
+    ...sharedMetadata,
+    analytics: { ...sharedMetadata.analytics, enabled: false },
+  }}
+  semanticInteractionMarkers={captureAllowed}
+>
+  <App />
+</SharedComponentsBrandingProvider>
+```
+
+The provider adds fixed `data-plasius-event` codes to built-in controls when
+enabled. Register `ui.navigation.select`, `ui.control.activate`, `ui.menu.open`,
+`ui.menu.close`, `ui.dialog.close` and `ui.action.cancel` in the host catalogue.
+No labels, link destinations, IDs, account fields, challenge values, or host
+children become event payloads. Buttons and links keep their normal activation
+behavior. A context-menu command can select the fixed navigation class with
+`semanticActivation: "navigation"` or exclude a sensitive command with
+`"exclude"`. Footer feedback actions and their feedback-enabled menu toggle,
+feedback primitives, and input fields are outside this package instrumentation.
+
+The package does not install the observer or create a semantic queue. Its
+legacy tracker is suppressed under an enabled marker provider. Keep legacy
+analytics disabled from the start in a semantic host, including after
+withdrawal or rollback; turning markers off does not dispose a previously
+started legacy session. Hosts still own consent, any other annotations, and
+collector disposal. See [ADR-0012](docs/adrs/adr-0012-passive-semantic-interaction-markers.md).
+
+### Legacy interaction forwarding
+
 When `metadata.analytics.endpoint` is configured, sharedcomponents automatically tracks user interactions for:
 
 - Header nav, brand click, and mobile menu flows

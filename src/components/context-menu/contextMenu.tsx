@@ -1,3 +1,4 @@
+import { useInteractionMarkers } from "../../analytics/interaction-markers.js";
 import {
   useEffect,
   useLayoutEffect,
@@ -14,6 +15,8 @@ export interface ContextMenuCommand {
   name: string;
   shortcut?: string;
   disabled?: boolean;
+  /** Uses the fixed navigation class or excludes a sensitive command from marking. */
+  semanticActivation?: "navigation" | "exclude";
   action: () => void;
 }
 
@@ -59,6 +62,7 @@ export function ContextMenu({
   labelledBy,
   id,
 }: ContextMenuProps) {
+  const markers = useInteractionMarkers();
   const menuRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const tabCloseTimerRef = useRef<number | null>(null);
@@ -290,6 +294,9 @@ export function ContextMenu({
             type="button"
             className={styles.menuItem}
             disabled={cmd.disabled}
+            {...(cmd.disabled || cmd.semanticActivation === "exclude"
+              ? undefined
+              : cmd.semanticActivation === "navigation" ? markers?.navigation : markers?.activate)}
             tabIndex={-1}
             onClick={() => {
               if (cmd.disabled) {

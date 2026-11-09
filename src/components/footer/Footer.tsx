@@ -1,3 +1,4 @@
+import { useInteractionMarkers } from "../../analytics/interaction-markers.js";
 import {
   useEffect,
   useMemo,
@@ -101,6 +102,7 @@ export function Footer({
   className,
   onNavigate,
 }: FooterProps) {
+  const markers = useInteractionMarkers();
   const { t } = useI18n();
   const translate = createSharedComponentTranslationResolver(t);
   const resolvedMetadata = useSharedComponentsBrandingMetadata("Footer", metadata);
@@ -136,6 +138,7 @@ export function Footer({
       context?: Record<string, unknown>;
     }
   ) => {
+    if (markers) return;
     trackSharedComponentsInteraction(resolvedMetadata, {
       component: "Footer",
       action,
@@ -249,6 +252,7 @@ export function Footer({
         <a
           href={`mailto:${resolvedContactEmail}`}
           className={styles.footerMetaLink}
+          {...markers?.navigation}
           onClick={() =>
             trackInteraction("contact_click", {
               label: contactLabel,
@@ -297,6 +301,7 @@ export function Footer({
                 target={item.external ? "_blank" : undefined}
                 rel={item.external ? "noopener noreferrer" : undefined}
                 data-footer-item-kind="link"
+                {...(isFooterFeedbackItem(item) ? undefined : markers?.navigation)}
                 onClick={(event: MouseEvent<HTMLAnchorElement>) => {
                   if (!isFooterFeedbackItem(item)) {
                     trackInteraction("nav_click", {
@@ -326,6 +331,9 @@ export function Footer({
               event.stopPropagation();
             }
           }}
+          {...(!hasEnabledFeedbackItem && !menuState?.feedbackEnabledAtOpen
+            ? menuOpen ? markers?.closeMenu : markers?.openMenu
+            : undefined)}
           onClick={toggleMobileMenu}
           aria-label={toggleFooterMenuLabel}
           aria-haspopup="menu"
@@ -346,6 +354,8 @@ export function Footer({
             onEscape={closeMenuAndRestoreFocus}
             commands={resolvedItems.map((item) => ({
               name: item.name,
+              semanticActivation: item.kind === "action" || isFooterFeedbackItem(item)
+                ? "exclude" : "navigation",
               disabled:
                 (isFooterFeedbackItem(item) &&
                   feedbackBecameEnabledWhileOpen) ||
