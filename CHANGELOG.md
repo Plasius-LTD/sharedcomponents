@@ -9,6 +9,20 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [1.5.0] - 2026-11-09
+
+- **Added**
   - Opt-in semantic interaction markers on shared navigation, profile,
     contact, menu, dialog and workspace controls. The host owns catalogue
     capture; the package does not start legacy tracking in this mode.
@@ -612,7 +626,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ---
 
-[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.5.0...HEAD
 
 ## [1.0.0] - 2026-02-11
 
@@ -660,3 +674,4 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 [1.2.8]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.8
 [1.3.0]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.3.0
 [1.4.0]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.4.0
+[1.5.0]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.5.0
