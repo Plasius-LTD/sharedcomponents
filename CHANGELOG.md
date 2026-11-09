@@ -9,6 +9,20 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [1.4.0] - 2026-11-09
+
+- **Added**
   - Opt-in `theme.css` export with scoped neutral and chronicle light/dark
     palettes, host identity overrides, typography, controls, focus styles and
     Header/Footer adapters. Fonts and brand assets remain host-owned.
@@ -596,7 +610,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ---
 
-[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.4.0...HEAD
 
 ## [1.0.0] - 2026-02-11
 
@@ -643,3 +657,4 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 [1.2.7]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.7
 [1.2.8]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.8
 [1.3.0]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.3.0
+[1.4.0]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.4.0
