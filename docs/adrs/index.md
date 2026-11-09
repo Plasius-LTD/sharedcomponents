@@ -10,3 +10,4 @@
 - [ADR-0008: Trusted push CI and confirmed release merges](./adr-0008-trusted-push-ci-and-confirmed-release-merges.md)
 - [ADR-0009: Required CSS build assets](./adr-0009-required-css-build-assets.md)
 - [ADR-0010: Host-independent persistent workspace](./adr-0010-persistent-workspace.md)
+- [ADR-0011: Opt-in theme stylesheet and host identities](./adr-0011-opt-in-theme-stylesheet.md)
