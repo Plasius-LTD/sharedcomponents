@@ -1,4 +1,4 @@
-# ADR-0009: Opt-in theme stylesheet and host identities
+# ADR-0011: Opt-in theme stylesheet and host identities
 
 - Status: Accepted
 - Date: 2026-09-19

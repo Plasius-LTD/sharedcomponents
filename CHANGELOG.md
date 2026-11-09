@@ -22,6 +22,112 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 - **Security**
   - (placeholder)
 
+## [1.3.0] - 2026-11-08
+
+- **Added**
+  - PersistentWorkspace with independent collapsible panels, compact disclosures, preserved viewport/form state, and localized accessible context controls.
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - Pin the development minimatch override to patched 11.0.1 for GHSA-g3hv-75wg-m249.
+
+## [1.2.8] - 2026-11-05
+
+- **Added**
+  - Documented the Header and Footer appearance and current-page navigation props, including host-controlled opt-in and default behavior.
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [1.2.7] - 2026-10-23
+
+- **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - Fail build and package validation when required component CSS modules are missing from either ESM or CommonJS output; copy with Node.js and verify packed assets before publication.
+
+- **Security**
+  - (placeholder)
+
+## [1.2.6] - 2026-10-18
+
+- Refresh npm dependency lockfile to current supported stable versions (weekly maintenance, 2026-10-18). Refresh published Plasius package baselines after upstream releases.
+
+- **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [1.2.5] - 2026-10-11
+
+- Refresh npm dependency lockfile to current supported stable versions (weekly maintenance, 2026-10-11). Refresh published Plasius package baselines after upstream releases.
+
+- **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [1.2.4] - 2026-10-04
+
+- Refresh supported npm dependencies and published Plasius baselines; pin patched brace-expansion (weekly maintenance, 2026-10-04).
+
+- **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [1.2.3] - 2026-09-28
+
+- Refresh npm dependency lockfile to current supported stable versions (weekly maintenance, 2026-09-28). Refresh published Plasius package baselines after upstream releases.
+
+- **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
 ## [1.2.2] - 2026-09-08
 
 ### Fixed
@@ -490,7 +596,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ---
 
-[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.2.2...HEAD
+[Unreleased]: https://github.com/Plasius-LTD/sharedcomponents/compare/v1.3.0...HEAD
 
 ## [1.0.0] - 2026-02-11
 
@@ -530,3 +636,10 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 [1.2.0]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.0
 [1.2.1]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.1
 [1.2.2]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.2
+[1.2.3]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.3
+[1.2.4]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.4
+[1.2.5]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.5
+[1.2.6]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.6
+[1.2.7]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.7
+[1.2.8]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.2.8
+[1.3.0]: https://github.com/Plasius-LTD/sharedcomponents/releases/tag/v1.3.0

@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
@@ -45,6 +46,19 @@ describe("opt-in theme stylesheet", () => {
     expect(read("src/index.ts")).not.toMatch(/theme\.css|fontsource/);
     expect(theme()).not.toMatch(/@import|@font-face|url\(/);
   });
+
+  it("ships the theme export in npm's actual package file list", () => {
+    const manifest = JSON.parse(read("package.json"));
+    const expectedPath = manifest.exports["./theme.css"].slice(2);
+    const [pack] = JSON.parse(execFileSync(
+      "npm",
+      ["pack", "--dry-run", "--json", "--ignore-scripts", "--cache", ".npm-cache/packcheck"],
+      { encoding: "utf8", timeout: 30_000 },
+    ));
+    expect(pack.files).toEqual(expect.arrayContaining([
+      expect.objectContaining({ path: expectedPath }),
+    ]));
+  }, 30_000);
 
   it("scopes every selector and leaves unthemed content alone", () => {
     const { style, scope } = mount();

@@ -29,6 +29,7 @@ If a product needs auth/profile behavior, wire it via callbacks/props from the h
 - `ConstrainedRichTextEditor`: lazy, allowlisted transient rich-text editor
 - `ContactDetails`: reusable legal contact block with configurable details
 - `ContextMenu`: generic context menu surface
+- `PersistentWorkspace`: persistent central content with independently collapsible navigation and option panels
 - `ActionMenu`: controlled touch-first overflow menu with an anchored popover and phone-sheet presentation
 - `ReviewSheet`: controlled modal review surface with responsive side-sheet and phone presentations
 - `UserProfile`: optional generic avatar/menu shell driven by callbacks
@@ -58,6 +59,32 @@ for classes, properties, accessibility requirements and migration examples.
 
 This package publishes dual ESM and CJS artifacts.
 When CJS output is emitted under `dist-cjs/*.js` with `type: module`, `dist-cjs/package.json` is generated with `{ "type": "commonjs" }` to ensure Node `require(...)` compatibility.
+
+## Persistent workspaces
+
+`PersistentWorkspace` reuses the model viewer's three-pane interaction model.
+Provide `items` (`id`, `label`, optional `icon`/`href`, `onSelect`), `active`,
+`title`, `options` (`id`, `label`, optional `icon`, `content`) and the central
+content as children. Optional `description`, `actions`, `navigation` and
+`className` slots keep application concerns in the host. Import the component
+and `WorkspaceLabels` type from `@plasius/sharedcomponents`.
+
+Supply translated `labels`: `navigation`, `selection`, `options`, `viewport`,
+`expandNavigation`, `collapseNavigation`, `expandOptions`, `collapseOptions`,
+`closeContext` and `openItem(label)`. The package embeds no application routes,
+game names, feature flags or account decisions.
+
+Desktop panels collapse independently to icon rails. Navigation icons open a
+context menu before selection; option icons open a nonmodal form with Escape
+and close focus restoration. At widths up to 1100 CSS pixels, independent
+disclosures replace the rails. Central children and hidden forms stay mounted
+across these interactions. Keep child keys stable and give the host container
+a bounded height for independent desktop scrolling. The host owns game pause,
+navigation confirmation and rendering lifecycle. Empty `options` omits the
+right panel. CSS is included in both package module formats.
+
+See the [workspace design](docs/design/persistent-workspace.md) and
+[architecture decision](docs/adrs/adr-0010-persistent-workspace.md).
 
 ## Continuous collections
 
@@ -152,6 +179,30 @@ const sharedMetadata: SharedComponentsMetadataInput = {
 
 `Header`, `Footer`, and `ContactDetails` require a branding metadata reference.
 Provide it once with `SharedComponentsBrandingProvider` (recommended), or per component using the `metadata` prop.
+
+## Header and Footer appearance
+
+Both components use the default appearance when `appearance` is omitted.
+Set `appearance="polishedMetal"` to opt into the metal finish. The host app
+decides when to enable it and can pass `"default"` when its rollout is disabled
+or unavailable.
+
+Pass the current navigation href as `activeHref` to mark matching links with
+`aria-current="page"`. This works with either appearance. The components
+compare the string to each resolved link href exactly (including a configured
+folder prefix). Normalize the value in the host if its router includes a query,
+hash, or trailing slash that the link does not have. Omitting `activeHref`
+leaves all links unmarked. Mobile menus continue to provide navigation
+commands.
+
+```tsx
+const appearance = chromeMetalEnabled ? "polishedMetal" : "default";
+
+<>
+  <Header items={navHeaderItems} appearance={appearance} activeHref={currentHref} />
+  <Footer items={navFooterItems} appearance={appearance} activeHref={currentHref} />
+</>;
+```
 
 ## Touch-first action and review surfaces
 
@@ -414,6 +465,23 @@ npm run build
 npm test
 npm run test:coverage
 ```
+
+`npm run typecheck` checks component source and the build/release tooling tests;
+the latter use dev-only Node.js typings.
+
+`npm run build` compiles ESM and CommonJS and copies every source CSS module
+into both output trees using Node.js. Missing required component stylesheets,
+nonregular source files, source symlinks, and copy errors fail the build;
+`rsync` is no longer required. The helper's required asset list preserves the
+eleven current component stylesheets even when stale output exists. Update that
+list and the regression fixtures when adding or deliberately removing a component.
+
+Run `npm run pack:check` after building. It checks the actual npm dry-run file
+manifest for every source CSS module under both `dist/` and `dist-cjs/`, as well
+as CommonJS metadata and the existing private-path/reference rules. Files merely
+existing on disk do not satisfy this check. CI runs it after build, and CD runs
+it in read-only validation before sealing the publication tarball. See
+[ADR-0009](docs/adrs/adr-0009-required-css-build-assets.md).
 
 ## Governance & ADRs
 

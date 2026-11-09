@@ -82,7 +82,8 @@ uses the system highlight for focus. Hosts must avoid clipping outlines.
 
 ## Validation and limits
 
-Contract tests check exported asset resolution, opt-in isolation, mode selection,
+Contract tests check exported asset resolution, presence in the npm tarball,
+opt-in isolation, mode selection,
 host overrides, fonts, control states, and text/border contrast in all four base
 palettes. Text/accent must contrast at least 4.5:1 with all defined backgrounds;
 control borders at least 3:1. Recheck these pairs whenever overriding tokens.
