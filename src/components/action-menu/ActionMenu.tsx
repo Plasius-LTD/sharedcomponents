@@ -1,3 +1,4 @@
+import { useInteractionMarkers } from "../../analytics/interaction-markers.js";
 import {
   useCallback,
   useEffect,
@@ -102,6 +103,7 @@ export function ActionMenu({
   id,
   className,
 }: ActionMenuProps) {
+  const markers = useInteractionMarkers();
   const generatedId = useId();
   const menuId = id ?? `action-menu-${generatedId}`;
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -289,6 +291,7 @@ export function ActionMenu({
     <div className={`${styles.root} ${className ?? ""}`}>
       <button
         ref={triggerRef}
+        {...(disabled ? undefined : open ? markers?.closeMenu : markers?.openMenu)}
         type="button"
         className={styles.trigger}
         aria-label={triggerLabel}
@@ -343,6 +346,7 @@ export function ActionMenu({
                   item.tone === "danger" ? styles.dangerItem : ""
                 }`}
                 disabled={item.disabled}
+                {...(item.disabled ? undefined : markers?.activate)}
                 onClick={() => {
                   try {
                     item.onSelect();

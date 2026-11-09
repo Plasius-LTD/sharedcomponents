@@ -11,3 +11,4 @@
 - [ADR-0009: Required CSS build assets](./adr-0009-required-css-build-assets.md)
 - [ADR-0010: Host-independent persistent workspace](./adr-0010-persistent-workspace.md)
 - [ADR-0011: Opt-in theme stylesheet and host identities](./adr-0011-opt-in-theme-stylesheet.md)
+- [ADR-0012: Passive semantic interaction markers](./adr-0012-passive-semantic-interaction-markers.md)

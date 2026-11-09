@@ -1,3 +1,4 @@
+import { useInteractionMarkers } from "../../analytics/interaction-markers.js";
 import {
   useRef,
   useState,
@@ -80,6 +81,7 @@ export function UserProfile({
   signedInCommands,
   signedOutCommands,
 }: UserProfileProps) {
+  const markers = useInteractionMarkers();
   const { t } = useI18n();
   const generatedMenuId = useId();
   const translate = useMemo(() => createSharedComponentTranslationResolver(t), [t]);
@@ -103,7 +105,7 @@ export function UserProfile({
         context?: Record<string, unknown>;
       }
     ) => {
-      if (!resolvedMetadata) {
+      if (markers || !resolvedMetadata) {
         return;
       }
 
@@ -115,7 +117,7 @@ export function UserProfile({
         context: details?.context,
       });
     },
-    [resolvedMetadata]
+    [markers, resolvedMetadata]
   );
 
   useEffect(() => {
@@ -189,6 +191,7 @@ export function UserProfile({
     <div className={[styles.userProfileContainer, className].filter(Boolean).join(" ")}>
       <button
         ref={avatarRef}
+        {...(menuVisible ? markers?.closeMenu : markers?.openMenu)}
         type="button"
         onClick={() =>
           setMenuVisible((visible: boolean) => {

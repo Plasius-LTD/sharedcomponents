@@ -1,3 +1,4 @@
+import { useInteractionMarkers } from "../../analytics/interaction-markers.js";
 import { useId } from "react";
 import styles from "./StatusPanel.module.css";
 
@@ -30,6 +31,7 @@ export function StatusPanel({
   actionDisabled = false,
   className,
 }: StatusPanelProps) {
+  const markers = useInteractionMarkers();
   const toneClass = tone === "danger" ? styles.danger : styles.default;
   const classes = [styles.panel, toneClass, className].filter(Boolean).join(" ");
   const ariaLive = announce === "off" ? undefined : announce;
@@ -56,6 +58,7 @@ export function StatusPanel({
           className={styles.action}
           onClick={onAction}
           disabled={actionDisabled}
+          {...(actionDisabled ? undefined : markers?.activate)}
         >
           {actionLabel}
         </button>

@@ -1,3 +1,4 @@
+import { useInteractionMarkers } from "../../analytics/interaction-markers.js";
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import styles from "./CollectionViewport.module.css";
 
@@ -55,6 +56,7 @@ export function CollectionViewport({
   children, label, labels, hasMore = false, onLoadMore, onRefresh,
   loading = false, disabled = false, refreshDisabled = false, resetKey = "", className,
 }: CollectionViewportProps) {
+  const markers = useInteractionMarkers();
   const rootRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<AbortController | null>(null);
   const gestureRef = useRef<Gesture | null>(null);
@@ -170,6 +172,7 @@ export function CollectionViewport({
     <div className={styles.toolbar}>
       <span id={statusId} role={failed ? "alert" : "status"} aria-live="polite" aria-atomic="true">{status}</span>
       {onRefresh ? <button type="button" disabled={disabled || busy || refreshDisabled}
+        {...(disabled || busy || refreshDisabled ? undefined : markers?.activate)}
         aria-describedby={refreshDisabled ? statusId : undefined}
         onClick={() => void run("refresh")}>{labels.refresh}</button> : null}
     </div>
@@ -187,7 +190,8 @@ export function CollectionViewport({
       }}>
       <div className={styles.content}>{children}</div>
       {hasMore && onLoadMore ? <div className={styles.more}>
-        <button type="button" disabled={disabled || busy} onClick={() => void run("more")}>{labels.loadMore}</button>
+        <button type="button" disabled={disabled || busy}
+          {...(disabled || busy ? undefined : markers?.activate)} onClick={() => void run("more")}>{labels.loadMore}</button>
       </div> : null}
     </div>
   </div>;
