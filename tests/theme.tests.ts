@@ -116,7 +116,11 @@ describe("opt-in theme stylesheet", () => {
       ["--footerLinkHover", "--plasius-accent"],
       ["--footerBorder", "--plasius-border"],
     ]) {
-      expect(css.getPropertyValue(property)).toBe(`var(${semantic})`);
+      expect(css.getPropertyValue(property).trim()).toBe(css.getPropertyValue(semantic).trim());
+      // A host override must flow through the semantic variable, not a copied literal.
+      scope.style.setProperty(semantic, "#123456");
+      expect(getComputedStyle(scope).getPropertyValue(property).trim()).toBe("#123456");
+      scope.style.removeProperty(semantic);
     }
   });
 
